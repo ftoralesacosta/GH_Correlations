@@ -1,0 +1,24 @@
+
+# Ignore all
+*
+
+# Unignore all with extensions
+!*.*
+
+# Unignore all dirs
+!*/
+
+*.d
+*.so
+*~
+*.xml
+*.root
+*myTask*
+*.sh
+*.jdl
+*.pcm
+*.png
+*.pdf
+*.hdf5
+*.out
+*.txt
