@@ -11,6 +11,7 @@
 *.d
 *.so
 *~
+*#
 *.xml
 *.root
 *myTask*
