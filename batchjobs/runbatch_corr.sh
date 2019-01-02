@@ -9,8 +9,8 @@ date
 
 module add ROOT/6.08.00
 
-#for p in {0,4,6}
-for p in 4
+for p in {0,4}
+#for p in 0
 do
     echo $1
     name=${1%.*}
@@ -20,14 +20,15 @@ do
 	./../pair_gale_shapley/paired_injector $name.root $p
     fi
     
-    for i in {0..280..20} #Mix 300 events
+    #for i in {0..280..20} #Mix 300 events
+    for i in {0..4..2} #Mix 300 events
     do
 	mix_min=$i
 	mix_max="$((i + 19))"
 	if [[ $3 == full ]]; then
-	    sbatch -p shared-chos -t 16:00:00 runCorr.sh ${name}_${p}GeVTrack_paired.root $2 $mix_min $mix_max $p	  
+	    sbatch -p shared-chos -t 16:00:00 runCorr.sh ${name}_${p}GeVTrack_paired.root ${name}_MB_${p}GeV.hdf5 $mix_min $mix_max $p	  
 	else
-	./runCorr.sh ${name}_${p}GeVTrack_paired.root $2 $mix_min $mix_max $p
+	./runCorr.sh ${name}_${p}GeVTrack_paired.root ${name}_MB_${p}GeV.hdf5 $mix_min $mix_max $p
 	fi
     echo "$mix_min $mix_max $name"
     done
