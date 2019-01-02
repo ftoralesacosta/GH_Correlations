@@ -15,7 +15,6 @@
 *.xml
 *.root
 *myTask*
-*.sh
 *.jdl
 *.pcm
 *.png
@@ -23,3 +22,4 @@
 *.hdf5
 *.out
 *.txt
+#*.sh
