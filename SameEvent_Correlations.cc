@@ -285,13 +285,20 @@ int main(int argc, char *argv[])
   float N_Signal_Triggers = 0;
   float N_BKGD_Triggers = 0;
   
-  TH1D* Signal_pT_Dist = new TH1D("Signal_pT_Dist","Cluster Pt Spectrum For Isolation (its_04) bins 0.55 < DNN < 0.85",100,pT_min,pT_max);
-  TH1D* BKGD_pT_Dist = new TH1D("BKGD_pT_Dist","Cluster Pt Spectrum For Isolation (its_04) bins 0.0 < DNN < 0.3",100,pT_min,pT_max);
-  TH1D* BKGD_pT_Dist_Weighted = new TH1D("BKGD_pT_Dist_Weighted","Weighted Cluster Pt Spectrum For Isolation (its_04) bins 0.0 < DNN < 0.3",100,pT_min,pT_max);
+  TH1F* Signal_pT_Dist = new TH1F("Signal_pT_Dist","Cluster Pt Spectrum For Isolation (its_04) bins 0.55 < DNN < 0.85",100,pT_min,pT_max);
+  TH1F* BKGD_pT_Dist = new TH1F("BKGD_pT_Dist","Cluster Pt Spectrum For Isolation (its_04) bins 0.0 < DNN < 0.3",100,pT_min,pT_max);
+  TH1F* BKGD_pT_Dist_Weighted = new TH1F("BKGD_pT_Dist_Weighted","Weighted Cluster Pt Spectrum For Isolation (its_04) bins 0.0 < DNN < 0.3",100,pT_min,pT_max);
 
-  TH1D hBR("hBR", "Isolated cluster, bkg region", 80, 10.0, 50.0);
-  TH1D hweight("hweight", "Isolated cluster, signal region", 80, 10.0, 50.0);
+  Signal_pT_Dist->Sumw2();
+  BKGD_pT_Dist->Sumw2();
+  BKGD_pT_Dist_Weighted->Sumw2();
 
+  TH1F hBR("hBR", "Isolated cluster, bkg region", 80, 10.0, 50.0);
+  TH1F hweight("hweight", "Isolated cluster, signal region", 80, 10.0, 50.0);
+  
+  hweight.Sumw2();
+  hBR.Sumw2();
+  
     for (int ipt = 0; ipt <nptbins; ipt++) {
       H_Signal_Triggers[ipt] = new TH1D(
       Form("N_DNN%i_Triggers_pT%1.0f_%1.0f",1,ptbins[ipt],ptbins[ipt+1]),
@@ -460,8 +467,8 @@ int main(int argc, char *argv[])
     Bool_t Signal = false;
     Bool_t Background = false;
 
-    //Long64_t nentries = _tree_event->GetEntries();         
-    Long64_t nentries = 100000;
+    Long64_t nentries = _tree_event->GetEntries();         
+    //Long64_t nentries = 20000;
     std::cout << " Total Number of entries in TTree: " << nentries << std::endl;
 
     //WEIGHTING and CLUSTER SPECTRA LOOP
@@ -492,25 +499,24 @@ int main(int argc, char *argv[])
 	h_cluster_eta->Fill(cluster_eta[n]);
 	
 	if (strcmp(shower_shape.data(),"Lambda")== 0) {
-	  if ((cluster_lambda_square[n][0] < Lambda0_cut))
-	    Signal = true;
-	  
-	  if ((cluster_lambda_square[n][0] > Lambda0_cut))
-	    Background = true;
+
+	  Signal = ((cluster_lambda_square[n][0] < Lambda0_cut));	  
+	  Background =  ((cluster_lambda_square[n][0] > Lambda0_cut));
+
 	}
 	
 	else if (strcmp(shower_shape.data(),"DNN")==0){
-	  if ( (cluster_s_nphoton[n][1] > DNN_min) && (cluster_s_nphoton[n][1]<DNN_max))
-	    Signal = true;
-	  if (cluster_s_nphoton[n][1] > 0.0 && cluster_s_nphoton[n][1] < DNN_Bkgd)
-	    Background = true;
+
+	  Signal =  ( (cluster_s_nphoton[n][1] > DNN_min) && (cluster_s_nphoton[n][1]<DNN_max));
+	  Background = (cluster_s_nphoton[n][1] > 0.0 && cluster_s_nphoton[n][1] < DNN_Bkgd);
+
 	}
 
 	else if (strcmp(shower_shape.data(),"EMax")==0){
-          if (cluster_e_max[n]/cluster_e[n] > Emax_max)
-            Signal = true;
-          if (cluster_e_max[n]/cluster_e[n] < Emax_min)
-            Background = true;
+
+          Signal = (cluster_e_max[n]/cluster_e[n] > Emax_max);
+          Background = (cluster_e_max[n]/cluster_e[n] < Emax_min);
+
         }
 
 
@@ -518,37 +524,41 @@ int main(int argc, char *argv[])
 
 	  //High DNN Trigger SGNL
 	  if (Signal){  	    
-	    for (int ipt = 0; ipt < nptbins; ipt++){
-	      if ((cluster_pt[n] >= pT_Ranges[ipt]) && (cluster_pt[n] < pT_Ranges[ipt+1]))
-		h_purity.Fill(purities[ipt]); }
 	    
 	    N_Signal_Triggers += 1;
-	    Signal_pT_Dist->Fill(cluster_pt[n],isolation);
+	    Signal_pT_Dist->Fill(cluster_pt[n]);
+	    hweight.Fill(cluster_pt[n]);
 
-	    for (int ipt = 0; ipt < nptbins; ipt++)
+	    for (int ipt = 0; ipt < nptbins; ipt++){
+	    
+	      if ((cluster_pt[n] >= pT_Ranges[ipt]) && (cluster_pt[n] < pT_Ranges[ipt+1]))
+		h_purity.Fill(purities[ipt]);
+	    
 	      if (cluster_pt[n] >ptbins[ipt] && cluster_pt[n] <ptbins[ipt+1])
 		H_Signal_Triggers[ipt]->Fill(1);
+	    }
+	    //fprintf(stderr,"\n %d: Signal Cluster pT = %f \n",__LINE__,cluster_pt[n]);
 
-	  hweight.Fill(cluster_pt[n]);
-
+	  
 	  }//Signal
 
 	  //Low DNN Trigger BKGD
 	  if (Background){
+
 	    N_BKGD_Triggers += 1;
 	    BKGD_pT_Dist->Fill(cluster_pt[n]);
+	    hBR.Fill(cluster_pt[n]);
+
 	    for (int ipt = 0; ipt < nptbins; ipt++)
 	      if (cluster_pt[n] >= ptbins[ipt] && cluster_pt[n] <ptbins[ipt+1]) 
 		H_BKGD_Triggers[ipt]->Fill(1); 
-
-	    hBR.Fill(cluster_pt[n]);
 
 	  } //Background
 	
 	  //no dnn
 	  for (int ipt = 0; ipt < nptbins; ipt++)
 	    Triggers[ipt]->Fill(1);
-	}
+	}//Iso
       }
     }
     hweight.Divide(&hBR);
@@ -581,32 +591,29 @@ int main(int argc, char *argv[])
 	else isolation = cluster_frixione_its_04_02[n];
 	
 	if (strcmp(shower_shape.data(),"Lambda")== 0) {
-	  if ((cluster_lambda_square[n][0] < Lambda0_cut))
-	    Signal = true;
-	  
-	  if ((cluster_lambda_square[n][0] > Lambda0_cut))
-	    Background = true;
+
+	  Signal = (cluster_lambda_square[n][0] < Lambda0_cut);	  
+	  Background = (cluster_lambda_square[n][0] > Lambda0_cut);
 	}
 	
 	else if (strcmp(shower_shape.data(),"DNN")==0){
-	  if ( (cluster_s_nphoton[n][1] > DNN_min) && (cluster_s_nphoton[n][1]<DNN_max))
-	    Signal = true;
-	  if (cluster_s_nphoton[n][1] > 0.0 && cluster_s_nphoton[n][1] < DNN_Bkgd)
-	    Background = true;
+
+	  Signal = ( (cluster_s_nphoton[n][1] > DNN_min) && (cluster_s_nphoton[n][1]<DNN_max));
+	  Background = (cluster_s_nphoton[n][1] > 0.0 && cluster_s_nphoton[n][1] < DNN_Bkgd);
 	}
 
 	else if (strcmp(shower_shape.data(),"EMax")==0){
-          if (cluster_e_max[n]/cluster_e[n] > Emax_max)
-            Signal = true;
-          if (cluster_e_max[n]/cluster_e[n] < Emax_min)
-            Background = true;
+          Signal = (cluster_e_max[n]/cluster_e[n] > Emax_max);
+          Background = (cluster_e_max[n]/cluster_e[n] < Emax_min);
         }
 
 
-	double bkg_weight = 1.0;
+	float bkg_weight = 1.0;
 	
 	if(Background){
 	  bkg_weight = hweight.GetBinContent(hweight.FindBin(cluster_pt[n]));
+	  //bkg_weight = (hweight.GetBinContent(hweight.FindBin(cluster_pt[n])) / hBR.GetBinContent(hBR.FindBin(cluster_pt[n])) );
+	  //fprintf(stderr,"\n %d: weight = %f \n",__LINE__,bkg_weight);
 	  BKGD_pT_Dist_Weighted->Fill(cluster_pt[n],bkg_weight);
 	  }
 
