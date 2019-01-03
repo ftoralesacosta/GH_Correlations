@@ -460,7 +460,8 @@ int main(int argc, char *argv[])
     Bool_t Signal = false;
     Bool_t Background = false;
 
-    Long64_t nentries = _tree_event->GetEntries();         
+    //Long64_t nentries = _tree_event->GetEntries();         
+    Long64_t nentries = 100000;
     std::cout << " Total Number of entries in TTree: " << nentries << std::endl;
 
     //WEIGHTING and CLUSTER SPECTRA LOOP
@@ -603,9 +604,9 @@ int main(int argc, char *argv[])
 
 
 	double bkg_weight = 1.0;
-
+	
 	if(Background){
-	  double bkg_weight = hweight.GetBinContent(hweight.FindBin(cluster_pt[n]));
+	  bkg_weight = hweight.GetBinContent(hweight.FindBin(cluster_pt[n]));
 	  BKGD_pT_Dist_Weighted->Fill(cluster_pt[n],bkg_weight);
 	  }
 
