@@ -28,7 +28,7 @@ using namespace H5;
 int main(int argc, char *argv[])
 {
   if (argc < 6) {
-    fprintf(stderr,"Batch Syntax is [Gamma-Triggered Paired Root], [Min-Bias HDF5] [Mix Start] [Mix End] [Track Skim GeV]");
+    fprintf(stderr,"\n Batch Syntax is [Gamma-Triggered Paired Root], [Min-Bias HDF5] [Mix Start] [Mix End] [Track Skim GeV] \n");
     exit(EXIT_FAILURE);
   }
 
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
   size_t mix_end = stoull(std::string(argv[4]));
 
   int GeV_Track_Skim = atoi(argv[5]);
-  std::cout<<"mix start is "<<mix_start<<std::endl;
+  std::cout<<std::endl<<"mix start is "<<mix_start<<std::endl;
   std::cout<<"mix end is "<<mix_end<<std::endl;
   fprintf(stderr,"Using %iGeV Track Skimmed from batch Script \n",GeV_Track_Skim);
 

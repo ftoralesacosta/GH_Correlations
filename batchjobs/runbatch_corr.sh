@@ -15,6 +15,7 @@ do
     echo $1
     name=${1%.*}
     #name=$(basename ../$1 .root)
+    echo $name
     if [ ! -f ${name}_${p}GeVTrack_paired.root ]; then
 	echo "calling paired Injector with file $name.root and track Gev $p"
 	./../pair_gale_shapley/paired_injector $name.root $p
@@ -26,9 +27,17 @@ do
 	mix_min=$i
 	mix_max="$((i + 19))"
 	if [[ $3 == full ]]; then
-	    sbatch -p shared-chos -t 16:00:00 runCorr.sh ${name}_${p}GeVTrack_paired.root ${name}_MB_${p}GeV.hdf5 $mix_min $mix_max $p	  
+	    if [ "../InputData/17q" = "$name" ]; then #account for 17q-17p mixing
+		sbatch -p shared-chos -t 16:00:00 runCorr.sh ${name}_${p}GeVTrack_paired.root ../InputData/17p_MB_${p}GeV.hdf5 $mix_min $mix_max $p	  
+	    else
+		sbatch -p shared-chos -t 16:00:00 runCorr.sh ${name}_${p}GeVTrack_paired.root ${name}_MB_${p}GeV.hdf5 $mix_min $mix_max $p	  
+	    fi
 	else
-	./runCorr.sh ${name}_${p}GeVTrack_paired.root ${name}_MB_${p}GeV.hdf5 $mix_min $mix_max $p
+	    if [ "../InputData/17q" = "$name" ]; then
+		./runCorr.sh ${name}_${p}GeVTrack_paired.root ../InputData/17p_MB_${p}GeV.hdf5 $mix_min $mix_max $p
+	    else
+		./runCorr.sh ${name}_${p}GeVTrack_paired.root ${name}_MB_${p}GeV.hdf5 $mix_min $mix_max $p
+	    fi
 	fi
     echo "$mix_min $mix_max $name"
     done
