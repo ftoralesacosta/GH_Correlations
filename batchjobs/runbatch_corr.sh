@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [[ $# -eq 1 ]] ; then
-    echo 'please give [13d, 13e, 17q,...] and [MinBias.hdf5] [test/full] as arguments'
+    echo 'please give [{13d, 13e, 17q,...}.root] and [{___}_MB_{}GeV.hdf5] [test/full] as arguments'
     exit 0
 fi
 
@@ -28,13 +28,13 @@ do
 	mix_max="$((i + 19))"
 	if [[ $3 == full ]]; then
 	    if [ "../InputData/17q" = "$name" ]; then #account for 17q-17p mixing
-		sbatch -p shared-chos -t 16:00:00 runCorr.sh ${name}_${p}GeVTrack_paired.root ../InputData/17p_MB_${p}GeV.hdf5 $mix_min $mix_max $p	  
+		sbatch -p shared-chos -t 16:00:00 runCorr.sh ${name}_${p}GeVTrack_paired.root ${name::$((${#name} - 3))}17p_MB_${p}GeV.hdf5 $mix_min $mix_max $p
 	    else
 		sbatch -p shared-chos -t 16:00:00 runCorr.sh ${name}_${p}GeVTrack_paired.root ${name}_MB_${p}GeV.hdf5 $mix_min $mix_max $p	  
 	    fi
 	else
 	    if [ "../InputData/17q" = "$name" ]; then
-		./runCorr.sh ${name}_${p}GeVTrack_paired.root ../InputData/17p_MB_${p}GeV.hdf5 $mix_min $mix_max $p
+		./runCorr.sh ${name}_${p}GeVTrack_paired.root ${name::$((${#name} - 3))}17p_MB_${p}GeV.hdf5 $mix_min $mix_max $p
 	    else
 		./runCorr.sh ${name}_${p}GeVTrack_paired.root ${name}_MB_${p}GeV.hdf5 $mix_min $mix_max $p
 	    fi
