@@ -1,4 +1,4 @@
- #include <TFile.h>
+#include <TFile.h>
 #include <TTree.h>
 #include <TLorentzVector.h>
 
@@ -649,7 +649,9 @@ int main(int argc, char *argv[])
 		      if (Background)
 			BKGD_IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);}
 
-		    Corr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
+		    if(isolation<iso_max){
+		      Corr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
+		    }
 		  }//if in zt bin
 		} // end loop over zt bins
 	      }//end if in pt bin

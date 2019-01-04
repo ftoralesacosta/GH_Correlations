@@ -557,8 +557,9 @@ int main(int argc, char *argv[])
 	  } //Background
 	
 	  //no dnn
-	  for (int ipt = 0; ipt < nptbins; ipt++)
-	    Triggers[ipt]->Fill(1);
+	  if (Isolated)
+	    for (int ipt = 0; ipt < nptbins; ipt++)
+	      Triggers[ipt]->Fill(1);
       }
     } //Events
 
