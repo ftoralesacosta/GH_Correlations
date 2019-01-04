@@ -285,16 +285,16 @@ int main(int argc, char *argv[])
   float N_Signal_Triggers = 0;
   float N_BKGD_Triggers = 0;
   
-  TH1F* Signal_pT_Dist = new TH1F("Signal_pT_Dist","Cluster Pt Spectrum For Isolation (its_04) bins 0.55 < DNN < 0.85",100,pT_min,pT_max);
-  TH1F* BKGD_pT_Dist = new TH1F("BKGD_pT_Dist","Cluster Pt Spectrum For Isolation (its_04) bins 0.0 < DNN < 0.3",100,pT_min,pT_max);
-  TH1F* BKGD_pT_Dist_Weighted = new TH1F("BKGD_pT_Dist_Weighted","Weighted Cluster Pt Spectrum For Isolation (its_04) bins 0.0 < DNN < 0.3",100,pT_min,pT_max);
+  TH1F* Signal_pT_Dist = new TH1F("Signal_pT_Dist","Cluster Pt Spectrum For Isolation (its_04) bins 0.55 < DNN < 0.85",(pT_max-pT_min)*2,pT_min,pT_max);
+  TH1F* BKGD_pT_Dist = new TH1F("BKGD_pT_Dist","Cluster Pt Spectrum For Isolation (its_04) bins 0.0 < DNN < 0.3",(pT_max-pT_min)*2,pT_min,pT_max);
+  TH1F* BKGD_pT_Dist_Weighted = new TH1F("BKGD_pT_Dist_Weighted","Weighted Cluster Pt Spectrum For Isolation (its_04) bins 0.0 < DNN < 0.3",(pT_max-pT_min)*2,pT_min,pT_max);
 
   Signal_pT_Dist->Sumw2();
   BKGD_pT_Dist->Sumw2();
   BKGD_pT_Dist_Weighted->Sumw2();
 
-  TH1F hBR("hBR", "Isolated cluster, bkg region", 80, 10.0, 50.0);
-  TH1F hweight("hweight", "Isolated cluster, signal region", 80, 10.0, 50.0);
+  TH1F hBR("hBR", "Isolated cluster, bkg region", 40, 10.0, 50.0);
+  TH1F hweight("hweight", "Isolated cluster, signal region", 40, 10.0, 50.0);
   
   hweight.Sumw2();
   hBR.Sumw2();
@@ -464,8 +464,11 @@ int main(int argc, char *argv[])
     //_tree_event->SetBranchAddress("eg_cross_section",&eg_cross_section);
     //_tree_event->SetBranchAddress("eg_ntrial",&eg_ntrial);
 
+
+    //IMPORTANT BOOLEAN VARIABLES
     Bool_t Signal = false;
     Bool_t Background = false;
+    Bool_t Isolated = false;
 
     Long64_t nentries = _tree_event->GetEntries();         
     //Long64_t nentries = 20000;
@@ -495,6 +498,8 @@ int main(int argc, char *argv[])
 	else if (determiner == CLUSTER_FRIXIONE_TPC_04_02) isolation = cluster_frixione_tpc_04_02[n];
 	else isolation = cluster_frixione_its_04_02[n];
 	
+	Isolated = (isolation<iso_max);
+
 	h_cluster_phi->Fill(cluster_phi[n]);
 	h_cluster_eta->Fill(cluster_eta[n]);
 	
@@ -519,11 +524,8 @@ int main(int argc, char *argv[])
 
         }
 
-
-	if (isolation<iso_max){	
-
-	  //High DNN Trigger SGNL
-	  if (Signal){  	    
+	  //High DNN Trigger SIGNAL
+	  if (Signal and Isolated){  	    
 	    
 	    N_Signal_Triggers += 1;
 	    Signal_pT_Dist->Fill(cluster_pt[n]);
@@ -543,10 +545,9 @@ int main(int argc, char *argv[])
 	  }//Signal
 
 	  //Low DNN Trigger BKGD
-	  if (Background){
+	  if (Background and Isolated){
 
 	    N_BKGD_Triggers += 1;
-	    BKGD_pT_Dist->Fill(cluster_pt[n]);
 	    hBR.Fill(cluster_pt[n]);
 
 	    for (int ipt = 0; ipt < nptbins; ipt++)
@@ -558,21 +559,20 @@ int main(int argc, char *argv[])
 	  //no dnn
 	  for (int ipt = 0; ipt < nptbins; ipt++)
 	    Triggers[ipt]->Fill(1);
-	}//Iso
       }
-    }
+    } //Events
+
     hweight.Divide(&hBR);
 
-    //MAIN CORRELATION LOOP
 
+
+    //MAIN CORRELATION LOOP
 
     fprintf(stderr,"\n Looping for main correlation functions \n");
     for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
       //for(Long64_t ievent = 0; ievent < 1000 ; ievent++){
       _tree_event->GetEntry(ievent);
       fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, ievent, nentries);
-
-      //double weight = (double)eg_cross_section/(double)eg_ntrial;
 
       bool first_cluster = true;
       for (ULong64_t n = 0; n < ncluster; n++) {
@@ -590,6 +590,8 @@ int main(int argc, char *argv[])
 	else if (determiner == CLUSTER_FRIXIONE_TPC_04_02) isolation = cluster_frixione_tpc_04_02[n];
 	else isolation = cluster_frixione_its_04_02[n];
 	
+	Isolated = (isolation<iso_max);
+
 	if (strcmp(shower_shape.data(),"Lambda")== 0) {
 
 	  Signal = (cluster_lambda_square[n][0] < Lambda0_cut);	  
@@ -610,10 +612,11 @@ int main(int argc, char *argv[])
 
 	float bkg_weight = 1.0;
 	
-	if(Background){
+	if(Background and Isolated){
 	  bkg_weight = hweight.GetBinContent(hweight.FindBin(cluster_pt[n]));
 	  //bkg_weight = (hweight.GetBinContent(hweight.FindBin(cluster_pt[n])) / hBR.GetBinContent(hBR.FindBin(cluster_pt[n])) );
 	  //fprintf(stderr,"\n %d: weight = %f \n",__LINE__,bkg_weight);
+	  BKGD_pT_Dist->Fill(cluster_pt[n]);
 	  BKGD_pT_Dist_Weighted->Fill(cluster_pt[n],bkg_weight);
 	  }
 
@@ -656,10 +659,10 @@ int main(int argc, char *argv[])
 		  //2 DNN Regions
 		  if (isolation<iso_max){
 
-		    if (Signal)
+		    if (Signal and Isolated)
 		      IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
 
-		    if (Background)
+		    if (Background and Isolated)
 		      BKGD_IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta,bkg_weight);
 
 		  }		  
