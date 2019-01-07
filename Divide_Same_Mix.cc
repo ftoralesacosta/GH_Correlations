@@ -282,11 +282,11 @@ int main(int argc, char *argv[])
     std::cout<<izt<<" "<<1.0/mix_DNN1_intgrl<<std::endl;
 
     Mix_Inclusive_Corr[izt+ipt*nztbins]->Scale(1.0/mix_Inclusive_intgrl);
-    // Mix_DNN1_Corr[izt+ipt*nztbins]->Scale(1.0/mix_DNN1_intgrl);
-    // Mix_DNN2_Corr[izt+ipt*nztbins]->Scale(1.0/mix_DNN2_intgrl);
+    Mix_DNN1_Corr[izt+ipt*nztbins]->Scale(1.0/mix_DNN1_intgrl);
+    Mix_DNN2_Corr[izt+ipt*nztbins]->Scale(1.0/mix_DNN2_intgrl);
 
-    Mix_DNN1_Corr[izt+ipt*nztbins]->Scale(1.0/mix_Inclusive_intgrl);
-    Mix_DNN2_Corr[izt+ipt*nztbins]->Scale(1.0/mix_Inclusive_intgrl);
+    // Mix_DNN1_Corr[izt+ipt*nztbins]->Scale(1.0/mix_Inclusive_intgrl);
+    // Mix_DNN2_Corr[izt+ipt*nztbins]->Scale(1.0/mix_Inclusive_intgrl);
 
     std::cout<<mix_DNN1_intgrl<<std::endl;
 
@@ -295,11 +295,13 @@ int main(int argc, char *argv[])
     //DIVIDE MIXING
     Same_Inclusive_Corr[izt+ipt*nztbins]->Divide(Mix_Inclusive_Corr[izt+ipt*nztbins]);
 
-//     Same_DNN1_Corr[izt+ipt*nztbins]->Divide(Mix_DNN1_Corr[izt+ipt*nztbins]);
-//     Same_DNN2_Corr[izt+ipt*nztbins]->Divide(Mix_DNN2_Corr[izt+ipt*nztbins]);
+    //DIVIDING BY Regional CORRELATIONS
+    Same_DNN1_Corr[izt+ipt*nztbins]->Divide(Mix_DNN1_Corr[izt+ipt*nztbins]);
+    Same_DNN2_Corr[izt+ipt*nztbins]->Divide(Mix_DNN2_Corr[izt+ipt*nztbins]);
 
-    Same_DNN1_Corr[izt+ipt*nztbins]->Divide(Mix_Inclusive_Corr[izt+ipt*nztbins]);
-    Same_DNN2_Corr[izt+ipt*nztbins]->Divide(Mix_Inclusive_Corr[izt+ipt*nztbins]);
+
+    // Same_DNN1_Corr[izt+ipt*nztbins]->Divide(Mix_Inclusive_Corr[izt+ipt*nztbins]);
+    // Same_DNN2_Corr[izt+ipt*nztbins]->Divide(Mix_Inclusive_Corr[izt+ipt*nztbins]);
 
     fprintf(stderr, "%s: %d: Division OK\n",__FILE__,__LINE__);
 
