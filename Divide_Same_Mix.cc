@@ -261,17 +261,10 @@ int main(int argc, char *argv[])
     TAxis *mix_xaxis = Mix_DNN1_Corr[izt+ipt*nztbins]->GetXaxis();
     TAxis *mix_yaxis = Mix_DNN1_Corr[izt+ipt*nztbins]->GetYaxis();
 
-    //Double_t mix_DNN1_intgrl = Mix_DNN1_Corr[izt+ipt*nztbins]->Integral(0,-1,0,-1)/(n_eta_bins*n_phi_bins);
-    //Double_t mix_DNN1_intgrl = Mix_DNN1_Corr[izt+ipt*nztbins]->GetBinContent(Mix_DNN1_Corr[izt+ipt*nztbins]->GetMaximumBin());
-
     Double_t mix_DNN1_intgrl = Mix_DNN1_Corr[izt+ipt*nztbins]->GetBinContent(Mix_DNN1_Corr[izt+ipt*nztbins]->GetMaximumBin());
-    //Double_t mix_DNN1_intgrl = Mix_DNN1_Corr[izt+ipt*nztbins]->GetMean(1);
     //    std::cout<<"Max DNN1 Value at) = "<<mix_DNN1_intgrl<<std::endl;
 
-    //Double_t mix_DNN2_intgrl = Mix_DNN2_Corr[izt+ipt*nztbins]->Integral(0,-1,0,-1)/(n_eta_bins*n_phi_bins);
-    //Double_t mix_DNN2_intgrl = Mix_DNN2_Corr[izt+ipt*nztbins]->GetBinContent(Mix_DNN2_Corr[izt+ipt*nztbins]->GetMaximumBin());
     Double_t mix_DNN2_intgrl = Mix_DNN2_Corr[izt+ipt*nztbins]->GetBinContent(Mix_DNN2_Corr[izt+ipt*nztbins]->GetMaximumBin());
-    //Double_t mix_DNN2_intgrl = Mix_DNN2_Corr[izt+ipt*nztbins]->GetMean(1);
     //    std::cout<<"Max DNN2 Value = "<<mix_DNN2_intgrl<<std::endl;
 
 
