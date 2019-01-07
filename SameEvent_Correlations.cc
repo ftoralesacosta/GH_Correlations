@@ -693,18 +693,18 @@ int main(int argc, char *argv[])
 		  if (first_cluster)
 		    h_track_phi_eta[izt+ipt*nztbins]->Fill(track_phi[itrack],track_eta[itrack]);	  
 		  //2 DNN Regions
-		  if (isolation<iso_max){
 
-		    if (Signal and Isolated)
-		      IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
-
-		    if (Background and Isolated)
-		      BKGD_IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta,bkg_weight);
-
-		  }		  
-		  //No Iso, no DNN
-		  Corr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
-
+		  if (Signal and Isolated)
+		    IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
+		  
+		  if (Background and Isolated)
+		    BKGD_IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta,bkg_weight);
+		  
+		  
+		  //no shower shape selection
+		  if(Isolated)
+		    Corr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
+		  
 		}//if in zt bin 
 	      } // for zt bins
 	    }//if in pt bin
@@ -734,7 +734,6 @@ int main(int argc, char *argv[])
   else
     fout = new TFile(Form("%s_SE_Correlation.root",rawname.data()),"RECREATE");
 
-  // TFile* fout = new TFile("Same_Event_Correlation_13defv1.root","RECREATE");
   std::cout<<"Clusters Passed Iosalation: "<<N_Signal_Triggers<<std::endl;
 			  
   h_purity.Write("purities");
