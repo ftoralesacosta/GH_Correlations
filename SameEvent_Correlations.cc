@@ -258,15 +258,37 @@ int main(int argc, char *argv[])
   h_cluster_phi->Sumw2();
   h_cluster_eta->Sumw2();
 
+  //Purity Handling
+
   //Following purities for pT range: 12.5,13.2,14.4,15.8
   //float pT_Ranges[4] = {12,13.2,14.4,16.1};//under/overshoot extremes for inclusivity
-  float pT_Ranges[4] = {14,16,18,20};
-  float purities[3];
+  int  N_pT_Ranges = 9;
+  float pT_Ranges[9] = {12,13.5,14,16,18,20,25,30,40};
+  float purities[8] = {0};
+  float Cluster_Purity = 0;
+
   if (strcmp(shower_shape.data(), "DNN") == 0){
-    purities[0]=0.41;purities[1]=0.46;purities[2]=0.50;}
-    //purities[0]=0.016;purities[1]=0.016;purities[2]=0.03;}
+    purities[0] = 0.258;
+    purities[1] = 0.298;
+    purities[2] = 0.321; 
+    purities[3] = 0.371;
+    purities[4] = 0.411;
+    purities[5] = 0.471;
+    purities[6] = 0.491;
+    purities[7] = 0.461;
+  }
+
   else if (strcmp(shower_shape.data(), "Lambda") == 0){
-    purities[0]=0.24;purities[1]=0.29;purities[2]=0.36;}
+    purities[0] = 0.237;
+    purities[1] = 0.267;
+    purities[2] = 0.286;
+    purities[3] = 0.386;
+    purities[4] = 0.426;
+    purities[5] = 0.441;
+    purities[6] = 0.501;
+    purities[7] = 0.531;
+  }
+
   else {
     purities[0]=0.27;purities[1]=0.32;purities[2]=0.37;}//Emax/Ecluster
 
@@ -277,6 +299,7 @@ int main(int argc, char *argv[])
   TH1D* H_Signal_Triggers[nptbins];
   TH1D* H_BKGD_Triggers[nptbins];
   TH1D* Triggers[nptbins];
+  TH1F* H_Purities[nptbins];
 
   TH2D * h_track_phi_eta[nztbins*nptbins];
   TH1D * h_track_eta[nztbins*nptbins];
@@ -311,6 +334,10 @@ int main(int argc, char *argv[])
       Triggers[ipt] = new TH1D(
       Form("N_Triggers_pT%1.0f_%1.0f",ptbins[ipt],ptbins[ipt+1]),
       "Number of Isolated Low DNN Photon Triggers", 2, -0.5,1.0);
+
+      H_Purities[ipt] = new TH1F(
+      Form("H_Purities_pT%1.0f_%1.0f",ptbins[ipt],ptbins[ipt+1]),
+      "yields weighted average purity for pT bin", 100, 0.0,1.0);
 
       for (int izt = 0; izt<nztbins; izt++){
 
@@ -531,14 +558,22 @@ int main(int argc, char *argv[])
 	    Signal_pT_Dist->Fill(cluster_pt[n]);
 	    hweight.Fill(cluster_pt[n]);
 
+	    for (int ipt = 0; ipt < (N_pT_Ranges-1); ipt++ ){
+	      if ((cluster_pt[n] >= pT_Ranges[ipt]) && (cluster_pt[n] < pT_Ranges[ipt+1])){
+		//fprintf(stderr,"\n%d: purity = %f; pT_Cluster = %f",__LINE__,purities[ipt],cluster_pt[n]);
+		h_purity.Fill(purities[ipt]);
+		Cluster_Purity = purities[ipt];
+	      }
+	    }
+
 	    for (int ipt = 0; ipt < nptbins; ipt++){
 	    
-	      if ((cluster_pt[n] >= pT_Ranges[ipt]) && (cluster_pt[n] < pT_Ranges[ipt+1]))
-		h_purity.Fill(purities[ipt]);
-	    
-	      if (cluster_pt[n] >ptbins[ipt] && cluster_pt[n] <ptbins[ipt+1])
+	      if (cluster_pt[n] >ptbins[ipt] && cluster_pt[n] <ptbins[ipt+1]){
 		H_Signal_Triggers[ipt]->Fill(1);
+		H_Purities[ipt]->Fill(Cluster_Purity);
+	      }
 	    }
+
 	    //fprintf(stderr,"\n %d: Signal Cluster pT = %f \n",__LINE__,cluster_pt[n]);
 
 	  
@@ -721,6 +756,9 @@ int main(int argc, char *argv[])
     
   for (int ipt = 0; ipt < nptbins; ipt++)
     Triggers[ipt]->Write();
+
+  for (int ipt = 0; ipt < nptbins; ipt++)
+    H_Purities[ipt]->Write();
 
   for (int ipt = 0; ipt<nptbins; ipt++){
     for (int izt = 0; izt<nztbins; izt++)
