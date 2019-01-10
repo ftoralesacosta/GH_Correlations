@@ -12,6 +12,9 @@
 #include <iostream>
 #include <fstream>
 #include "H5Cpp.h"
+#include <chrono>
+
+#include "omp.h"
 
 #define NTRACK_MAX (1U << 14)
 
@@ -31,6 +34,9 @@ int main(int argc, char *argv[])
     fprintf(stderr,"\n Batch Syntax is [Gamma-Triggered Paired Root], [Min-Bias HDF5] [Mix Start] [Mix End] [Track Skim GeV] \n");
     exit(EXIT_FAILURE);
   }
+
+  std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
 
   int dummyc = 1;
   char **dummyv = new char *[1];
@@ -507,7 +513,7 @@ int main(int argc, char *argv[])
     //define space in memory for hyperslab, then write from file to memory
     track_memspace.selectHyperslab( H5S_SELECT_SET, track_count_out, track_offset_out );
     track_dataset.read( track_data_out, PredType::NATIVE_FLOAT, track_memspace, track_dataspace );
-    fprintf(stderr, "%s:%d: %s\n", __FILE__, __LINE__, "track dataset read into array: OK");
+    fprintf(stderr, "%s:%d: %s\n", __FILE__, __LINE__, "track dataset read into array: OK"); //Test only
 
     cluster_memspace.selectHyperslab( H5S_SELECT_SET, cluster_count_out, cluster_offset_out );
     cluster_dataset.read( cluster_data_out, PredType::NATIVE_FLOAT, cluster_memspace, cluster_dataspace );
@@ -516,15 +522,39 @@ int main(int argc, char *argv[])
     event_memspace.selectHyperslab( H5S_SELECT_SET, event_count_out, event_offset_out );
     event_dataset.read( event_data_out, PredType::NATIVE_FLOAT, event_memspace, event_dataspace);
 
-    Long64_t nentries = _tree_event->GetEntries();   
-    //Long64_t nentries = 1000;   
+    //Long64_t nentries = _tree_event->GetEntries();   
+    Long64_t nentries = 20000;   
 
    int skip_counter = 0;
+
+
+   std::vector<double> vec;
+
+   omp_lock_t h5readlock;
+   omp_lock_t root_readlock;
+
+   omp_init_lock(&h5readlock);
+   omp_init_lock(&root_readlock);
+
+#pragma omp parallel
+   {
+   std::vector<double> vec_private;
+
+   float track_data_out_private[1][ntrack_max][NTrack_Vars];
+   float cluster_data_out_private[1][ncluster_max][NCluster_Vars];
+   float event_data_out_private[1][NEvent_Vars];
+
+#pragma omp for nowait collapse(7)
+
     for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
       //for(Long64_t ievent = 0; ievent < 200; ievent++){
+
+      omp_set_lock(&root_readlock);
+
       fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, ievent, nentries);
       _tree_event->GetEntry(ievent);
 
+      omp_unset_lock(&root_readlock);
       float multiplicity_sum = 0;
       for (int k = 0; k < 64; k++)  multiplicity_sum += multiplicity_v0[k];
 
@@ -578,19 +608,24 @@ int main(int argc, char *argv[])
 	  if(mix_event >= 9999999) continue;  
 
 	  //adjust offset for next mixed event
+
+	  //Lock HDF5 reading to 1 thread
+	  omp_set_lock(&h5readlock);
+
 	  track_offset[0]=mix_event;
 	  track_dataspace.selectHyperslab( H5S_SELECT_SET, track_count, track_offset );
-	  track_dataset.read( track_data_out, PredType::NATIVE_FLOAT, track_memspace, track_dataspace );
+	  track_dataset.read( track_data_out_private, PredType::NATIVE_FLOAT, track_memspace, track_dataspace );
 
 	  cluster_offset[0]=mix_event;
 	  cluster_dataspace.selectHyperslab( H5S_SELECT_SET, cluster_count, cluster_offset );
-	  cluster_dataset.read( cluster_data_out, PredType::NATIVE_FLOAT, cluster_memspace, cluster_dataspace );
+	  cluster_dataset.read( cluster_data_out_private, PredType::NATIVE_FLOAT, cluster_memspace, cluster_dataspace );
 
 	  event_offset[0]=mix_event;
 	  event_dataspace.selectHyperslab( H5S_SELECT_SET, event_count, event_offset );
-	  event_dataset.read( event_data_out, PredType::NATIVE_FLOAT, event_memspace, event_dataspace );
-
-	  //Fill ∆Event Distro's
+	  event_dataset.read( event_data_out_private, PredType::NATIVE_FLOAT, event_memspace, event_dataspace );
+	  
+	  omp_unset_lock(&h5readlock);
+	  //Fill Event Distro's
 	  if (first_cluster){
 	    z_Vertices->Fill(TMath::Abs(event_data_out[0][0] - primary_vertex[2]));
 	    z_Vertices_hdf5->Fill(event_data_out[0][0]);
@@ -642,9 +677,11 @@ int main(int argc, char *argv[])
 		  if(zt>ztbins[izt] and  zt<ztbins[izt+1]){
 
 		    if(isolation< iso_max){
-		      if (Signal)
-			IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);}
-
+		      if (Signal){
+			IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
+			vec_private.push_back(DeltaPhi);
+		      }
+		    }
 		    if(isolation<iso_max){
 		      if (Background)
 			BKGD_IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);}
@@ -662,8 +699,15 @@ int main(int argc, char *argv[])
       }//end loop on clusters.
       N_ME->Fill(ME_pass_Counter,multiplicity_sum);       
     } //end loop over events
-    //}//end loop over samples
 
+
+    #pragma omp critical
+    vec.insert(vec.end(), vec_private.begin(), vec_private.end());
+
+    //}//end loop over samples
+   }
+   omp_destroy_lock(&h5readlock);
+   omp_destroy_lock(&root_readlock);
 
     // Write to fout    
     size_t lastindex = std::string(root_file).find_last_of("."); 
@@ -700,6 +744,10 @@ int main(int argc, char *argv[])
 
     fout->Close();     
     
+    std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
+    std::cout << "Time difference in micro seconds = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() <<std::endl;
+    //std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() <<std::endl;
+
     std::cout << " ending " << std::endl;
     return EXIT_SUCCESS;
 }
