@@ -539,13 +539,12 @@ int main(int argc, char *argv[])
 #pragma omp parallel
    {
    std::vector<double> vec_private;
-
+   
    float track_data_out_private[1][ntrack_max][NTrack_Vars];
    float cluster_data_out_private[1][ncluster_max][NCluster_Vars];
    float event_data_out_private[1][NEvent_Vars];
 
-#pragma omp for nowait collapse(7)
-
+    #pragma omp for nowait
     for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
       //for(Long64_t ievent = 0; ievent < 200; ievent++){
 
@@ -698,8 +697,7 @@ int main(int argc, char *argv[])
 	first_cluster = false;
       }//end loop on clusters.
       N_ME->Fill(ME_pass_Counter,multiplicity_sum);       
-    } //end loop over events
-
+   } //end loop over events   
 
     #pragma omp critical
     vec.insert(vec.end(), vec_private.begin(), vec_private.end());
