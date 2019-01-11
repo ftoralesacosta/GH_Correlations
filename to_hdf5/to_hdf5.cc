@@ -378,29 +378,29 @@ int main(int argc, char *argv[])
     H5::DSetCreatPropList cluster_property = H5::DSetCreatPropList();
     H5::DSetCreatPropList jet_property = H5::DSetCreatPropList();
 
-#ifdef HDF5_USE_DEFLATE
-    // Check for zlib (deflate) availability and enable only if
-    // present
-    if (!H5Zfilter_avail(H5Z_FILTER_DEFLATE)) {
-        fprintf(stderr, "%s:%d: warning: deflate filter not "
-                "available\n", __FILE__, __LINE__);
-    }
-    else {
-        unsigned int filter_info;
+// #ifdef HDF5_USE_DEFLATE
+//     // Check for zlib (deflate) availability and enable only if
+//     // present
+//     if (!H5Zfilter_avail(H5Z_FILTER_DEFLATE)) {
+//         fprintf(stderr, "%s:%d: warning: deflate filter not "
+//                 "available\n", __FILE__, __LINE__);
+//     }
+//     else {
+//         unsigned int filter_info;
 
-        H5Zget_filter_info(H5Z_FILTER_DEFLATE, &filter_info);
-        if (!(filter_info & H5Z_FILTER_CONFIG_ENCODE_ENABLED)) {
-            fprintf(stderr, "%s:%d: warning: deflate filter not "
-                    "available for encoding\n", __FILE__, __LINE__);
-        }
-        else {
-            event_property.setDeflate(1);
-            track_property.setDeflate(1);
-            cluster_property.setDeflate(1);
-            jet_property.setDeflate(1);
-        }
-    }
-#endif // HDF5_USE_DEFLATE
+//         H5Zget_filter_info(H5Z_FILTER_DEFLATE, &filter_info);
+//         if (!(filter_info & H5Z_FILTER_CONFIG_ENCODE_ENABLED)) {
+//             fprintf(stderr, "%s:%d: warning: deflate filter not "
+//                     "available for encoding\n", __FILE__, __LINE__);
+//         }
+//         else {
+//             event_property.setDeflate(1);
+//             track_property.setDeflate(1);
+//             cluster_property.setDeflate(1);
+//             jet_property.setDeflate(1);
+//         }
+//     }
+// #endif // HDF5_USE_DEFLATE
 
     // Activate chunking, while observing the HDF5_DEFAULT_CACHE being
     // the CPU L2 cache size
