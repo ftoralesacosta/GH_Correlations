@@ -61,6 +61,7 @@ void find_ntrack_ncluster_max(char *argv_first[], char *argv_last[], UInt_t &nev
         fprintf(stderr, "%s:%d: %s\n", __FILE__, __LINE__, "Obtaining ntrack, ncluster, and njet max for hdf5 file");
 
         for (Long64_t i = 0; i < hi_tree->GetEntries(); i++) {
+	//for (Long64_t i = 0; i < 10000; i++) {
             hi_tree->GetEntry(i);
             ntrack_max = std::max(ntrack_max, ntrack);
             ncluster_max = std::max(ncluster_max, ncluster);
@@ -81,7 +82,7 @@ void find_ntrack_ncluster_max(char *argv_first[], char *argv_last[], UInt_t &nev
 void write_track_cluster(H5::DataSet &event_data_set, H5::DataSet &track_data_set, H5::DataSet &cluster_data_set, H5::DataSet &jet_data_set,
              hsize_t *event_offset, hsize_t *offset,
              const hsize_t *event_dim_extend, const hsize_t *track_dim_extend, const hsize_t *cluster_dim_extend, const hsize_t *jet_dim_extend,
-             const UInt_t nevent_max, const UInt_t ntrack_max, const UInt_t ncluster_max, const UInt_t njet_max,
+	     const UInt_t nevent_max, const UInt_t ntrack_max, const UInt_t ncluster_max, const UInt_t njet_max, const UInt_t block_size,
              char *argv_first[], char *argv_last[])
 {
     for (char **p = argv_first; p != argv_last; p++) {
@@ -168,97 +169,118 @@ void write_track_cluster(H5::DataSet &event_data_set, H5::DataSet &track_data_se
         hi_tree->SetBranchAddress("jet_ak04its_multiplicity_raw", &jet_ak04its_multiplicity[0]);
         // hi_tree->SetBranchAddress("jet_ak04its_width_sigma", &jet_ak04its_width_sigma[0]);
 
+	int nEventVariables = 2;
+	int nClusterVariables = 5;
+	int nTrackVariables = 10;
         int nJetVariables = 5;
+
+	fprintf(stderr,"\n %d: BLOCK SIZE = %u\n",__LINE__,block_size);
+
+	std::vector<float> event_data (block_size * nEventVariables, NAN); //2 variables, multp, vertx
+	std::vector<float> track_data(block_size * ntrack_max * 10, NAN);
+	std::vector<float> cluster_data(block_size * ncluster_max * 5, NAN);
+	std::vector<float> jet_data(block_size * njet_max * nJetVariables, NAN);
+
         for (Long64_t i = 0; i < hi_tree->GetEntries(); i++) {
+	  //for (Long64_t i = 0; i < 10000; i++) {
             hi_tree->GetEntry(i);
-
-            std::vector<float> event_data (1, NAN); //2 variables, multp, vertx
-            std::vector<float> track_data(ntrack_max * 10, NAN);
-            std::vector<float> cluster_data(ncluster_max * 5, NAN);
-            std::vector<float> jet_data(njet_max * nJetVariables, NAN);
-
+	    
+	    int iblock = i % block_size;
+	    //fprintf(stderr,"\n %d: iblock = %i \n",__LINE__,iblock);
+	   
             float multiplicity_sum = 0;
             for (int k = 0; k < 64; k++) multiplicity_sum += multiplicity_v0[k];        
-            event_data[0] = primary_vertex[2]; //xyz, choose 3rd element, z
-            event_data[1] = multiplicity_sum;
+            event_data[iblock*nEventVariables + 0] = primary_vertex[2]; //xyz, choose 3rd element, z
+            event_data[iblock*nEventVariables + 1] = multiplicity_sum;
         
             for (Long64_t j = 0; j < ntrack; j++) {
                 // Note HDF5 is always row-major (C-like)
-                track_data[j * 10 + 0] = track_e[j];
-                track_data[j * 10 + 1] = track_pt[j];
-                track_data[j * 10 + 2] = track_eta[j];
-                track_data[j * 10 + 3] = track_phi[j];
-                track_data[j * 10 + 4] = track_quality[j];
-                track_data[j * 10 + 5] = track_eta_emcal[j];
-                track_data[j * 10 + 6] = track_phi_emcal[j];
-                track_data[j * 10 + 7] = track_its_ncluster[j];
-                track_data[j * 10 + 8] = track_its_chi_square[j];
-                track_data[j * 10 + 9] = track_dca_xy[j];
+                track_data[iblock*ntrack_max*10 + j*10 + 0] = track_e[j];
+                track_data[iblock*ntrack_max*10 + j*10 + 1] = track_pt[j];
+                track_data[iblock*ntrack_max*10 + j*10 + 2] = track_eta[j];
+                track_data[iblock*ntrack_max*10 + j*10 + 3] = track_phi[j];
+                track_data[iblock*ntrack_max*10 + j*10 + 4] = track_quality[j];
+                track_data[iblock*ntrack_max*10 + j*10 + 5] = track_eta_emcal[j];
+                track_data[iblock*ntrack_max*10 + j*10 + 6] = track_phi_emcal[j];
+                track_data[iblock*ntrack_max*10 + j*10 + 7] = track_its_ncluster[j];
+                track_data[iblock*ntrack_max*10 + j*10 + 8] = track_its_chi_square[j];
+                track_data[iblock*ntrack_max*10 + j*10 + 9] = track_dca_xy[j];
             }
 
             for(Long64_t n = 0; n < ncluster; n++){
-                cluster_data[n * 5 + 0] = cluster_e[n];
-                cluster_data[n * 5 + 1] = cluster_pt[n];
-                cluster_data[n * 5 + 2] = cluster_eta[n];
-                cluster_data[n * 5 + 3] = cluster_phi[n];
-                cluster_data[n * 5 + 4] = cluster_e_cross[n];
+                cluster_data[iblock*ncluster_max*5 + n*5 + 0] = cluster_e[n];
+                cluster_data[iblock*ncluster_max*5 + n*5 + 1] = cluster_pt[n];
+                cluster_data[iblock*ncluster_max*5 + n*5 + 2] = cluster_eta[n];
+                cluster_data[iblock*ncluster_max*5 + n*5 + 3] = cluster_phi[n];
+                cluster_data[iblock*ncluster_max*5 + n*5 + 4] = cluster_e_cross[n];
                 //cluster_data[j * 7 + 5] = cluster_s_nphoton[j][0];
                 //cluster_data[j * 7 + 6] = cluster_s_nphoton[j][1];
             }
 
             for (Long64_t j = 0; j < njet_ak04its; j++) {
-                jet_data[j * nJetVariables + 0] = jet_ak04its_pt_raw[j];
-                jet_data[j * nJetVariables + 1] = jet_ak04its_eta_raw[j];
-                jet_data[j * nJetVariables + 2] = jet_ak04its_phi[j];
-                jet_data[j * nJetVariables + 3] = jet_ak04its_ptd_raw[j];
-                jet_data[j * nJetVariables + 4] = jet_ak04its_multiplicity[j];
+                jet_data[iblock*njet_max*nJetVariables + j*nJetVariables + 0] = jet_ak04its_pt_raw[j];
+                jet_data[iblock*njet_max*nJetVariables + j*nJetVariables + 1] = jet_ak04its_eta_raw[j];
+                jet_data[iblock*njet_max*nJetVariables + j*nJetVariables + 2] = jet_ak04its_phi[j];
+                jet_data[iblock*njet_max*nJetVariables + j*nJetVariables + 3] = jet_ak04its_ptd_raw[j];
+                jet_data[iblock*njet_max*nJetVariables + j*nJetVariables + 4] = jet_ak04its_multiplicity[j];
             }
+	
+	    if (iblock == (block_size-1)) {
 
-        if (event_offset == 0) {
-          //write first event
-          event_data_set.write(&event_data[0], H5::PredType::NATIVE_FLOAT);
-        }
-        else{
-          //set up extension
-          const hsize_t event_dim_extended[2] = {
-        event_offset[0] + event_dim_extend[0], event_dim_extend[1]
-          };
+	      // for (int i = 0; i < block_size; i++){
+	      // 	fprintf(stderr,"\n %d: event %i: track pT = %f\n",__LINE__,i,track_data[i*ntrack_max*10 + 0*ntrack_max + 1]); //look at track pT of first track per event
+	      // } //check array
+
+	      if (event_offset[0] == 0) {
+		//write first event
+		event_data_set.write(&event_data[0], H5::PredType::NATIVE_FLOAT);
+	      }
+	      
+	      else{ 
+		//set up extension
+		const hsize_t event_dim_extended[2] = {
+		  event_offset[0] + event_dim_extend[0], event_dim_extend[1] };
         
-          //Extend to new Dimension
-          event_data_set.extend(event_dim_extended);
-          H5::DataSpace event_file_space = event_data_set.getSpace();
-          event_file_space.selectHyperslab(
-          H5S_SELECT_SET, event_dim_extend, event_offset);
-          H5::DataSpace event_memory_space(2, event_dim_extend, NULL);
-          event_data_set.write(&event_data[0], H5::PredType::NATIVE_FLOAT,
-                               event_memory_space, event_file_space);
-        }
-        event_offset[0] ++;
+		//Extend to new Dimension
+		event_data_set.extend(event_dim_extended);
+		H5::DataSpace event_file_space = event_data_set.getSpace();
 
+		event_file_space.selectHyperslab(
+		   H5S_SELECT_SET, event_dim_extend, event_offset);
 
-            if (offset == 0) {
-                // Writing the first event. The track_data space is already
-                // created with space for one event (see when
-                // file.createDataSet() was called)
-                track_data_set.write(&track_data[0], H5::PredType::NATIVE_FLOAT);
-                cluster_data_set.write(&cluster_data[0], H5::PredType::NATIVE_FLOAT);
-                jet_data_set.write(&jet_data[0], H5::PredType::NATIVE_FLOAT);
-            }
-            else {
+		H5::DataSpace event_memory_space(2, event_dim_extend, NULL);
+		event_data_set.write(&event_data[0], H5::PredType::NATIVE_FLOAT,
+				     event_memory_space, event_file_space);
+	      }
+
+	      //put in block logic
+	      event_offset[0] += block_size;
+
+	      if (offset[0] == 0) {
+		// Writing the first event. The track_data space is already
+		// created with space for one event (see when
+		// file.createDataSet() was called)
+		track_data_set.write(&track_data[0], H5::PredType::NATIVE_FLOAT);
+		cluster_data_set.write(&cluster_data[0], H5::PredType::NATIVE_FLOAT);
+		jet_data_set.write(&jet_data[0], H5::PredType::NATIVE_FLOAT);
+	      }
+
+	    
+	      else { 
                 // The new, extended-by-1 dimension
                 const hsize_t track_dim_extended[RANK] = {
-                    offset[0] + track_dim_extend[0], track_dim_extend[1],
-                    track_dim_extend[2]
+		  offset[0] + track_dim_extend[0], track_dim_extend[1],
+		  track_dim_extend[2]
                 };
 
                 const hsize_t cluster_dim_extended[RANK] = {
-                    offset[0] + cluster_dim_extend[0], cluster_dim_extend[1],
-                    cluster_dim_extend[2]
+		  offset[0] + cluster_dim_extend[0], cluster_dim_extend[1],
+		  cluster_dim_extend[2]
                 };
-
+		
                 const hsize_t jet_dim_extended[RANK] = {
-                    offset[0] + jet_dim_extend[0], jet_dim_extend[1],
-                    jet_dim_extend[2]
+		  offset[0] + jet_dim_extend[0], jet_dim_extend[1],
+		  jet_dim_extend[2]
                 };
 
                 // Extend to the new dimension
@@ -274,13 +296,13 @@ void write_track_cluster(H5::DataSet &event_data_set, H5::DataSet &track_data_se
                 H5::DataSpace jet_file_space = jet_data_set.getSpace();
 
                 track_file_space.selectHyperslab(
-                    H5S_SELECT_SET, track_dim_extend, offset);
+		  H5S_SELECT_SET, track_dim_extend, offset);
 
                 cluster_file_space.selectHyperslab(
-                    H5S_SELECT_SET, cluster_dim_extend, offset);
+		  H5S_SELECT_SET, cluster_dim_extend, offset);
 
                 jet_file_space.selectHyperslab(
-                    H5S_SELECT_SET, jet_dim_extend, offset);
+		  H5S_SELECT_SET, jet_dim_extend, offset);
 
                 // The memory space is the difference only (i.e. also
                 // the new event, but at offset 0)
@@ -290,24 +312,26 @@ void write_track_cluster(H5::DataSet &event_data_set, H5::DataSet &track_data_se
 
                 // Write the data from memory space to file space
                 track_data_set.write(&track_data[0], H5::PredType::NATIVE_FLOAT,
-                               track_memory_space, track_file_space);
+				     track_memory_space, track_file_space);
 
                 cluster_data_set.write(&cluster_data[0], H5::PredType::NATIVE_FLOAT,
-                               cluster_memory_space, cluster_file_space);
+				       cluster_memory_space, cluster_file_space);
 
                 jet_data_set.write(&jet_data[0], H5::PredType::NATIVE_FLOAT,
-                               jet_memory_space, jet_file_space);
+				   jet_memory_space, jet_file_space);
 
-            }
-            offset[0]++;
+	      }
+	      //put in block log
 
-            if (offset[0] % 1000 == 0) {
-                fprintf(stderr, "%s:%d: %llu / %lld\n", __FILE__,
-                        __LINE__, offset[0],
-                        hi_tree->GetEntries());
-            }
-        }
+	      offset[0]+=block_size;	 
+	      
+	      fprintf(stderr, "%s:%d: %llu / %lld\n", __FILE__,__LINE__, offset[0],
+		      hi_tree->GetEntries());
 
+	    }//BLOCK CHECK
+	    
+        }//Events
+	
         hi_tree->Delete();
         delete df;
         file->Close();
@@ -334,6 +358,7 @@ int main(int argc, char *argv[])
     UInt_t ntrack_max = 0;
     UInt_t ncluster_max = 0;
     UInt_t njet_max = 0;
+    UInt_t block_size = 2000; //affects chunk size, used from pairing
 
     find_ntrack_ncluster_max(argv + 1, argv + argc - 1, nevent_max, ntrack_max, ncluster_max, njet_max);
     fprintf(stderr, "%sf:%d: nevents = %u, ntrack_max = %u, ncluster_max = %u, njet_max = %u\n", __FILE__, __LINE__, nevent_max, ntrack_max, ncluster_max, njet_max);
@@ -350,11 +375,11 @@ int main(int argc, char *argv[])
     //easier to just make cluster use same # properties, reuse dim_extend
 
 
-    // The tensor dimension increment for each new event
-    hsize_t event_dim_extend[Event_RANK] = {1, event_row_size};
-    hsize_t track_dim_extend[RANK] = { 1, ntrack_max, track_row_size };
-    hsize_t cluster_dim_extend[RANK] = { 1, ncluster_max, cluster_row_size };
-    hsize_t jet_dim_extend[RANK] = { 1, njet_max, jet_row_size };
+    // The tensor dimension increment for each new chunk of events
+    hsize_t event_dim_extend[Event_RANK] = {2000, event_row_size};
+    hsize_t track_dim_extend[RANK] = { 2000, ntrack_max, track_row_size };
+    hsize_t cluster_dim_extend[RANK] = { 2000, ncluster_max, cluster_row_size };
+    hsize_t jet_dim_extend[RANK] = { 2000, njet_max, jet_row_size };
 
     // The maximum tensor dimension, for unlimited number of events
     hsize_t event_dim_max[Event_RANK] = {H5S_UNLIMITED, event_row_size};
@@ -405,41 +430,45 @@ int main(int argc, char *argv[])
     // Activate chunking, while observing the HDF5_DEFAULT_CACHE being
     // the CPU L2 cache size
     hsize_t event_dim_chunk[Event_RANK] = {
-        std::max(static_cast<unsigned long long>(1),
-                 HDF5_DEFAULT_CACHE /
-                 std::max(static_cast<unsigned long long>(1),
-                          event_dim_extend[0]*
-                          sizeof(float))),
+        // std::max(static_cast<unsigned long long>(1),
+        //          HDF5_DEFAULT_CACHE /
+        //          std::max(static_cast<unsigned long long>(1),
+        //                   event_dim_extend[0]*
+        //                   sizeof(float))),
+	event_dim_extend[0],
         event_dim_extend[1]
     };
     
 
     hsize_t track_dim_chunk[RANK] = {
-        std::max(static_cast<unsigned long long>(1),
-                 HDF5_DEFAULT_CACHE /
-                 std::max(static_cast<unsigned long long>(1),
-                          track_dim_extend[1] * track_dim_extend[2] *
-                          sizeof(float))),
-        track_dim_extend[1],
+        // std::max(static_cast<unsigned long long>(1),
+        //          HDF5_DEFAULT_CACHE /
+        //          std::max(static_cast<unsigned long long>(1),
+        //                   track_dim_extend[1] * track_dim_extend[2] *
+        //                   sizeof(float))),
+	track_dim_extend[0],
+	track_dim_extend[1],
         track_dim_extend[2]
     };
 
     hsize_t cluster_dim_chunk[RANK] = {
-        std::max(static_cast<unsigned long long>(1),
-                 HDF5_DEFAULT_CACHE /
-                 std::max(static_cast<unsigned long long>(1),
-                          cluster_dim_extend[1] * cluster_dim_extend[2] *
-                          sizeof(float))),
+        // std::max(static_cast<unsigned long long>(1),
+        //          HDF5_DEFAULT_CACHE /
+        //          std::max(static_cast<unsigned long long>(1),
+        //                   cluster_dim_extend[1] * cluster_dim_extend[2] *
+        //                   sizeof(float))),
+	cluster_dim_extend[0],
         cluster_dim_extend[1],
         cluster_dim_extend[2]
     };
 
     hsize_t jet_dim_chunk[RANK] = {
-        std::max(static_cast<unsigned long long>(1),
-                 HDF5_DEFAULT_CACHE /
-                 std::max(static_cast<unsigned long long>(1),
-                          jet_dim_extend[1] * jet_dim_extend[2] *
-                          sizeof(float))),
+        // std::max(static_cast<unsigned long long>(1),
+        //          HDF5_DEFAULT_CACHE /
+        //          std::max(static_cast<unsigned long long>(1),
+        //                   jet_dim_extend[1] * jet_dim_extend[2] *
+        //                   sizeof(float))),
+        jet_dim_extend[0],
         jet_dim_extend[1],
         jet_dim_extend[2]
     };
@@ -449,7 +478,7 @@ int main(int argc, char *argv[])
     cluster_property.setChunk(RANK, cluster_dim_chunk);
     jet_property.setChunk(RANK, jet_dim_chunk);
 
-    // Create the data set, which will have space for the first event
+    // Create the data set, which will have space for the first event (chunk)
     H5::DataSet event_data_set =
       file.createDataSet("event", H5::PredType::NATIVE_FLOAT,
              event_data_space, event_property);
@@ -471,7 +500,7 @@ int main(int argc, char *argv[])
 
     write_track_cluster(event_data_set, track_data_set, cluster_data_set, jet_data_set,
             event_offset, offset, event_dim_extend, track_dim_extend, cluster_dim_extend, jet_dim_extend,
-            nevent_max, ntrack_max, ncluster_max, njet_max, argv + 1, argv + argc - 1);
+	    nevent_max, ntrack_max, ncluster_max, njet_max, block_size,argv + 1, argv + argc - 1);
 
     file.close();
 
