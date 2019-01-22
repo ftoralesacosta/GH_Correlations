@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 //int main()
 {
   if (argc < 2){
-    std::cout<<"Syntax is [Command] [Same_Event_root_file] [Mixed_Event_root_file]"<<std::endl;
+    std::cout<<"Syntax is [Command] [Same_Event_root_file] (Assumes Mixed File)"<<std::endl;
     exit(EXIT_FAILURE);
   }
   TFile *corr = TFile::Open((TString)argv[1]);
@@ -47,12 +47,9 @@ int main(int argc, char *argv[])
 
   TFile* MixFile[nTrackSkims];
   for (int iSkim = 0; iSkim < nTrackSkims; iSkim ++){
-    //MixFile[iSkim] = TFile::Open(Form("InputData/13f_MB_%1.0fGeV_NN_15_20.root",trackPtSkims[iSkim]));
     MixFile[iSkim] = TFile::Open(Form("%s_MB_%1.0fGeV_Skim_Correlation.root",basic_name.c_str(),trackPtSkims[iSkim]));
-    //MixFile[iSkim] = TFile::Open((TString)argv[2]);
-    //MixFile[iSkim] = TFile::Open("InputData/17q_MB_4GeVTrack_Correlation_12_15.root");
-    //std::cout<<Form("%s_%1.0fGeVTracks.root",basic_name.c_str(),trackPtSkims[iSkim])<<std::endl;
 
+    //std::cout<<Form("%s_%1.0fGeVTracks.root",basic_name.c_str(),trackPtSkims[iSkim])<<std::endl;
     //MixFile[iSkim] = TFile::Open((TString)argv[2]);
 
     if (MixFile[iSkim] == NULL) {
@@ -159,6 +156,7 @@ int main(int argc, char *argv[])
   TH2F* Same_Inclusive_Corr[nztbins*nptbins];
   TH2F* Same_DNN1_Corr[nztbins*nptbins]; 
   TH2F* Same_DNN2_Corr[nztbins*nptbins];
+  TH2F* Same_DNN2_Corr_UnWeight[nztbins*nptbins];
 
   TH2F* Mix_Inclusive_Corr[nztbins*nptbins];
   TH2F* Mix_DNN1_Corr[nztbins*nptbins];
@@ -200,6 +198,7 @@ int main(int argc, char *argv[])
 	std::cout << "Same 1 TH2D fail" << std::endl;
 	exit(EXIT_FAILURE);}
 
+
       Same_DNN2_Corr[izt+ipt*nztbins] = (TH2F*)corr->Get(
           Form("DNN%i_Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",
           2,ptbins[ipt],ptbins[ipt+1],100*ztbins[izt],100*ztbins[izt+1]));
@@ -207,6 +206,15 @@ int main(int argc, char *argv[])
       if (Same_DNN2_Corr[izt+ipt*nztbins] == NULL) {
 	std::cout << "Same 2 TH2D fail" << std::endl;
 	exit(EXIT_FAILURE);}
+
+      Same_DNN2_Corr_UnWeight[izt+ipt*nztbins] = (TH2F*)corr->Get(
+	  Form("Unweighted_DNN%i_Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",
+	  2,ptbins[ipt],ptbins[ipt+1],100*ztbins[izt],100*ztbins[izt+1]));
+
+      if (Same_DNN2_Corr[izt+ipt*nztbins] == NULL) {
+	std::cout << "Same DNN2 UW TH2D fail" << std::endl;
+        exit(EXIT_FAILURE);}
+
 
       //Implement due to Track pT Skimming min bias
       for (int iSkim = 0; iSkim < nTrackSkims; iSkim ++){
@@ -278,23 +286,20 @@ int main(int argc, char *argv[])
     Mix_DNN1_Corr[izt+ipt*nztbins]->Scale(1.0/mix_DNN1_intgrl);
     Mix_DNN2_Corr[izt+ipt*nztbins]->Scale(1.0/mix_DNN2_intgrl);
 
-    // Mix_DNN1_Corr[izt+ipt*nztbins]->Scale(1.0/mix_Inclusive_intgrl);
-    // Mix_DNN2_Corr[izt+ipt*nztbins]->Scale(1.0/mix_Inclusive_intgrl);
-
     std::cout<<mix_DNN1_intgrl<<std::endl;
 
     fprintf(stderr, "%s: %d: scaled Mixed Events by max ME value: %f\n",__FILE__,__LINE__,mix_DNN1_intgrl);
 
-    //DIVIDE MIXING
+    //DIVIDE MIXING (by inclusive for better statistics. <2% deviation from region division)
+
     Same_Inclusive_Corr[izt+ipt*nztbins]->Divide(Mix_Inclusive_Corr[izt+ipt*nztbins]);
+    Same_DNN1_Corr[izt+ipt*nztbins]->Divide(Mix_Inclusive_Corr[izt+ipt*nztbins]);
+    Same_DNN2_Corr[izt+ipt*nztbins]->Divide(Mix_Inclusive_Corr[izt+ipt*nztbins]);
+    Same_DNN2_Corr_UnWeight[izt+ipt*nztbins]->Divide(Mix_Inclusive_Corr[izt+ipt*nztbins]);
 
     //DIVIDING BY Regional CORRELATIONS
-    Same_DNN1_Corr[izt+ipt*nztbins]->Divide(Mix_DNN1_Corr[izt+ipt*nztbins]);
-    Same_DNN2_Corr[izt+ipt*nztbins]->Divide(Mix_DNN2_Corr[izt+ipt*nztbins]);
-
-
-    // Same_DNN1_Corr[izt+ipt*nztbins]->Divide(Mix_Inclusive_Corr[izt+ipt*nztbins]);
-    // Same_DNN2_Corr[izt+ipt*nztbins]->Divide(Mix_Inclusive_Corr[izt+ipt*nztbins]);
+    //Same_DNN1_Corr[izt+ipt*nztbins]->Divide(Mix_DNN1_Corr[izt+ipt*nztbins]);
+    //Same_DNN2_Corr[izt+ipt*nztbins]->Divide(Mix_DNN2_Corr[izt+ipt*nztbins]);
 
     fprintf(stderr, "%s: %d: Division OK\n",__FILE__,__LINE__);
 
@@ -305,6 +310,11 @@ int main(int argc, char *argv[])
     for (int izt = 0; izt < nztbins; izt++){
       Same_DNN2_Corr[izt+ipt*nztbins]->Write();
     fprintf(stderr, "%s: %d: Write DNN2 OK\n",__FILE__,__LINE__);
+    }
+
+    for (int izt = 0; izt < nztbins; izt++){
+      Same_DNN2_Corr_UnWeight[izt+ipt*nztbins]->Write();
+      fprintf(stderr, "%s: %d: Write DNN2 UW OK\n",__FILE__,__LINE__);
     }
 
     for (int izt = 0; izt < nztbins; izt++){
@@ -323,7 +333,6 @@ int main(int argc, char *argv[])
     std::cout<<N_Iso_Triggers[ipt]->GetEntries()<<std::endl;
   }//ipt
 
-  TCanvas *canvas = new TCanvas("canv","canv", 1200,1000);
   corr->Close();
   for (int iSkim = 0; iSkim < nTrackSkims; iSkim ++) MixFile[iSkim]->Close();
   MyFile->Close();
