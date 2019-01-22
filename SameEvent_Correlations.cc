@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
   ptbins = new float[nptbins+1];
   ptbins[0] = 10.0; ptbins[1] = 11; ptbins[2] = 12.5; ptbins[3] = 16;
 
-
+  //FIXME: Obviously needs to be put in a header file.
   // Loop through config file
   char line[MAX_INPUT_LENGTH];
   while (fgets(line, MAX_INPUT_LENGTH, config) != NULL) {
@@ -295,6 +295,7 @@ int main(int argc, char *argv[])
   TH2D* Corr[nztbins*nptbins];
   TH2D* IsoCorr[nztbins*nptbins];
   TH2D* BKGD_IsoCorr[nztbins*nptbins];
+  TH2D* BKGD_IsoCorr_UW[nztbins*nptbins];
 
   TH1D* H_Signal_Triggers[nptbins];
   TH1D* H_BKGD_Triggers[nptbins];
@@ -318,7 +319,9 @@ int main(int argc, char *argv[])
 
   TH1F hBR("hBR", "Isolated cluster, bkg region", 40, 10.0, 50.0);
   TH1F hweight("hweight", "Isolated cluster, signal region", 40, 10.0, 50.0);
-  
+  TH1F* Weights_Sum = new TH1F("Weights_Sum", "Sum of Weights. XBin Centers = pt Bin", nptbins,0.5,4.5);
+  float weight_sum[nptbins];
+
   hweight.Sumw2();
   hBR.Sumw2();
   
@@ -338,6 +341,8 @@ int main(int argc, char *argv[])
       H_Purities[ipt] = new TH1F(
       Form("H_Purities_pT%1.0f_%1.0f",ptbins[ipt],ptbins[ipt+1]),
       "yields weighted average purity for pT bin", 100, 0.0,1.0);
+      
+      weight_sum[ipt] = 0;
 
       for (int izt = 0; izt<nztbins; izt++){
 
@@ -358,6 +363,14 @@ int main(int argc, char *argv[])
 
       BKGD_IsoCorr[izt+ipt*nztbins]->Sumw2();
       BKGD_IsoCorr[izt+ipt*nztbins]->SetMinimum(0.);
+
+
+      BKGD_IsoCorr_UW[izt+ipt*nztbins] = new TH2D(Form("Unweighted_DNN%i_Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",2,ptbins[ipt],ptbins[ipt+1],
+						    100*ztbins[izt],100*ztbins[izt+1]),"#gamma-H [AntiIso] Correlation", n_phi_bins,0,M_PI, n_eta_bins, -1.4, 1.4);
+
+      BKGD_IsoCorr_UW[izt+ipt*nztbins]->Sumw2();
+      BKGD_IsoCorr_UW[izt+ipt*nztbins]->SetMinimum(0.);
+
 
       h_track_phi_eta[izt+ipt*nztbins] = new TH2D(Form("track_phi_eta__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",2,ptbins[ipt],ptbins[ipt+1],
       100*ztbins[izt],100*ztbins[izt+1]),"Paired Track #phi #eta distribution", n_phi_bins*2,0,M_PI, n_eta_bins*2, -1, 1);
@@ -498,7 +511,7 @@ int main(int argc, char *argv[])
     Bool_t Isolated = false;
 
     Long64_t nentries = _tree_event->GetEntries();         
-    //Long64_t nentries = 20000;
+    //Long64_t nentries = 200;
     std::cout << " Total Number of entries in TTree: " << nentries << std::endl;
 
     //WEIGHTING and CLUSTER SPECTRA LOOP
@@ -532,13 +545,12 @@ int main(int argc, char *argv[])
 	
 	if (strcmp(shower_shape.data(),"Lambda")== 0) {
 
-	  Signal = ((cluster_lambda_square[n][0] < Lambda0_cut));	  
-	  Background =  ((cluster_lambda_square[n][0] > Lambda0_cut));
+	  Signal = ((cluster_lambda_square[n][0] > 0.05) && (cluster_lambda_square[n][0] < Lambda0_cut));	  
+	  Background =  ((cluster_lambda_square[n][0] > Lambda0_cut) && (cluster_lambda_square[n][0] < 1.0));
 
 	}
 	
 	else if (strcmp(shower_shape.data(),"DNN")==0){
-
 	  Signal =  ( (cluster_s_nphoton[n][1] > DNN_min) && (cluster_s_nphoton[n][1]<DNN_max));
 	  Background = (cluster_s_nphoton[n][1] > 0.0 && cluster_s_nphoton[n][1] < DNN_Bkgd);
 
@@ -567,10 +579,9 @@ int main(int argc, char *argv[])
 	    }
 
 	    for (int ipt = 0; ipt < nptbins; ipt++){
-	    
 	      if (cluster_pt[n] >ptbins[ipt] && cluster_pt[n] <ptbins[ipt+1]){
 		H_Signal_Triggers[ipt]->Fill(1);
-		H_Purities[ipt]->Fill(Cluster_Purity);
+		H_Purities[ipt]->Fill(Cluster_Purity); 
 	      }
 	    }
 
@@ -584,17 +595,19 @@ int main(int argc, char *argv[])
 
 	    N_BKGD_Triggers += 1;
 	    hBR.Fill(cluster_pt[n]);
-
-	    for (int ipt = 0; ipt < nptbins; ipt++)
-	      if (cluster_pt[n] >= ptbins[ipt] && cluster_pt[n] <ptbins[ipt+1]) 
+	    
+	    for (int ipt = 0; ipt < nptbins; ipt++){
+	      if (cluster_pt[n] >ptbins[ipt] && cluster_pt[n] <ptbins[ipt+1])
 		H_BKGD_Triggers[ipt]->Fill(1); 
-
+	    }
 	  } //Background
 	
 	  //no dnn
-	  if (Isolated)
+	  if (Isolated){
+	    //fprintf(stderr,"\n %d: Isolation = %f \n",__LINE__,isolation);
 	    for (int ipt = 0; ipt < nptbins; ipt++)
 	      Triggers[ipt]->Fill(1);
+	  }
       }
     } //Events
 
@@ -650,7 +663,12 @@ int main(int argc, char *argv[])
 	
 	if(Background and Isolated){
 	  bkg_weight = hweight.GetBinContent(hweight.FindBin(cluster_pt[n]));
-	  //bkg_weight = (hweight.GetBinContent(hweight.FindBin(cluster_pt[n])) / hBR.GetBinContent(hBR.FindBin(cluster_pt[n])) );
+	  for (int ipt = 0; ipt < nptbins; ipt++){
+	    if (cluster_pt[n] >= ptbins[ipt] && cluster_pt[n] < ptbins[ipt+1]){
+	      Weights_Sum->Fill((ipt+1),bkg_weight); //Integrate histo for pTbin for sum of weights
+	      weight_sum[ipt] += bkg_weight;
+	    }
+	  }
 	  //fprintf(stderr,"\n %d: weight = %f \n",__LINE__,bkg_weight);
 	  BKGD_pT_Dist->Fill(cluster_pt[n]);
 	  BKGD_pT_Dist_Weighted->Fill(cluster_pt[n],bkg_weight);
@@ -697,10 +715,12 @@ int main(int argc, char *argv[])
 		  if (Signal and Isolated)
 		    IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
 		  
-		  if (Background and Isolated)
-		    BKGD_IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta,bkg_weight);
-		  
-		  
+		  if (Background and Isolated){
+		    BKGD_IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta); //NO WEIGHTS!!
+		    BKGD_IsoCorr_UW[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
+		  }
+		
+	    	  
 		  //no shower shape selection
 		  if(Isolated)
 		    Corr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
@@ -734,7 +754,7 @@ int main(int argc, char *argv[])
   else
     fout = new TFile(Form("%s_SE_Correlation.root",rawname.data()),"RECREATE");
 
-  std::cout<<"Clusters Passed Iosalation: "<<N_Signal_Triggers<<std::endl;
+  std::cout<<"Clusters Passed Iosalation and Shower Shape: "<<N_Signal_Triggers<<std::endl;
 			  
   h_purity.Write("purities");
 
@@ -744,6 +764,7 @@ int main(int argc, char *argv[])
   hweight.Write();
 
   Signal_pT_Dist->Write();
+  BKGD_pT_Dist->Scale(1.0/(hweight.Integral(1,40))); //Divide by sum of weights
   BKGD_pT_Dist->Write();
   BKGD_pT_Dist_Weighted->Write();
 
@@ -760,22 +781,32 @@ int main(int argc, char *argv[])
     H_Purities[ipt]->Write();
 
   for (int ipt = 0; ipt<nptbins; ipt++){
+    //Weights_Sum->SetBinContent(ipt+1,weight_sum[ipt]);
+    fprintf(stderr,"\n %d: Weight sum in pt bin %i: %f \n",__LINE__,ipt,weight_sum[ipt]);    
+    fprintf(stderr,"\n %d: Weight sum in pt bin %i: %f \n",__LINE__,ipt,Weights_Sum->GetBinContent(ipt+1));    
+
     for (int izt = 0; izt<nztbins; izt++)
       h_track_phi_eta[izt+ipt*nztbins]->Write();
-    // for (int izt = 0; izt<nztbins; izt++)
-    //   h_track_eta[nztbins*nptbins]->Write();
-    // for (int izt = 0; izt<nztbins; izt++)
-    //   h_track_phi[nztbins*nptbins]->Write();
-    for (int izt = 0; izt<nztbins; izt++)
+
+    for (int izt = 0; izt<nztbins; izt++){
       Corr[izt+ipt*nztbins]->Write();
-    for (int izt = 0; izt<nztbins; izt++)
+    }
+    for (int izt = 0; izt<nztbins; izt++){
       IsoCorr[izt+ipt*nztbins]->Write();
-    for (int izt = 0; izt<nztbins; izt++)
+    }
+    for (int izt = 0; izt<nztbins; izt++){
       BKGD_IsoCorr[izt+ipt*nztbins]->Write();
+    }
+    for (int izt = 0; izt<nztbins; izt++){
+      BKGD_IsoCorr_UW[izt+ipt*nztbins]->Write();
+    }
   }
+
+  Weights_Sum->Write();
+
   //Seperate zt loops for easier file reading
   fout->Close();     
   file->Close();  
   std::cout << " ending " << std::endl;
   return EXIT_SUCCESS;
-}
+      }
