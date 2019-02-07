@@ -23,3 +23,5 @@
 *.out
 *.txt
 #*.sh
+
+./batchjobs/res_dir/
