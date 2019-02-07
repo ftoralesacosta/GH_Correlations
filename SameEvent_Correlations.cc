@@ -261,32 +261,31 @@ int main(int argc, char *argv[])
   //Purity Handling
 
   //Following purities for pT range: 12.5,13.2,14.4,15.8
-  //float pT_Ranges[4] = {12,13.2,14.4,16.1};//under/overshoot extremes for inclusivity
   int  N_pT_Ranges = 9;
-  float pT_Ranges[9] = {12,13.5,14,16,18,20,25,30,40};
+  float pT_Ranges[9] = {12,13.46,15.09,16.92,18.97,21.28,23.86,30,40};
   float purities[8] = {0};
   float Cluster_Purity = 0;
 
   if (strcmp(shower_shape.data(), "DNN") == 0){
-    purities[0] = 0.258;
-    purities[1] = 0.298;
-    purities[2] = 0.321; 
-    purities[3] = 0.371;
-    purities[4] = 0.411;
-    purities[5] = 0.471;
-    purities[6] = 0.491;
-    purities[7] = 0.461;
+    purities[0] = 0.229;
+    purities[1] = 0.255;
+    purities[2] = 0.326; 
+    purities[3] = 0.372;
+    purities[4] = 0.447;
+    purities[5] = 0.502;
+    purities[6] = 0.533;
+    purities[7] = 0.531;
   }
 
   else if (strcmp(shower_shape.data(), "Lambda") == 0){
-    purities[0] = 0.237;
-    purities[1] = 0.267;
-    purities[2] = 0.286;
-    purities[3] = 0.386;
-    purities[4] = 0.426;
-    purities[5] = 0.441;
-    purities[6] = 0.501;
-    purities[7] = 0.531;
+    purities[0] = 0.207;
+    purities[1] = 0.210;
+    purities[2] = 0.328;
+    purities[3] = 0.367;
+    purities[4] = 0.447;
+    purities[5] = 0.524;
+    purities[6] = 0.509;
+    purities[7] = 0.597;
   }
 
   else {
@@ -332,7 +331,7 @@ int main(int argc, char *argv[])
 
       H_BKGD_Triggers[ipt] = new TH1D(
       Form("N_DNN%i_Triggers_pT%1.0f_%1.0f",2,ptbins[ipt],ptbins[ipt+1]),
-      "Number of Isolated Low DNN Photon Triggers", 2, -0.5,1.0);
+      "Number of Isolated Low DNN Photon Triggers", 1, -0.5,3.5);
 
       Triggers[ipt] = new TH1D(
       Form("N_Triggers_pT%1.0f_%1.0f",ptbins[ipt],ptbins[ipt+1]),
@@ -546,8 +545,9 @@ int main(int argc, char *argv[])
 	if (strcmp(shower_shape.data(),"Lambda")== 0) {
 
 	  Signal = ((cluster_lambda_square[n][0] > 0.05) && (cluster_lambda_square[n][0] < Lambda0_cut));	  
-	  Background =  ((cluster_lambda_square[n][0] > Lambda0_cut) && (cluster_lambda_square[n][0] < 1.0));
-
+	  //Background =  (cluster_lambda_square[n][0] > Lambda0_cut);
+	  //Background =  ((cluster_lambda_square[n][0] > 0.4) && (cluster_lambda_square[n][0] < 1.0)); //DOES NOT WORK!!!!
+	  Background =  ((cluster_lambda_square[n][0] > 0.4));
 	}
 	
 	else if (strcmp(shower_shape.data(),"DNN")==0){
@@ -570,11 +570,12 @@ int main(int argc, char *argv[])
 	    Signal_pT_Dist->Fill(cluster_pt[n]);
 	    hweight.Fill(cluster_pt[n]);
 
-	    for (int ipt = 0; ipt < (N_pT_Ranges-1); ipt++ ){
-	      if ((cluster_pt[n] >= pT_Ranges[ipt]) && (cluster_pt[n] < pT_Ranges[ipt+1])){
+	    //N_pT_Ranges corresponds to pT binning of purity, not pT binning of correlations
+	    for (int i = 0; i < (N_pT_Ranges-1); i++ ){
+	      if ((cluster_pt[n] >= pT_Ranges[i]) && (cluster_pt[n] < pT_Ranges[i+1])){
 		//fprintf(stderr,"\n%d: purity = %f; pT_Cluster = %f",__LINE__,purities[ipt],cluster_pt[n]);
-		h_purity.Fill(purities[ipt]);
-		Cluster_Purity = purities[ipt];
+		h_purity.Fill(purities[i]);
+		Cluster_Purity = purities[i];
 	      }
 	    }
 
@@ -596,10 +597,10 @@ int main(int argc, char *argv[])
 	    N_BKGD_Triggers += 1;
 	    hBR.Fill(cluster_pt[n]);
 	    
-	    for (int ipt = 0; ipt < nptbins; ipt++){
-	      if (cluster_pt[n] >ptbins[ipt] && cluster_pt[n] <ptbins[ipt+1])
-		H_BKGD_Triggers[ipt]->Fill(1); 
-	    }
+	  //   for (int ipt = 0; ipt < nptbins; ipt++){
+	  //     if (cluster_pt[n] >ptbins[ipt] && cluster_pt[n] <ptbins[ipt+1])
+	  // 	//H_BKGD_Triggers[ipt]->Fill(1); 
+	  //   }
 	  } //Background
 	
 	  //no dnn
@@ -612,8 +613,6 @@ int main(int argc, char *argv[])
     } //Events
 
     hweight.Divide(&hBR);
-
-
 
     //MAIN CORRELATION LOOP
 
@@ -642,8 +641,7 @@ int main(int argc, char *argv[])
 	Isolated = (isolation<iso_max);
 
 	if (strcmp(shower_shape.data(),"Lambda")== 0) {
-
-	  Signal = (cluster_lambda_square[n][0] < Lambda0_cut);	  
+	  Signal = (cluster_lambda_square[n][0] < Lambda0_cut);
 	  Background = (cluster_lambda_square[n][0] > Lambda0_cut);
 	}
 	
@@ -667,6 +665,7 @@ int main(int argc, char *argv[])
 	    if (cluster_pt[n] >= ptbins[ipt] && cluster_pt[n] < ptbins[ipt+1]){
 	      Weights_Sum->Fill((ipt+1),bkg_weight); //Integrate histo for pTbin for sum of weights
 	      weight_sum[ipt] += bkg_weight;
+	      H_BKGD_Triggers[ipt]->Fill(1,bkg_weight); //Fill Single Bin, Sum = Bin Contents
 	    }
 	  }
 	  //fprintf(stderr,"\n %d: weight = %f \n",__LINE__,bkg_weight);
@@ -716,7 +715,7 @@ int main(int argc, char *argv[])
 		    IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
 		  
 		  if (Background and Isolated){
-		    BKGD_IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta); //NO WEIGHTS!!
+		    BKGD_IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta,bkg_weight); //NO WEIGHTS!!
 		    BKGD_IsoCorr_UW[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
 		  }
 		
@@ -784,7 +783,8 @@ int main(int argc, char *argv[])
     //Weights_Sum->SetBinContent(ipt+1,weight_sum[ipt]);
     fprintf(stderr,"\n %d: Weight sum in pt bin %i: %f \n",__LINE__,ipt,weight_sum[ipt]);    
     fprintf(stderr,"\n %d: Weight sum in pt bin %i: %f \n",__LINE__,ipt,Weights_Sum->GetBinContent(ipt+1));    
-
+    fprintf(stderr,"\n %d: Weight sum in pt bin %i: %f \n",__LINE__,ipt,H_BKGD_Triggers[ipt]->GetBinContent(1));    
+    
     for (int izt = 0; izt<nztbins; izt++)
       h_track_phi_eta[izt+ipt*nztbins]->Write();
 
@@ -809,4 +809,4 @@ int main(int argc, char *argv[])
   file->Close();  
   std::cout << " ending " << std::endl;
   return EXIT_SUCCESS;
-      }
+}

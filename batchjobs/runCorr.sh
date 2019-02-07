@@ -11,6 +11,6 @@ date
 
 echo "Command runCorr with file = $1, hdf5 = $2 mix_start = $3, mix_end = $4, and TrackSkim GeV = $5"
 
-./Batch_Mix_Correlations $1 $2 $3 $4 $5
+./Batch_Mix_Correlations_PDSF $1 $2 $3 $4 $5
 
 date

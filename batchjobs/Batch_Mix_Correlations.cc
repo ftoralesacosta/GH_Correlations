@@ -546,8 +546,8 @@ int main(int argc, char *argv[])
     event_memspace.selectHyperslab( H5S_SELECT_SET, event_count_out, event_offset_out );
     event_dataset.read( event_data_out, PredType::NATIVE_FLOAT, event_memspace, event_dataspace);
 
-    //Long64_t nentries = _tree_event->GetEntries();   
-    Long64_t nentries = 20000;   
+    Long64_t nentries = _tree_event->GetEntries();   
+    //Long64_t nentries = 20000;   
 
    int skip_counter = 0;
 
@@ -599,7 +599,7 @@ int main(int argc, char *argv[])
         else if (strcmp(shower_shape.data(),"DNN")==0){
           if ((cluster_s_nphoton[n][1] > DNN_min) && (cluster_s_nphoton[n][1]<DNN_max))
             Signal = true;
-          if (cluster_s_nphoton[n][1] > 0.0 && cluster_s_nphoton[n][1] < 0.3)
+          if (cluster_s_nphoton[n][1] > 0.0 && cluster_s_nphoton[n][1] < 0.3) //0.3 = DNN_Bkgd
             Background = true;
         }
 

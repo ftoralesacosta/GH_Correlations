@@ -22,7 +22,7 @@ do
     fi
     
     #for i in {0..4..2} #Mix 2 test events
-    for i in {0..280..20} #Mix 300 events
+    for i in {100..280..20} #Mix 300 events
     do
 	mix_min=$i
 	mix_max="$((i + 19))"

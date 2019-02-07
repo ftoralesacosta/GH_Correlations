@@ -208,11 +208,11 @@ int main(int argc, char *argv[])
 	exit(EXIT_FAILURE);}
 
       Same_DNN2_Corr_UnWeight[izt+ipt*nztbins] = (TH2F*)corr->Get(
-	  Form("Unweighted_DNN%i_Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",
-	  2,ptbins[ipt],ptbins[ipt+1],100*ztbins[izt],100*ztbins[izt+1]));
+      	  Form("Unweighted_DNN%i_Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",
+      	  2,ptbins[ipt],ptbins[ipt+1],100*ztbins[izt],100*ztbins[izt+1]));
 
-      if (Same_DNN2_Corr[izt+ipt*nztbins] == NULL) {
-	std::cout << "Same DNN2 UW TH2D fail" << std::endl;
+      if (Same_DNN2_Corr_UnWeight[izt+ipt*nztbins] == NULL) {
+      	std::cout << "Same DNN2 UW TH2D fail" << std::endl;
         exit(EXIT_FAILURE);}
 
 
@@ -265,41 +265,24 @@ int main(int argc, char *argv[])
 	}
 
       } //iSkim
-    //Normalization from max value!! (STAR/ALICE way)
-    TAxis *mix_xaxis = Mix_DNN1_Corr[izt+ipt*nztbins]->GetXaxis();
-    TAxis *mix_yaxis = Mix_DNN1_Corr[izt+ipt*nztbins]->GetYaxis();
 
+    
+    //Normalization: Set Max Value to 1.0 (STAR/ALICE way)
     Double_t mix_DNN1_intgrl = Mix_DNN1_Corr[izt+ipt*nztbins]->GetBinContent(Mix_DNN1_Corr[izt+ipt*nztbins]->GetMaximumBin());
-    //    std::cout<<"Max DNN1 Value at) = "<<mix_DNN1_intgrl<<std::endl;
-
     Double_t mix_DNN2_intgrl = Mix_DNN2_Corr[izt+ipt*nztbins]->GetBinContent(Mix_DNN2_Corr[izt+ipt*nztbins]->GetMaximumBin());
-    //    std::cout<<"Max DNN2 Value = "<<mix_DNN2_intgrl<<std::endl;
-
-
-    //Double_t mix_Inclusive_intgrl = Mix_Inclusive_Corr[izt+ipt*nztbins]->GetBinContent(Mix_Inclusive_Corr[izt+ipt*nztbins]->GetMaximumBin());
     Double_t mix_Inclusive_intgrl = Mix_Inclusive_Corr[izt+ipt*nztbins]->GetBinContent(Mix_Inclusive_Corr[izt+ipt*nztbins]->GetMaximumBin());
-
-    //std::cout<<"Max Inclusive Value at) = "<<mix_Inclusive_intgrl<<std::endl;
-    std::cout<<izt<<" "<<1.0/mix_DNN1_intgrl<<std::endl;
 
     Mix_Inclusive_Corr[izt+ipt*nztbins]->Scale(1.0/mix_Inclusive_intgrl);
     Mix_DNN1_Corr[izt+ipt*nztbins]->Scale(1.0/mix_DNN1_intgrl);
     Mix_DNN2_Corr[izt+ipt*nztbins]->Scale(1.0/mix_DNN2_intgrl);
 
-    std::cout<<mix_DNN1_intgrl<<std::endl;
-
     fprintf(stderr, "%s: %d: scaled Mixed Events by max ME value: %f\n",__FILE__,__LINE__,mix_DNN1_intgrl);
 
-    //DIVIDE MIXING (by inclusive for better statistics. <2% deviation from region division)
-
+    //DIVIDE MIXING (by inclusive for better statistics. Less than 2.0% deviation from region division)
     Same_Inclusive_Corr[izt+ipt*nztbins]->Divide(Mix_Inclusive_Corr[izt+ipt*nztbins]);
     Same_DNN1_Corr[izt+ipt*nztbins]->Divide(Mix_Inclusive_Corr[izt+ipt*nztbins]);
     Same_DNN2_Corr[izt+ipt*nztbins]->Divide(Mix_Inclusive_Corr[izt+ipt*nztbins]);
     Same_DNN2_Corr_UnWeight[izt+ipt*nztbins]->Divide(Mix_Inclusive_Corr[izt+ipt*nztbins]);
-
-    //DIVIDING BY Regional CORRELATIONS
-    //Same_DNN1_Corr[izt+ipt*nztbins]->Divide(Mix_DNN1_Corr[izt+ipt*nztbins]);
-    //Same_DNN2_Corr[izt+ipt*nztbins]->Divide(Mix_DNN2_Corr[izt+ipt*nztbins]);
 
     fprintf(stderr, "%s: %d: Division OK\n",__FILE__,__LINE__);
 
