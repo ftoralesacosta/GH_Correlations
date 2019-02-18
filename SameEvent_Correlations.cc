@@ -291,6 +291,16 @@ int main(int argc, char *argv[])
   else {
     purities[0]=0.27;purities[1]=0.32;purities[2]=0.37;}//Emax/Ecluster
 
+  //Track Corrections (Calculated in 1GeV pT bins, used as weights when filling)
+
+  float Smearing_Correction[15] = {1.007,1.007,0.982,0.957,0.926,0.894,0.853,0.817,0.757,0.681,0.673,0.619,0.469,0.342,0.301};
+  
+  float OneMinFakeRate[15] = {0.9821,0.9821,0.9803,0.9751,0.9645,0.9525,0.9278,0.9098,0.8702,0.8593,0.7870,0.7825,0.7624,0.7389,0.6710};
+
+  const float Efficiency = 0.85;
+
+
+
   TH2D* Corr[nztbins*nptbins];
   TH2D* IsoCorr[nztbins*nptbins];
   TH2D* BKGD_IsoCorr[nztbins*nptbins];
@@ -658,7 +668,8 @@ int main(int argc, char *argv[])
 
 
 	float bkg_weight = 1.0;
-	
+	float track_weight = 1.0; //Fake Rate, smearing, efficiency
+
 	if(Background and Isolated){
 	  bkg_weight = hweight.GetBinContent(hweight.FindBin(cluster_pt[n]));
 	  for (int ipt = 0; ipt < nptbins; ipt++){
@@ -697,6 +708,14 @@ int main(int argc, char *argv[])
 	  }
  	  //if (Track_HasMatch) continue;
 
+	  //Apply corrections as weights. 1/Eff, *FakeRate, *SmearingAffect
+
+	  for (int ipt = 0; ipt < 15; ipt++){
+	    if ( (track_pt[itrack] >= ipt) && (track_pt[itrack] < (ipt+1)) ) {
+	      track_weight = Smearing_Correction[ipt]*OneMinFakeRate[ipt]/Efficiency;
+	    }
+	  }
+	
 	  //Observables:
 	  Double_t zt = track_pt[itrack]/cluster_pt[n];
 	  Float_t DeltaPhi = TMath::Abs(TVector2::Phi_mpi_pi(cluster_phi[n] - track_phi[itrack]));
@@ -712,11 +731,12 @@ int main(int argc, char *argv[])
 		  //2 DNN Regions
 
 		  if (Signal and Isolated)
-		    IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
+		    IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta,track_weight);
 		  
 		  if (Background and Isolated){
-		    BKGD_IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta,bkg_weight); //NO WEIGHTS!!
-		    BKGD_IsoCorr_UW[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
+		    BKGD_IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta,bkg_weight*track_weight);
+		    //not weighted with pT distro
+		    BKGD_IsoCorr_UW[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta,track_weight);
 		  }
 		
 	    	  
