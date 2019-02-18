@@ -1,4 +1,4 @@
-pT_min:                       12
+BBpT_min:                       12
 pT_max:                       40
 DNN_min:                      0.55
 DNN_max:                      0.85
@@ -11,7 +11,7 @@ Cluster_min:                  2
 Cluster_dist_to_bad_channel:  2
 Cluster_N_Local_Maxima:       3.0
 EcrossoverE_min:              0.05
-iso_max:                      1.0
+iso_max:                      1.5
 noniso_min:                   5.0
 noniso_max:                   10.0
 deta_max:                     0.6
@@ -23,6 +23,6 @@ Zt_bins:               [0.05, 0.07670637, 0.11767734, 0.18053204, 0.27695915, 0.
 #Pt_bins:               [12.0, 15.0]
 Pt_bins:	       [12.0,15.0,19.0,26.0,40.0]
 Cluster_isolation_determinant: cluster_iso_its_04
-#Shower_Shape:                 DNN
-Shower_Shape:                 Lambda
+Shower_Shape:                 DNN
+#Shower_Shape:                 Lambda
 #Shower_Shape:                  EMax
