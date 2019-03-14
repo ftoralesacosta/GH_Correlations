@@ -264,17 +264,30 @@ int main(int argc, char *argv[])
   int  N_pT_Ranges = 9;
   float pT_Ranges[9] = {12,13.46,15.09,16.92,18.97,21.28,23.86,30,40};
   float purities[8] = {0};
+  float purity_Uncertainties[8] = {0};
   float Cluster_Purity = 0;
+  float Cluster_Purity_Uncertainty = 0;
 
   if (strcmp(shower_shape.data(), "DNN") == 0){
-    purities[0] = 0.229;
+    purities[0] = 0.207;
     purities[1] = 0.255;
     purities[2] = 0.326; 
     purities[3] = 0.372;
     purities[4] = 0.447;
     purities[5] = 0.502;
-    purities[6] = 0.533;
-    purities[7] = 0.531;
+    purities[6] = 0.533; //Extrapolating last bin
+    purities[7] = 0.533;
+
+
+    purity_Uncertainties[0] = 0.030;
+    purity_Uncertainties[1] = 0.037;
+    purity_Uncertainties[2] = 0.042;
+    purity_Uncertainties[3] = 0.050;
+    purity_Uncertainties[4] = 0.056;
+    purity_Uncertainties[5] = 0.062;
+    purity_Uncertainties[6] = 0.058;
+    purity_Uncertainties[7] = 0.058;
+
   }
 
   else if (strcmp(shower_shape.data(), "Lambda") == 0){
@@ -284,12 +297,19 @@ int main(int argc, char *argv[])
     purities[3] = 0.367;
     purities[4] = 0.447;
     purities[5] = 0.524;
-    purities[6] = 0.509;
-    purities[7] = 0.597;
-  }
+    purities[6] = 0.509; //Extrapolating last bin
+    purities[7] = 0.509;
 
-  else {
-    purities[0]=0.27;purities[1]=0.32;purities[2]=0.37;}//Emax/Ecluster
+    purity_Uncertainties[0]= 0.027;
+    purity_Uncertainties[1]= 0.028;
+    purity_Uncertainties[2]= 0.029;
+    purity_Uncertainties[3]= 0.033;
+    purity_Uncertainties[4]= 0.035;
+    purity_Uncertainties[5]= 0.037;
+    purity_Uncertainties[6]= 0.036;
+    purity_Uncertainties[7]= 0.036;
+
+  }
 
   //Track Corrections (Calculated in 1GeV pT bins, used as weights when filling)
 
@@ -300,16 +320,21 @@ int main(int argc, char *argv[])
   const float Efficiency = 0.85;
 
 
-
   TH2D* Corr[nztbins*nptbins];
   TH2D* IsoCorr[nztbins*nptbins];
   TH2D* BKGD_IsoCorr[nztbins*nptbins];
   TH2D* BKGD_IsoCorr_UW[nztbins*nptbins];
+  TH2D* Inclusive_Corr[nztbins*nptbins];
 
   TH1D* H_Signal_Triggers[nptbins];
   TH1D* H_BKGD_Triggers[nptbins];
+  TH1D* H_Signal_Overlap_Triggers[nptbins];
+  TH1D* H_BKGD_Overlap_Triggers[nptbins];
   TH1D* Triggers[nptbins];
+  TH1D* Inclusive_Triggers[nptbins];
+
   TH1F* H_Purities[nptbins];
+  TH1F* H_Purity_Uncertainties[nptbins];
 
   TH2D * h_track_phi_eta[nztbins*nptbins];
   TH1D * h_track_eta[nztbins*nptbins];
@@ -343,32 +368,53 @@ int main(int argc, char *argv[])
       Form("N_DNN%i_Triggers_pT%1.0f_%1.0f",2,ptbins[ipt],ptbins[ipt+1]),
       "Number of Isolated Low DNN Photon Triggers", 1, -0.5,3.5);
 
+      H_Signal_Overlap_Triggers[ipt] = new TH1D(
+      Form("N_DNN%i_Overlap_Triggers_pT%1.0f_%1.0f",1,ptbins[ipt],ptbins[ipt+1]),
+      "Number of Isolated Low DNN Photon Triggers", 1, -0.5,3.5);
+
+      H_BKGD_Overlap_Triggers[ipt] = new TH1D(
+      Form("N_DNN%i_Overlap_Triggers_pT%1.0f_%1.0f",2,ptbins[ipt],ptbins[ipt+1]),
+      "Number of Isolated Low DNN Photon Triggers", 1, -0.5,3.5);
+
       Triggers[ipt] = new TH1D(
       Form("N_Triggers_pT%1.0f_%1.0f",ptbins[ipt],ptbins[ipt+1]),
+      "Number of Isolated Low DNN Photon Triggers", 2, -0.5,1.0);
+
+      Inclusive_Triggers[ipt] = new TH1D(
+      Form("N_Inclusive_Triggers_pT%1.0f_%1.0f",ptbins[ipt],ptbins[ipt+1]),
       "Number of Isolated Low DNN Photon Triggers", 2, -0.5,1.0);
 
       H_Purities[ipt] = new TH1F(
       Form("H_Purities_pT%1.0f_%1.0f",ptbins[ipt],ptbins[ipt+1]),
       "yields weighted average purity for pT bin", 100, 0.0,1.0);
+
+      H_Purity_Uncertainties[ipt] = new TH1F(
+      Form("H_Purity_Uncertanty_pT%1.0f_%1.0f",ptbins[ipt],ptbins[ipt+1]),
+      "yields weighted average purity uncertainty for pT bin", 100, 0.0,0.10);
+
       
       weight_sum[ipt] = 0;
 
       for (int izt = 0; izt<nztbins; izt++){
 
+      Inclusive_Corr[izt+ipt*nztbins] = new TH2D(Form("Inclusive_Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",ptbins[ipt],ptbins[ipt+1],
+      100*ztbins[izt],100*ztbins[izt+1]),"#gamma-H Isclusive Correlation", n_phi_bins,0,M_PI, n_eta_bins, -1.4, 1.4);
+
+
       Corr[izt+ipt*nztbins] = new TH2D(Form("Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",ptbins[ipt],ptbins[ipt+1],
-      100*ztbins[izt],100*ztbins[izt+1]),"#gamma-H [all] Correlation", n_phi_bins,0,M_PI, n_eta_bins, -1.4, 1.4);
+      100*ztbins[izt],100*ztbins[izt+1]),"#gamma-H Isolated Correlation", n_phi_bins,0,M_PI, n_eta_bins, -1.4, 1.4);
 
       Corr[izt+ipt*nztbins]->Sumw2();
       Corr[izt+ipt*nztbins]->SetMinimum(0.);
 
       IsoCorr[izt+ipt*nztbins] = new TH2D(Form("DNN%i_Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",1,ptbins[ipt],ptbins[ipt+1],
-      100*ztbins[izt],100*ztbins[izt+1]),"#gamma-H [Iso] Correlation", n_phi_bins,0,M_PI,n_eta_bins, -1.4, 1.4);
+      100*ztbins[izt],100*ztbins[izt+1]),"#gamma-H Signal Region Correlation", n_phi_bins,0,M_PI,n_eta_bins, -1.4, 1.4);
 
       IsoCorr[izt+ipt*nztbins]->Sumw2();
       IsoCorr[izt+ipt*nztbins]->SetMinimum(0.);
 
       BKGD_IsoCorr[izt+ipt*nztbins] = new TH2D(Form("DNN%i_Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",2,ptbins[ipt],ptbins[ipt+1],
-      100*ztbins[izt],100*ztbins[izt+1]),"#gamma-H [AntiIso] Correlation", n_phi_bins,0,M_PI, n_eta_bins, -1.4, 1.4);
+      100*ztbins[izt],100*ztbins[izt+1]),"#gamma-H Background Region Correlation", n_phi_bins,0,M_PI, n_eta_bins, -1.4, 1.4);
 
       BKGD_IsoCorr[izt+ipt*nztbins]->Sumw2();
       BKGD_IsoCorr[izt+ipt*nztbins]->SetMinimum(0.);
@@ -586,6 +632,7 @@ int main(int argc, char *argv[])
 		//fprintf(stderr,"\n%d: purity = %f; pT_Cluster = %f",__LINE__,purities[ipt],cluster_pt[n]);
 		h_purity.Fill(purities[i]);
 		Cluster_Purity = purities[i];
+		Cluster_Purity_Uncertainty = purity_Uncertainties[i];
 	      }
 	    }
 
@@ -593,6 +640,7 @@ int main(int argc, char *argv[])
 	      if (cluster_pt[n] >ptbins[ipt] && cluster_pt[n] <ptbins[ipt+1]){
 		H_Signal_Triggers[ipt]->Fill(1);
 		H_Purities[ipt]->Fill(Cluster_Purity); 
+		H_Purity_Uncertainties[ipt]->Fill(Cluster_Purity_Uncertainty);
 	      }
 	    }
 
@@ -619,7 +667,27 @@ int main(int argc, char *argv[])
 	    for (int ipt = 0; ipt < nptbins; ipt++)
 	      Triggers[ipt]->Fill(1);
 	  }
-      }
+
+	  for (int ipt = 0; ipt < nptbins; ipt++)
+	    Inclusive_Triggers[ipt]->Fill(1);
+
+	  //DNN and L0 Signal Overlap
+	  if (Isolated and (( (cluster_s_nphoton[n][1] > DNN_min) && (cluster_s_nphoton[n][1]<DNN_max))) 
+	      and (((cluster_lambda_square[n][0] > 0.05) && (cluster_lambda_square[n][0] < Lambda0_cut))) ){
+	    for (int ipt = 0; ipt < nptbins; ipt++){
+	      if (cluster_pt[n] >ptbins[ipt] && cluster_pt[n] <ptbins[ipt+1])
+		H_Signal_Overlap_Triggers[ipt]->Fill(1);
+	    }
+	  }
+	  //DNN and L0 Background Overlap
+	  if (Isolated and (((cluster_lambda_square[n][0] > 0.4))) 
+	      and ((cluster_s_nphoton[n][1] > 0.0 && cluster_s_nphoton[n][1] < DNN_Bkgd)) ){
+	    for (int ipt = 0; ipt < nptbins; ipt++){
+	      if (cluster_pt[n] >ptbins[ipt] && cluster_pt[n] <ptbins[ipt+1])
+	      H_BKGD_Overlap_Triggers[ipt]->Fill(1);		
+	    }
+	  }
+      }//Clusters
     } //Events
 
     hweight.Divide(&hBR);
@@ -743,7 +811,9 @@ int main(int argc, char *argv[])
 		  //no shower shape selection
 		  if(Isolated)
 		    Corr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
-		  
+
+		  Inclusive_Corr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);	       
+
 		}//if in zt bin 
 	      } // for zt bins
 	    }//if in pt bin
@@ -797,7 +867,21 @@ int main(int argc, char *argv[])
     Triggers[ipt]->Write();
 
   for (int ipt = 0; ipt < nptbins; ipt++)
+    Inclusive_Triggers[ipt]->Write();
+
+  for (int ipt = 0; ipt < nptbins; ipt ++)
+    H_Signal_Overlap_Triggers[ipt]->Write();
+
+  for (int ipt = 0; ipt < nptbins; ipt ++)
+    H_BKGD_Overlap_Triggers[ipt]->Write();
+
+
+  for (int ipt = 0; ipt < nptbins; ipt++)
     H_Purities[ipt]->Write();
+
+  for (int ipt = 0; ipt < nptbins; ipt++)
+    H_Purity_Uncertainties[ipt]->Write();
+
 
   for (int ipt = 0; ipt<nptbins; ipt++){
     //Weights_Sum->SetBinContent(ipt+1,weight_sum[ipt]);
@@ -819,6 +903,9 @@ int main(int argc, char *argv[])
     }
     for (int izt = 0; izt<nztbins; izt++){
       BKGD_IsoCorr_UW[izt+ipt*nztbins]->Write();
+    }
+    for (int izt = 0; izt<nztbins; izt++){
+      Inclusive_Corr[izt+ipt*nztbins]->Write();
     }
   }
 

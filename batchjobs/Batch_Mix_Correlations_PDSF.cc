@@ -266,6 +266,7 @@ int main(int argc, char *argv[])
   TH2D* Corr[nztbins*nptbins];
   TH2D* IsoCorr[nztbins*nptbins];
   TH2D* BKGD_IsoCorr[nztbins*nptbins];
+  TH2D* Inclusive_Corr[nztbins*nptbins];
 
   TH1D* H_Signal_Triggers[nptbins];
   TH1D* H_BKGD_Triggers[nptbins];
@@ -298,20 +299,24 @@ int main(int argc, char *argv[])
 
       for (int izt = 0; izt<nztbins; izt++){
 
-      Corr[izt+ipt*nztbins] = new TH2D(Form("Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",ptbins[ipt],ptbins[ipt+1],
+      Inclusive_Corr[izt+ipt*nztbins] = new TH2D(Form("Inclusive_Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",ptbins[ipt],ptbins[ipt+1],
       100*ztbins[izt],100*ztbins[izt+1]),"#gamma-H [all] Correlation", n_phi_bins,0,M_PI, n_eta_bins, -1.4, 1.4);
+
+
+      Corr[izt+ipt*nztbins] = new TH2D(Form("Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",ptbins[ipt],ptbins[ipt+1],
+      100*ztbins[izt],100*ztbins[izt+1]),"#gamma-H Isolated Correlation", n_phi_bins,0,M_PI, n_eta_bins, -1.4, 1.4);
 
       Corr[izt+ipt*nztbins]->Sumw2();
       Corr[izt+ipt*nztbins]->SetMinimum(0.);
 
       IsoCorr[izt+ipt*nztbins] = new TH2D(Form("DNN%i_Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",1,ptbins[ipt],ptbins[ipt+1],
-      100*ztbins[izt],100*ztbins[izt+1]),"#gamma-H [Iso] Correlation", n_phi_bins,0,M_PI,n_eta_bins, -1.4, 1.4);
+      100*ztbins[izt],100*ztbins[izt+1]),"#gamma-H Signal Region Correlation", n_phi_bins,0,M_PI,n_eta_bins, -1.4, 1.4);
 
       IsoCorr[izt+ipt*nztbins]->Sumw2();
       IsoCorr[izt+ipt*nztbins]->SetMinimum(0.);
 
       BKGD_IsoCorr[izt+ipt*nztbins] = new TH2D(Form("DNN%i_Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",2,ptbins[ipt],ptbins[ipt+1],
-      100*ztbins[izt],100*ztbins[izt+1]),"#gamma-H [AntiIso] Correlation", n_phi_bins,0,M_PI, n_eta_bins, -1.4, 1.4);
+      100*ztbins[izt],100*ztbins[izt+1]),"#gamma-H Background Correlation", n_phi_bins,0,M_PI, n_eta_bins, -1.4, 1.4);
 
       BKGD_IsoCorr[izt+ipt*nztbins]->Sumw2();
       BKGD_IsoCorr[izt+ipt*nztbins]->SetMinimum(0.);
@@ -517,7 +522,7 @@ int main(int argc, char *argv[])
     event_dataset.read( event_data_out, PredType::NATIVE_FLOAT, event_memspace, event_dataspace);
 
     Long64_t nentries = _tree_event->GetEntries();   
-    //Long64_t nentries = 1000;   
+    //Long64_t nentries = 100;   
 
    int skip_counter = 0;
     for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
@@ -652,6 +657,9 @@ int main(int argc, char *argv[])
 		    if(isolation<iso_max){
 		      Corr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
 		    }
+		  
+		    Inclusive_Corr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
+		  
 		  }//if in zt bin
 		} // end loop over zt bins
 	      }//end if in pt bin
@@ -672,7 +680,7 @@ int main(int argc, char *argv[])
 
     TFile* fout;
     if (strcmp(shower_shape.data(),"Lambda")== 0)
-      fout = new TFile(Form("%s_%luGeVTracks_Correlation_Lambda_%1.1lu_to_%1.1lu.root",rawname.data(),GeV_Track_Skim,mix_start,mix_end),"RECREATE");
+      fout = new TFile(Form("%s_%luGeVTracks_Correlation_Lambda_%1.1lu_to_%1.1lu_pTRebin.root",rawname.data(),GeV_Track_Skim,mix_start,mix_end),"RECREATE");
     else if (strcmp(shower_shape.data(),"DNN")== 0)
       fout = new TFile(Form("%s_%luGeVTracks_Correlation_DNN_%1.1lu_to_%1.1lu.root",rawname.data(),GeV_Track_Skim,mix_start,mix_end),"RECREATE");
     else
@@ -688,6 +696,9 @@ int main(int argc, char *argv[])
       }
       for (int izt = 0; izt<nztbins; izt++){
 	BKGD_IsoCorr[izt+ipt*nztbins]->Write();	
+      }
+      for (int izt = 0; izt<nztbins; izt++){
+	Inclusive_Corr[izt+ipt*nztbins]->Write();
       }
     }
     z_Vertices->Write();

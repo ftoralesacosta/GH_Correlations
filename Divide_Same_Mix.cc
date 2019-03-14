@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 
   TFile* MixFile[nTrackSkims];
   for (int iSkim = 0; iSkim < nTrackSkims; iSkim ++){
-    MixFile[iSkim] = TFile::Open(Form("%s_MB_%1.0fGeV_Skim_Correlation.root",basic_name.c_str(),trackPtSkims[iSkim]));
+    MixFile[iSkim] = TFile::Open(Form("%s_MB_%1.0fGeV_Skim_Correlation_NN_Inclusive.root",basic_name.c_str(),trackPtSkims[iSkim]));
 
     //std::cout<<Form("%s_%1.0fGeVTracks.root",basic_name.c_str(),trackPtSkims[iSkim])<<std::endl;
     //MixFile[iSkim] = TFile::Open((TString)argv[2]);
@@ -154,22 +154,27 @@ int main(int argc, char *argv[])
 
 
   TH2F* Same_Inclusive_Corr[nztbins*nptbins];
-  TH2F* Same_DNN1_Corr[nztbins*nptbins]; 
+  TH2F* Same_Isolated_Corr[nztbins*nptbins];
+  TH2F* Same_DNN1_Corr[nztbins*nptbins];
   TH2F* Same_DNN2_Corr[nztbins*nptbins];
   TH2F* Same_DNN2_Corr_UnWeight[nztbins*nptbins];
 
   TH2F* Mix_Inclusive_Corr[nztbins*nptbins];
+  TH2F* Mix_Isolated_Corr[nztbins*nptbins];
   TH2F* Mix_DNN1_Corr[nztbins*nptbins];
   TH2F* Mix_DNN2_Corr[nztbins*nptbins];
 
   TH1D* N_Incl_Triggers[nptbins];
-  TH1D* N_Iso_Triggers[nptbins];
+  TH1D* N_Isolated_Triggers[nptbins];
+  TH1D* N_Sig_Triggers[nptbins];
   TH1D* N_BKGD_Triggers[nptbins];
+  TH1D* N_Signal_Overlap_Triggers[nptbins];
+  TH1D* N_BKGD_Overlap_Triggers[nptbins];
 
   TString root_file = (TString)argv[1];
   size_t lastindex = std::string(root_file).find_last_of(".");
   std::string rawname = std::string(root_file).substr(0, lastindex);
-  TFile *MyFile = new TFile(Form("%s_GMB_Ratio.root",rawname.data()),"RECREATE");
+  TFile *MyFile = new TFile(Form("%s_GMB_Ratio_Inclusive.root",rawname.data()),"RECREATE");
   //TFile* fout = new TFile(Form("%s_%luGeVTracks_Correlation_%1.1lu_to_%1.1lu.root",rawname.data(),GeV_Track_Skim,mix_start,mix_end),"RECREATE");
 
 
@@ -177,13 +182,24 @@ int main(int argc, char *argv[])
   for(int ipt = 0; ipt < nptbins; ipt++){
     for (int izt = 0; izt<nztbins; izt++){
 
-
       Same_Inclusive_Corr[izt+ipt*nztbins] = (TH2F*)corr->Get(
-	  Form("Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",
+	  Form("Inclusive_Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",
 	  ptbins[ipt],ptbins[ipt+1],100*ztbins[izt],100*ztbins[izt+1]));
+
+      fprintf(stderr,Form("Inclusive_Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",
+			  ptbins[ipt],ptbins[ipt+1],100*ztbins[izt],100*ztbins[izt+1]));
 
       if (Same_Inclusive_Corr[izt+ipt*nztbins] == NULL) {
 	std::cout << "Same Incl TH2D fail" << std::endl;
+        exit(EXIT_FAILURE);}
+
+
+      Same_Isolated_Corr[izt+ipt*nztbins] = (TH2F*)corr->Get(
+	  Form("Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",
+	  ptbins[ipt],ptbins[ipt+1],100*ztbins[izt],100*ztbins[izt+1]));
+
+      if (Same_Isolated_Corr[izt+ipt*nztbins] == NULL) {
+	std::cout << "Same Iso TH2D fail" << std::endl;
         exit(EXIT_FAILURE);}
 
 
@@ -231,17 +247,26 @@ int main(int argc, char *argv[])
 	  
 
 	  Mix_Inclusive_Corr[izt+ipt*nztbins] = (TH2F*)MixFile[iSkim]->Get(
+	      Form("Inclusive_Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",
+	      ptbins[ipt],ptbins[ipt+1],100*ztbins[izt],100*ztbins[izt+1]));
+
+	  if (Mix_Inclusive_Corr[izt+ipt*nztbins] == NULL) {
+	    std::cout << "Mix Incl TH2D fail" << std::endl;
+	    exit(EXIT_FAILURE);}
+
+
+	  Mix_Isolated_Corr[izt+ipt*nztbins] = (TH2F*)MixFile[iSkim]->Get(
 	      Form("Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",
 	      ptbins[ipt],ptbins[ipt+1],100*ztbins[izt],100*ztbins[izt+1]));
 
 	  fprintf(stderr,"Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",
 		  ptbins[ipt],ptbins[ipt+1],100*ztbins[izt],100*ztbins[izt+1]);
 
-	  DNN1_entries = Mix_Inclusive_Corr[izt+ipt*nztbins]->GetEntries();
-	  fprintf(stderr, "%s:%d: Number of Entries in Mix Inclusive %lld \n",__FILE__,__LINE__,DNN1_entries);
+	  DNN1_entries = Mix_Isolated_Corr[izt+ipt*nztbins]->GetEntries();
+	  fprintf(stderr, "%s:%d: Number of Entries in Mix Isolated %lld \n",__FILE__,__LINE__,DNN1_entries);
       
-	  if (Mix_Inclusive_Corr[izt+ipt*nztbins] == NULL) {
-	    std::cout << "Mix Incl TH2D fail" << std::endl;
+	  if (Mix_Isolated_Corr[izt+ipt*nztbins] == NULL) {
+	    std::cout << "Mix Iso TH2D fail" << std::endl;
 	    exit(EXIT_FAILURE);}
 
 	  Mix_DNN1_Corr[izt+ipt*nztbins] = (TH2F*)MixFile[iSkim]->Get(
@@ -270,9 +295,11 @@ int main(int argc, char *argv[])
     //Normalization: Set Max Value to 1.0 (STAR/ALICE way)
     Double_t mix_DNN1_intgrl = Mix_DNN1_Corr[izt+ipt*nztbins]->GetBinContent(Mix_DNN1_Corr[izt+ipt*nztbins]->GetMaximumBin());
     Double_t mix_DNN2_intgrl = Mix_DNN2_Corr[izt+ipt*nztbins]->GetBinContent(Mix_DNN2_Corr[izt+ipt*nztbins]->GetMaximumBin());
-    Double_t mix_Inclusive_intgrl = Mix_Inclusive_Corr[izt+ipt*nztbins]->GetBinContent(Mix_Inclusive_Corr[izt+ipt*nztbins]->GetMaximumBin());
+    Double_t mix_Isolated_intgrl = Mix_Isolated_Corr[izt+ipt*nztbins]->GetBinContent(Mix_Isolated_Corr[izt+ipt*nztbins]->GetMaximumBin());
+    Double_t mix_Inc_intgrl = Mix_Inclusive_Corr[izt+ipt*nztbins]->GetBinContent(Mix_Inclusive_Corr[izt+ipt*nztbins]->GetMaximumBin());
 
-    Mix_Inclusive_Corr[izt+ipt*nztbins]->Scale(1.0/mix_Inclusive_intgrl);
+    Mix_Inclusive_Corr[izt+ipt*nztbins]->Scale(1.0/mix_Inc_intgrl);
+    Mix_Isolated_Corr[izt+ipt*nztbins]->Scale(1.0/mix_Isolated_intgrl);
     Mix_DNN1_Corr[izt+ipt*nztbins]->Scale(1.0/mix_DNN1_intgrl);
     Mix_DNN2_Corr[izt+ipt*nztbins]->Scale(1.0/mix_DNN2_intgrl);
 
@@ -280,9 +307,10 @@ int main(int argc, char *argv[])
 
     //DIVIDE MIXING (by inclusive for better statistics. Less than 2.0% deviation from region division)
     Same_Inclusive_Corr[izt+ipt*nztbins]->Divide(Mix_Inclusive_Corr[izt+ipt*nztbins]);
-    Same_DNN1_Corr[izt+ipt*nztbins]->Divide(Mix_Inclusive_Corr[izt+ipt*nztbins]);
-    Same_DNN2_Corr[izt+ipt*nztbins]->Divide(Mix_Inclusive_Corr[izt+ipt*nztbins]);
-    Same_DNN2_Corr_UnWeight[izt+ipt*nztbins]->Divide(Mix_Inclusive_Corr[izt+ipt*nztbins]);
+    Same_Isolated_Corr[izt+ipt*nztbins]->Divide(Mix_Isolated_Corr[izt+ipt*nztbins]);
+    Same_DNN1_Corr[izt+ipt*nztbins]->Divide(Mix_Isolated_Corr[izt+ipt*nztbins]);
+    Same_DNN2_Corr[izt+ipt*nztbins]->Divide(Mix_Isolated_Corr[izt+ipt*nztbins]);
+    Same_DNN2_Corr_UnWeight[izt+ipt*nztbins]->Divide(Mix_Isolated_Corr[izt+ipt*nztbins]);
 
     fprintf(stderr, "%s: %d: Division OK\n",__FILE__,__LINE__);
 
@@ -301,19 +329,31 @@ int main(int argc, char *argv[])
     }
 
     for (int izt = 0; izt < nztbins; izt++){
+      Same_Isolated_Corr[izt+ipt*nztbins]->Write();
+      fprintf(stderr, "%s: %d: Write Isolated OK\n",__FILE__,__LINE__);
+    }
+
+    for (int izt = 0; izt < nztbins; izt++){
       Same_Inclusive_Corr[izt+ipt*nztbins]->Write();
       fprintf(stderr, "%s: %d: Write Inclusive OK\n",__FILE__,__LINE__);
     }
 
-    N_Incl_Triggers[ipt] = (TH1D*)corr->Get(Form("N_Triggers_pT%1.0f_%1.0f",1,ptbins[ipt],ptbins[ipt+1]));
-    N_Iso_Triggers[ipt] = (TH1D*)corr->Get(Form("N_DNN%i_Triggers_pT%1.0f_%1.0f",1,ptbins[ipt],ptbins[ipt+1]));
+    N_Incl_Triggers[ipt] = (TH1D*)corr->Get(Form("N_Inclusive_Triggers_pT%1.0f_%1.0f",1,ptbins[ipt],ptbins[ipt+1]));
+    N_Isolated_Triggers[ipt] = (TH1D*)corr->Get(Form("N_Triggers_pT%1.0f_%1.0f",1,ptbins[ipt],ptbins[ipt+1]));
+    N_Sig_Triggers[ipt] = (TH1D*)corr->Get(Form("N_DNN%i_Triggers_pT%1.0f_%1.0f",1,ptbins[ipt],ptbins[ipt+1]));
     N_BKGD_Triggers[ipt] = (TH1D*)corr->Get(Form("N_DNN%i_Triggers_pT%1.0f_%1.0f",2,ptbins[ipt],ptbins[ipt+1]));
+    N_Signal_Overlap_Triggers[ipt] = (TH1D*)corr->Get(Form("N_DNN%i_Overlap_Triggers_pT%1.0f_%1.0f",1,ptbins[ipt],ptbins[ipt+1]));
+    N_BKGD_Overlap_Triggers[ipt] = (TH1D*)corr->Get(Form("N_DNN%i_Overlap_Triggers_pT%1.0f_%1.0f",2,ptbins[ipt],ptbins[ipt+1]));
+
     fprintf(stderr, "%s: %d: Write Trigger Get OK",__FILE__,__LINE__);
 
     N_Incl_Triggers[ipt]->Write();
-    N_Iso_Triggers[ipt]->Write();
+    N_Isolated_Triggers[ipt]->Write();
+    N_Sig_Triggers[ipt]->Write();
     N_BKGD_Triggers[ipt]->Write();
-    std::cout<<N_Iso_Triggers[ipt]->GetEntries()<<std::endl;
+    N_Signal_Overlap_Triggers[ipt]->Write();
+    N_BKGD_Overlap_Triggers[ipt]->Write();
+    std::cout<<N_Sig_Triggers[ipt]->GetEntries()<<std::endl;
   }//ipt
 
   corr->Close();
