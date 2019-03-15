@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 
   TFile* MixFile[nTrackSkims];
   for (int iSkim = 0; iSkim < nTrackSkims; iSkim ++){
-    MixFile[iSkim] = TFile::Open(Form("%s_MB_%1.0fGeV_Skim_Correlation_NN_Inclusive.root",basic_name.c_str(),trackPtSkims[iSkim]));
+    MixFile[iSkim] = TFile::Open(Form("%s_%1.0fGeV_Skim_Correlation_pTRebin.root",basic_name.c_str(),trackPtSkims[iSkim]));
 
     //std::cout<<Form("%s_%1.0fGeVTracks.root",basic_name.c_str(),trackPtSkims[iSkim])<<std::endl;
     //MixFile[iSkim] = TFile::Open((TString)argv[2]);
@@ -174,7 +174,7 @@ int main(int argc, char *argv[])
   TString root_file = (TString)argv[1];
   size_t lastindex = std::string(root_file).find_last_of(".");
   std::string rawname = std::string(root_file).substr(0, lastindex);
-  TFile *MyFile = new TFile(Form("%s_GMB_Ratio_Inclusive.root",rawname.data()),"RECREATE");
+  TFile *MyFile = new TFile(Form("%s_GMB_Ratio_pTRebin.root",rawname.data()),"RECREATE");
   //TFile* fout = new TFile(Form("%s_%luGeVTracks_Correlation_%1.1lu_to_%1.1lu.root",rawname.data(),GeV_Track_Skim,mix_start,mix_end),"RECREATE");
 
 
