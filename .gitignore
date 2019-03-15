@@ -18,7 +18,7 @@
 *.jdl
 *.pcm
 *.png
-*.pdf
+#*.pdf
 *.hdf5
 *.out
 *.txt
