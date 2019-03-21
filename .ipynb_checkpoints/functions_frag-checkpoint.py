@@ -1,4 +1,4 @@
-###Corr->Frag###
+### Corr -> Frag ###
 
 import matplotlib.pyplot as plt
 import matplotlib
@@ -230,7 +230,9 @@ def Integrate_Away_Side(Phi_array,Phi_Errors,LE_Error):
     return FF_zt, FF_zt_Errors
 
 def Get_Fragmentation(Dict):
+    
     Keys = []
+    
     for SYS in Systems:
         Keys.append("%s_FF"%(SYS))
         Keys.append("%s_FF_Errors"%(SYS))
@@ -242,10 +244,22 @@ def Get_Fragmentation(Dict):
     for SYS in Systems:
         
         temp_FF, temp_FF_Errors = Integrate_Away_Side(Dict["%s_CSR"%(SYS)],Dict["%s_CSR_Errors"%(SYS)],Dict["%s_Uncorr_Error"%(SYS)])
-        FF_Dict["%s_FF"%(SYS)], FF_Dict["%s_FF_Errors"%(SYS)] = temp_FF, temp_FF_Errors
-        
+        temp_purity_Errors = []
         for ipt in range(N_pT_Bins):
-            FF_Dict["%s_purity_FF_Errors"%(SYS)] = temp_FF[ipt]*(purity_Uncertainty[ipt]/purity[ipt])*Integration_Width
+            temp_purity_Errors.append(temp_FF[ipt]*(purity_Uncertainty[ipt]/purity[ipt])*Integration_Width)
+        
+        FF_Dict["%s_FF"%(SYS)], FF_Dict["%s_FF_Errors"%(SYS)] = temp_FF, temp_FF_Errors
+        FF_Dict["%s_purity_FF_Errors"%(SYS)] = np.asarray(temp_purity_Errors)
+    
+    for SYS in Systems:
+        if (Use_Weights):
+            np.save("npy_files/%s_%s_Fragmentation_Functions.npy"%(Shower,SYS),FF_Dict["%s_FF"%(SYS)])
+            np.save("npy_files/%s_%s_Fragmentation_Function_Errors.npy"%(Shower,SYS),FF_Dict["%s_FF_Errors"%(SYS)])
+            np.save("npy_files/%s_%s_FF_purity_Uncertainty.npy"%(Shower,SYS),FF_Dict["%s_purity_FF_Errors"%(SYS)])
+        else:
+            np.save("npy_files/%s_%s_Fragmentation_Functions_Unweight.npy"%(Shower,SYS),FF_Dict["%s_FF"%(SYS)])
+            np.save("npy_files/%s_%s_Fragmentation_Function_Errors_Unweight.npy"%(Shower,SYS),FF_Dict["%s_FF_Errors"%(SYS)])
+            np.save("npy_files/%s_%s_FF_purity_Uncertainty_Unweight.npy"%(Shower,SYS),FF_Dict["%s_purity_FF_Errors"%(SYS)])
     
     return FF_Dict
 
@@ -274,7 +288,7 @@ def Plot_FF(FF_Dict):
 
         empt, = ax.plot([], [],' ')
 
-        plt.yscale('log')                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+        plt.yscale('log')                                                                                                                                                                                                                                                                                                                                          
         plt.ylabel(r"$\frac{1}{N_{\mathrm{\gamma}}}\frac{\mathrm{d}N}{\mathrm{d}z_{\mathrm{T}} \mathrm{d}\Delta\eta}$",fontsize=20)
         plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^\mathrm{h}/p_\mathrm{T}^\mathrm{\gamma}$",fontsize=20)
         #plt.xlim(xmin = 0.1,xmax=0.7)

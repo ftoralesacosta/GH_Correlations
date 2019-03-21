@@ -35,6 +35,7 @@ zT_centers = (zTbins[1:] + zTbins[:-1]) / 2
 zT_widths = [(j-i)/2 for i, j in zip(zTbins[:-1], zTbins[1:])]
 zT_offset = 0
 NzT = len(zTbins)-1
+zt_box = np.ones(NzT) * 0.03 #plotting Uncert. Boxes
 
 #deta
 eta_max = 1.2 #Range of Signal Correlations
