@@ -264,7 +264,7 @@ def Get_Fragmentation(Dict):
     return FF_Dict
 
 def Plot_FF(FF_Dict):
-    fig = plt.figure(figsize=(17,13/(4-N_pT_Bins)+1))
+    fig = plt.figure(figsize=(17,13/(4-N_pT_Bins+1)))
     for ipt in range(N_pT_Bins):
 
         zt_box = np.ones(NzT) * 0.03
