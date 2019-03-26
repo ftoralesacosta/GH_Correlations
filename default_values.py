@@ -61,7 +61,7 @@ Shower = "LO"
 Use_Weights = True
 CorrectedP = True  # FALSE FOR HARDPROBES
 Use_MC = False
-pT_Rebin = True
+pT_Rebin = False
 
 if (Shower == "LO"):
     pPb_File = 'InputData/pPb_SE_L0_Correlation_GMB_Ratio_Track.root'
