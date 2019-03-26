@@ -252,6 +252,3 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
 
     print("\n                Full Systematic Uncertainty:")
     print(Ratio_Systematic)
-
-
-    
