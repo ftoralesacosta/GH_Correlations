@@ -4,7 +4,7 @@ import matplotlib
 
 def FF_Ratio(FF_Dict):
     
-    fig = plt.figure(figsize=(17,13/(4-N_pT_Bins)+1))
+    fig = plt.figure(figsize=(17,13/(4-N_pT_Bins+1)))
     
     for ipt in range (N_pT_Bins):
         #if (ipt > 0): continue
@@ -251,4 +251,5 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
     print(Efficiency_Uncertainty)
 
     print("\n                Full Systematic Uncertainty:")
+
     print(Ratio_Systematic)
