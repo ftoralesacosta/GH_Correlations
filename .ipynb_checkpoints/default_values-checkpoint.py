@@ -33,7 +33,7 @@ N_pT_Bins = len(pTbins)-1
 zTbins = np.asarray([0.05, 0.07670637, 0.11767734, 0.18053204, 0.27695915, 0.42489062, 0.65183634]) #0.65-1 skipped for now
 zT_centers = (zTbins[1:] + zTbins[:-1]) / 2
 zT_widths = [(j-i)/2 for i, j in zip(zTbins[:-1], zTbins[1:])]
-zT_offset = 0
+zT_offset = 1
 NzT = len(zTbins)-1
 zt_box = np.ones(NzT) * 0.03 #plotting Uncert. Boxes
 
@@ -59,9 +59,9 @@ ue_error_bar = [dPhi_Bins[1],dPhi_Bins[2]] #Horiz. width of UE at first plotted 
 #Shower = "NN"
 Shower = "LO"
 Use_Weights = True
-CorrectedP = True  #FALSE FOR HARDPROBES
+CorrectedP = True  # FALSE FOR HARDPROBES
 Use_MC = False
-pT_Rebin = True
+pT_Rebin = False
 
 if (Shower == "LO"):
     pPb_File = 'InputData/pPb_SE_L0_Correlation_GMB_Ratio_Track.root'

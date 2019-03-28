@@ -246,7 +246,7 @@ def Get_Fragmentation(Dict):
         temp_FF, temp_FF_Errors = Integrate_Away_Side(Dict["%s_CSR"%(SYS)],Dict["%s_CSR_Errors"%(SYS)],Dict["%s_Uncorr_Error"%(SYS)])
         temp_purity_Errors = []
         for ipt in range(N_pT_Bins):
-            temp_purity_Errors.append(temp_FF[ipt]*(purity_Uncertainty[ipt]/purity[ipt])*Integration_Width)
+            temp_purity_Errors.append(temp_FF[ipt]*(purity_Uncertainty[ipt]/purity[ipt])*Integration_Width)  # abs. FF purity uncertainty
         
         FF_Dict["%s_FF"%(SYS)], FF_Dict["%s_FF_Errors"%(SYS)] = temp_FF, temp_FF_Errors
         FF_Dict["%s_purity_FF_Errors"%(SYS)] = np.asarray(temp_purity_Errors)
@@ -264,7 +264,7 @@ def Get_Fragmentation(Dict):
     return FF_Dict
 
 def Plot_FF(FF_Dict):
-    fig = plt.figure(figsize=(17,13/(4-N_pT_Bins)+1))
+    fig = plt.figure(figsize=(17,13/(4-N_pT_Bins+1)))
     for ipt in range(N_pT_Bins):
 
         zt_box = np.ones(NzT) * 0.03

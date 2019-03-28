@@ -148,23 +148,24 @@ def Plot_pp_pPb_Avg_FF(Comb_Dict):
     
     for SYS,sys_col in zip(Systems,Colors):
         
-        Efficiency_Uncertainty_pp = 0.05*Comb_Dict["%s_Combined_FF"%(SYS)]
-        Sys_Uncertainty = np.sqrt(Efficiency_Uncertainty_pp**2 + Comb_Dict["%s_purity_Uncertainty"%(SYS)]**2)
+        Efficiency_Uncertainty = 0.05*Comb_Dict["%s_Combined_FF"%(SYS)]
+        Sys_Uncertainty = np.sqrt(Efficiency_Uncertainty**2 + Comb_Dict["%s_purity_Uncertainty"%(SYS)]**2)
 
 
         #---------------- Plot ------------------------------#
 
-        plt.errorbar(zT_centers, Comb_Dict["%s_Combined_FF"%(SYS)],xerr=zT_widths,yerr=Comb_Dict["%s_Combined_FF_Errors"%(SYS)],
-                     linewidth=1, fmt='o',color=sys_col,capsize=1,label=r' %s %1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(SYS,pTbins[0],pTbins[N_pT_Bins]))
+        #plt.errorbar(zT_centers, Comb_Dict["%s_Combined_FF"%(SYS)],xerr=zT_widths,yerr=Comb_Dict["%s_Combined_FF_Errors"%(SYS)],
+            #linewidth=1, fmt='o',color=sys_col,capsize=1,label=r' %s %1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(SYS,pTbins[0],pTbins[N_pT_Bins]))
 
-        Sys_Plot_pp = plt.bar(zT_centers, Sys_Uncertainty+Sys_Uncertainty, bottom=Comb_Dict["%s_Combined_FF"%(SYS)]-Sys_Uncertainty, 
-                              width=zt_box, align='center',edgecolor="black",color='white',)
+        #Sys_Plot_pp = plt.bar(zT_centers, Sys_Uncertainty+Sys_Uncertainty, bottom=Comb_Dict["%s_Combined_FF"%(SYS)]-Sys_Uncertainty, 
+        #                      width=zt_box, align='center',edgecolor="black",color='white',)
         
-        #plt.errorbar(zT_centers[1:], Comb_Dict["%s_Combined_FF"%(SYS)][1:],xerr=zT_widths[1:],yerr=Comb_Dict["%s_Combined_FF_Errors"%(SYS)][1:],
-        #             linewidth=1, fmt='o',capsize=1,label=r' %s %1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(SYS,pTbins[0],pTbins[N_pT_Bins]))
+        plt.errorbar(zT_centers[zT_offset:], Comb_Dict["%s_Combined_FF"%(SYS)][zT_offset:],xerr=zT_widths[zT_offset:],
+            yerr=Comb_Dict["%s_Combined_FF_Errors"%(SYS)][zT_offset:],linewidth=1, fmt='o',capsize=1,
+            label=r' %s %1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(SYS,pTbins[0],pTbins[N_pT_Bins]))
 
-        #Sys_Plot_pp = plt.bar(zT_centers[1:], Sys_Uncertainty[1:]+Sys_Uncertainty[1:], bottom=Comb_Dict["%s_Combined_FF"%(SYS)][1:]-Sys_Uncertainty[1:], 
-        #                      width=zt_box[1:], align='center',edgecolor="black",color='white',)
+        Sys_Plot_pp = plt.bar(zT_centers[zT_offset:], Sys_Uncertainty[zT_offset:]+Sys_Uncertainty[zT_offset:], 
+            bottom=Comb_Dict["%s_Combined_FF"%(SYS)][zT_offset:]-Sys_Uncertainty[zT_offset:],width=zt_box[zT_offset:], align='center',edgecolor="black",color='white',)
 
         plt.yscale('log')                                                                                                                                                                                                                                                              
         plt.ylabel(r"$\frac{1}{N_{\mathrm{\gamma}}}\frac{\mathrm{d}N}{\mathrm{d}z_{\mathrm{T}} \mathrm{d}\Delta\eta}$",fontsize=20)
@@ -184,8 +185,41 @@ def Plot_pp_pPb_Avg_FF(Comb_Dict):
     
     for SYS in Systems:
         print("                    %s Central Values:"%(SYS))
-        print(Comb_Dict["%s_Combined_FF"%(SYS)])
+        print(Comb_Dict["%s_Combined_FF"%(SYS)][zT_offset:])
         print("")
+        print("                    %s Stat. Uncertainty:"%(SYS))
+        print(Comb_Dict["%s_Combined_FF_Errors"%(SYS)][zT_offset:])
+        print("")
+        
+    print("                        LaTeX Table")
+    
+    pp_stat_min = np.amin(Comb_Dict["pp_Combined_FF_Errors"]/Comb_Dict["pp_Combined_FF"])*100
+    pp_stat_max = np.amax(Comb_Dict["pp_Combined_FF_Errors"]/Comb_Dict["pp_Combined_FF"])*100
+    pPb_stat_min = np.amin(Comb_Dict["p-Pb_Combined_FF_Errors"]/Comb_Dict["p-Pb_Combined_FF"])*100
+    pPb_stat_max = np.amax(Comb_Dict["p-Pb_Combined_FF_Errors"]/Comb_Dict["p-Pb_Combined_FF"])*100
+    
+    pp_purity_min = np.amin(Comb_Dict["pp_purity_Uncertainty"]/Comb_Dict["pp_Combined_FF"])*100
+    pp_purity_max = np.amax(Comb_Dict["pp_purity_Uncertainty"]/Comb_Dict["pp_Combined_FF"])*100
+    pPb_purity_min = np.amin(Comb_Dict["p-Pb_purity_Uncertainty"]/Comb_Dict["p-Pb_Combined_FF"])*100
+    pPb_purity_max = np.amax(Comb_Dict["p-Pb_purity_Uncertainty"]/Comb_Dict["p-Pb_Combined_FF"])*100
+    
+    print("Source   &  pp data & \pPb~data  \\\\")
+    print("Statistical Uncertainty & {0}\%-{1}\% & {2}\%-{3}\% \\\\".format(int(pp_stat_min+0.5),
+                        int(pp_stat_max+0.5),int(pPb_stat_min+0.5),int(pPb_stat_max+0.5)) )
+    print("\hline")
+    
+    print("Purity & {0}\%-{1}\% & {2}\%-{3}\% \\\\".format(int(pp_purity_min+0.5),
+        int(pp_purity_max+0.5),int(pPb_purity_min+0.5),int(pPb_purity_max+0.5)) )
+    
+    print("Tracking Efficiency &  5\% & 5\%  \\\\ ")
+    
+#      Source   &  pp data & \pPb~data  \\
+#  Statistical uncertainty &  8 - 30 \% & 11 - 35\%  \\
+#  \hline 
+#  Purity (sys.) &  25\% & 25\%  \\
+#  Purity (stat.)  & 6\% & 6\%\\
+#  Tracking efficiency &  5\% & 5\%  \\
+#  UE Estimate &  3-10\% & 3-9\%  \\
 
 def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
     
@@ -209,7 +243,8 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
 
     plt.figure(figsize=(10,7)) 
 
-    Sys_Plot = plt.bar(zT_centers, Ratio_Systematic+Ratio_Systematic, bottom=Ratio-Ratio_Systematic, width=zt_box, align='center',edgecolor="black",color='white',)
+    Sys_Plot = plt.bar(zT_centers[zT_offset:], Ratio_Systematic[zT_offset:]+Ratio_Systematic[zT_offset:], 
+            bottom=Ratio[zT_offset:]-Ratio_Systematic[zT_offset:], width=zt_box[zT_offset:], align='center',edgecolor="black",color='white',)
     #Sys_Plot = plt.bar(zT_centers, Ratio_Systematic+Ratio_Systematic, bottom=Ratio-Ratio_Systematic, width=zt_box, align='center',edgecolor="black",color='white',)
 
     empt4, = plt.plot([], [],' ')
@@ -217,7 +252,7 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
     Sys_Box = [0.65,0.69]
     xfill = [0.65,0.7]
 
-    Ratio_Plot = plt.errorbar(zT_centers, Ratio, yerr=Ratio_Error,xerr=zT_widths, fmt='ko',capsize=3, ms=6,lw=1)
+    Ratio_Plot = plt.errorbar(zT_centers[zT_offset:], Ratio[zT_offset:], yerr=Ratio_Error[zT_offset:],xerr=zT_widths[zT_offset:], fmt='ko',capsize=3, ms=6,lw=1)
     #Ratio_Plot = plt.errorbar(zT_centers, Ratio, yerr=Ratio_Error,xerr=zT_widths, fmt='ko',capsize=3, ms=6,lw=1)
 
     plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^{\mathrm{h}}/p_\mathrm{T}^\gamma$",fontsize=20)
@@ -241,15 +276,15 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
     plt.show()
 
     print("                Central Values:")
-    print(Ratio)
+    print(Ratio[zT_offset:])
 
 
     print("\n                Ratio Uncertainty from Purity:")
-    print(Purity_Uncertainty)
+    print(Purity_Uncertainty[zT_offset:])
 
     print("\n                Ratio Uncertainty from Single Track Efficiency:")
-    print(Efficiency_Uncertainty)
+    print(Efficiency_Uncertainty[zT_offset:])
 
     print("\n                Full Systematic Uncertainty:")
 
-    print(Ratio_Systematic)
+    print(Ratio_Systematic[zT_offset:])
