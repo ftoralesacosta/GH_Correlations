@@ -161,7 +161,7 @@ def Plot_pp_pPb_Avg_FF(Comb_Dict):
         #                      width=zt_box, align='center',edgecolor="black",color='white',)
         
         plt.errorbar(zT_centers[zT_offset:], Comb_Dict["%s_Combined_FF"%(SYS)][zT_offset:],xerr=zT_widths[zT_offset:],
-            yerr=Comb_Dict["%s_Combined_FF_Errors"%(SYS)][zT_offset:],linewidth=1, fmt='o',capsize=1,
+            yerr=Comb_Dict["%s_Combined_FF_Errors"%(SYS)][zT_offset:],linewidth=1, fmt='o',color=sys_col,capsize=1,
             label=r' %s %1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(SYS,pTbins[0],pTbins[N_pT_Bins]))
 
         Sys_Plot_pp = plt.bar(zT_centers[zT_offset:], Sys_Uncertainty[zT_offset:]+Sys_Uncertainty[zT_offset:], 
