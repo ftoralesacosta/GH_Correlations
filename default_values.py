@@ -13,10 +13,8 @@ Systems = ["pp","p-Pb"]
 Files = [pp_File,pPb_File]
 
 purity = np.asarray([0.208095, 0.339478, 0.483944, 0.509])
-purity_Uncertainty = np.asarray([0.0273652,0.0305499,0.0358471,0.036])
+purity_Uncertainty = np.asarray([0.0376517,0.0476880,0.0489686,0.0480000])
 
-Uncorr_Estimate = "ZYAM"
-Average_UE = False
 
 Corrections = np.asarray([1.007,0.982,0.957,0.926,0.894,0.853,0.817,0.757,0.681,0.673,0.619,0.469,0.342,0.301])
 Fake_Rate = np.asarray([0.0179,0.0197,0.0249,0.0355,0.0475,0.0722,0.0902,0.1298,0.1407,0.2130,0.2175,0.2376,0.2611,0.2611])
@@ -33,8 +31,9 @@ N_pT_Bins = len(pTbins)-1
 zTbins = np.asarray([0.05, 0.07670637, 0.11767734, 0.18053204, 0.27695915, 0.42489062, 0.65183634]) #0.65-1 skipped for now
 zT_centers = (zTbins[1:] + zTbins[:-1]) / 2
 zT_widths = [(j-i)/2 for i, j in zip(zTbins[:-1], zTbins[1:])]
-zT_offset = 1
-NzT = len(zTbins)-1
+zT_offset = 0
+ZT_OFF_PLOT = 1 #Offset for FF plotting
+NzT = len(zTbins)-1-zT_offset
 zt_box = np.ones(NzT) * 0.03 #plotting Uncert. Boxes
 
 #deta
@@ -51,10 +50,14 @@ Integration_Width = math.pi/(len(delta_phi_centers)+1) * N_Phi_Integrate
 phi_width = math.pi/(N_dPhi_Bins)/2
 
 #UE
+Uncorr_Estimate = "ZYAM"
+Average_UE = False
 ue_error_bar = [dPhi_Bins[1],dPhi_Bins[2]] #Horiz. width of UE at first plotted dphi point
+Ped_Sub_First = True
 
 
-        #CASE SWITCHING
+
+                #####CASE SWITCHING#####
 
 #Shower = "NN"
 Shower = "LO"
@@ -69,7 +72,8 @@ if (Shower == "LO"):
 
     if (CorrectedP):
         purity = np.asarray([0.208095, 0.339478, 0.483944, 0.509])
-        purity_Uncertainty = np.asarray([0.0273652,0.0305499,0.0358471,0.036])
+        purity_Uncertainty = np.asarray([0.0376517,0.0476880,0.0489686,0.0480000])
+        #purity_Uncertainty = np.asarray([0.0273652,0.0305499,0.0358471,0.036])
     else:
         purity = [0.35]
         

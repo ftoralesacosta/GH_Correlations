@@ -300,14 +300,14 @@ int main(int argc, char *argv[])
     purities[6] = 0.509; //Extrapolating last bin
     purities[7] = 0.509;
 
-    purity_Uncertainties[0]= 0.027;
-    purity_Uncertainties[1]= 0.028;
-    purity_Uncertainties[2]= 0.029;
-    purity_Uncertainties[3]= 0.033;
-    purity_Uncertainties[4]= 0.035;
-    purity_Uncertainties[5]= 0.037;
-    purity_Uncertainties[6]= 0.036;
-    purity_Uncertainties[7]= 0.036;
+    purity_Uncertainties[0]= 0.034;
+    purity_Uncertainties[1]= 0.044;
+    purity_Uncertainties[2]= 0.047;
+    purity_Uncertainties[3]= 0.049;
+    purity_Uncertainties[4]= 0.050;
+    purity_Uncertainties[5]= 0.048;
+    purity_Uncertainties[6]= 0.048;
+    purity_Uncertainties[7]= 0.048;
 
   }
 

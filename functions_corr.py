@@ -345,7 +345,7 @@ def ROOT_to_nparray():
                 BR_UB = 0
                 BR_UB_Error = 0
 
-                UB_Error = 0 #Final Value
+                UB_Error = 0 #Only UB stored in Dict
 
                 Sig_Phi_Array, Sig_Phi_Error_Array = GetPhiProj(ifile,SYS,ipt,izt,True)
                 Bkg_Phi_Array, Bkg_Phi_Error_Array = GetPhiProj(ifile,SYS,ipt,izt,False)
@@ -367,13 +367,17 @@ def ROOT_to_nparray():
                 if (Average_UE):
                     Avg_UB = (SR_UB + BR_UB)/2
                     UB_Error = np.sqrt(SR_UB_Error**2 + BR_UB_Error**2)/2
-
-                    Sig_Phi_Array -= Avg_UB
-                    Bkg_Phi_Array -= Avg_UB
+                    
+                    if (Ped_Sub_First):
+                        Sig_Phi_Array -= Avg_UB
+                        Bkg_Phi_Array -= Avg_UB
 
                 else:
-                    Sig_Phi_Array -= SR_UB
-                    Bkg_Phi_Array -= BR_UB
+
+                    if (Ped_Sub_First):
+                        Sig_Phi_Array -= SR_UB
+                        Bkg_Phi_Array -= BR_UB
+                        
                     UB_Error = np.sqrt(SR_UB_Error**2 + BR_UB_Error**2)
 
                     Dict["%s_CSR"%(SYS)][ipt][izt] = Sig_Phi_Array

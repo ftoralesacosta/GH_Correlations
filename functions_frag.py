@@ -3,8 +3,9 @@
 import matplotlib.pyplot as plt
 import matplotlib
 from default_values import *
+from functions_corr import ZYAM_Line
 
-def Plot_UB_Subtraction(Dict):
+def Plot_UB_Subtraction_old(Dict):
     fsize = 20
     for SYS,ifile in zip(Systems,Files):
         if (SYS == "p-Pb"):
@@ -83,6 +84,102 @@ def Plot_UB_Subtraction(Dict):
                     leg.set_title("ALICE, $\sqrt{s_{\mathrm{_{NN}}}}=$5 TeV %s"%(SYS))
                 plt.setp(leg.get_title(),fontsize=15)
                 fig.savefig('pics/%s/%s_%s_Gamma_hadron_UE_sub_zT_%i.pdf'%(Shower,Shower,SYS,izt), bbox_inches='tight')
+
+def Plot_UB_Subtraction(Dict):
+    fsize = 20
+    for SYS,ifile in zip(Systems,Files):
+        if (SYS == "p-Pb"):
+            print("\n \n                                       PROTON-LEAD")
+        else:
+            SYS=SYS
+        if (SYS == "pp"):
+            print("\n \n                                       PROTON-PROTON")
+
+
+        for ipt in range (N_pT_Bins):
+            fig = plt.figure(figsize=(34,17))
+            if not(Ped_Sub_First):
+                fig = plt.figure(figsize=(17,12))
+            #if (ipt > 0): continue
+            #ipt = ipt+2
+            for izt in range (zT_offset,NzT+zT_offset):
+                ztb = izt-zT_offset
+
+                UE_Band = "None"
+                if not(Ped_Sub_First):
+                    ax = fig.add_subplot(2,3,(ztb+1))
+                else:
+                    #Sig
+                    if (NzT ==4):
+                        ax = fig.add_subplot(2,4,(2*ztb+1))
+                    elif (NzT ==6):
+                        ax = fig.add_subplot(3,4,(2*ztb+1))
+                        #ax.plot(delta_phi_centers,Dict["%s_CSR"%(SYS)][ipt][ztb],'bo',ms=10)
+                    
+                    UE_Band = ax.fill_between(ue_error_bar,-Dict["%s_Uncorr_Error"%(SYS)][ipt][ztb][0],
+                                Dict["%s_Uncorr_Error"%(SYS)][ipt][ztb][0],facecolor='purple',alpha=0.35) 
+
+                    plt.axhline(y=0,color='gray',linestyle='--',linewidth=1.3,alpha=0.8)
+
+                s_plot = ax.errorbar(delta_phi_centers,Dict["%s_CSR"%(SYS)][ipt][ztb],xerr=phi_width,
+                                     yerr=Dict["%s_CSR_Errors"%(SYS)][ipt][ztb],fmt='bo',ecolor='b',
+                                     label='Signal Region (stat. error)')
+
+
+                plt.xlabel(r'|$\Delta \varphi$|',fontsize=fsize+4)
+                plt.xticks(fontsize=(fsize))
+                plt.xlim((0.39269908169872414,3.14159))
+                plt.ylabel(r'$1/N_{\mathrm{trig}} \: \: \mathrm{d}N/\mathrm{d}\Delta\eta$',fontsize=fsize+2)
+                empt, = ax.plot([], [], ' ')
+                empt2, = ax.plot([],[],' ')
+                plt.yticks(fontsize=fsize-5)
+
+                if not(Ped_Sub_First):
+                    leg = ax.legend([s_plot,UE_Band,empt,empt2],['Shower Sig. Region (stat. error)',"UB Error",r'%1.2f < $z_\mathrm{T}$ < %1.2f'
+                            %(zTbins[izt],zTbins[izt+1]),r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],
+                            loc='best',title = "Alice %s 5 TeV",fontsize=14,frameon=False,numpoints=1)
+                else:
+                    leg = ax.legend([s_plot,empt,empt2],['Shower Sig. Region (stat. error)',r'%1.2f < $z_\mathrm{T}$ < %1.2f'
+                            %(zTbins[izt],zTbins[izt+1]),r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],
+                            loc='best',title = "Alice %s 5 TeV",fontsize=14,frameon=False,numpoints=1)
+                    
+
+                if (SYS == 'pp'):
+                    leg.set_title("ALICE, $\sqrt{s}=$5 TeV %s"%(SYS))
+                else:
+                    leg.set_title("ALICE, $\sqrt{s_{\mathrm{_{NN}}}}=$5 TeV %s"%(SYS))                
+                plt.setp(leg.get_title(),fontsize=14)
+
+                
+                if (Ped_Sub_First):
+                    #bkg
+                    if (NzT ==4):
+                        ax = fig.add_subplot(2,4,(2*ztb+2))
+                    elif (NzT ==6):
+                        ax = fig.add_subplot(3,4,(2*ztb+2))
+
+                    plt.xlabel(r'|$\Delta \varphi$|',fontsize=fsize+4)
+                    plt.xticks(fontsize=(fsize))
+                    plt.xlim((0.39269908169872414,3.14159))
+                    plt.ylabel(r'$1/N_{\mathrm{trig}} \: \: \mathrm{d}N/\mathrm{d}\Delta\eta$',fontsize=fsize+2)
+                    plt.yticks(fontsize=fsize-5)
+
+                    ax.plot(delta_phi_centers,Dict["%s_CBR"%(SYS)][ipt][ztb],'ro',ms=10)
+                    b_plot = ax.errorbar(delta_phi_centers,Dict["%s_CBR"%(SYS)][ipt][ztb],xerr=phi_width,yerr=Dict["%s_CBR_Errors"%(SYS)][ipt][ztb],fmt=None,ecolor='r')
+                    UE_Band = ax.fill_between(ue_error_bar,-Dict["%s_Uncorr_Error"%(SYS)][ipt][ztb][0],Dict["%s_Uncorr_Error"%(SYS)][ipt][ztb][0],facecolor='purple',alpha=0.35) 
+                    plt.axhline(y=0,color='gray',linestyle='--',linewidth=1.3,alpha=0.8)
+
+
+                    leg = ax.legend([b_plot,UE_Band,empt,empt2],[' Shower Bkg Region (stat. error)',"UB Error",r'%1.2f < $z_\mathrm{T}$ < %1.2f'
+                            %(zTbins[izt],zTbins[izt+1]),r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],
+                            loc='best',fontsize=14,frameon=False,numpoints=1)
+                    if (SYS == 'pp'):
+                        leg.set_title("ALICE, $\sqrt{s}=$5 TeV %s"%(SYS))
+                    else:
+                        leg.set_title("ALICE, $\sqrt{s_{\mathrm{_{NN}}}}=$5 TeV %s"%(SYS))
+                    plt.setp(leg.get_title(),fontsize=15)
+                fig.savefig('pics/%s/%s_%s_Gamma_hadron_UE_sub_zT_%i.pdf'%(Shower,Shower,SYS,izt), bbox_inches='tight')
+
                 
 def Plot_Sub_UB_Overlay(Dict):
     #NOTE: UB Errors already propagated!
@@ -147,6 +244,26 @@ def Correlated_Subtraction(Dict):
             Dict["%s_CSR_Errors"%(SYS)][ipt] = Dict["%s_CSR_Errors"%(SYS)][ipt]/purity[ipt]
             Dict["%s_Uncorr_Error"%(SYS)][ipt] = Dict["%s_Uncorr_Error"%(SYS)][ipt]/purity[ipt]
             
+            
+            #if not(Ped_Sub_First):
+            #    Ped_Sub_After_Cs(Dict)
+
+
+
+def Ped_Sub_After_Cs(Dict):
+#This function calculates ZYAM after correlated subtraction (Cs)
+    for SYS,ifile in zip(Systems,Files):
+        for ipt in range (N_pT_Bins):
+            #if (ipt > 0): continue
+
+            for izt in range (NzT):
+                ZYAM_Cs,ZYAM_Cs_Error = ZYAM_Line(Dict["%s_CSR"%(SYS)][ipt][izt],
+                                                  Dict["%s_CSR_Errors"%(SYS)][ipt][izt])
+
+                Dict["%s_CSR"%(SYS)][ipt][izt] = Dict["%s_CSR"%(SYS)][ipt][izt] - ZYAM_Cs
+                Dict["%s_Uncorr_Error"%(SYS)][ipt][izt] = ZYAM_Cs_Error
+                                                  
+
 def Plot_pp_pPb_Cs(Dict):
     
     for ipt in range (N_pT_Bins):

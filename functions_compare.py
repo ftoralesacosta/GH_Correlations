@@ -1,6 +1,7 @@
 from default_values import *
 import matplotlib.pyplot as plt
 import matplotlib
+from ROOT import TGraphErrors
 
 def FF_Ratio(FF_Dict):
     
@@ -160,12 +161,12 @@ def Plot_pp_pPb_Avg_FF(Comb_Dict):
         #Sys_Plot_pp = plt.bar(zT_centers, Sys_Uncertainty+Sys_Uncertainty, bottom=Comb_Dict["%s_Combined_FF"%(SYS)]-Sys_Uncertainty, 
         #                      width=zt_box, align='center',edgecolor="black",color='white',)
         
-        plt.errorbar(zT_centers[zT_offset:], Comb_Dict["%s_Combined_FF"%(SYS)][zT_offset:],xerr=zT_widths[zT_offset:],
-            yerr=Comb_Dict["%s_Combined_FF_Errors"%(SYS)][zT_offset:],linewidth=1, fmt='o',color=sys_col,capsize=1,
+        plt.errorbar(zT_centers[ZT_OFF_PLOT:], Comb_Dict["%s_Combined_FF"%(SYS)][ZT_OFF_PLOT:],xerr=zT_widths[ZT_OFF_PLOT:],
+            yerr=Comb_Dict["%s_Combined_FF_Errors"%(SYS)][ZT_OFF_PLOT:],linewidth=1, fmt='o',color=sys_col,capsize=1,
             label=r' %s %1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(SYS,pTbins[0],pTbins[N_pT_Bins]))
 
-        Sys_Plot_pp = plt.bar(zT_centers[zT_offset:], Sys_Uncertainty[zT_offset:]+Sys_Uncertainty[zT_offset:], 
-            bottom=Comb_Dict["%s_Combined_FF"%(SYS)][zT_offset:]-Sys_Uncertainty[zT_offset:],width=zt_box[zT_offset:], align='center',edgecolor="black",color='white',)
+        Sys_Plot_pp = plt.bar(zT_centers[ZT_OFF_PLOT:], Sys_Uncertainty[ZT_OFF_PLOT:]+Sys_Uncertainty[ZT_OFF_PLOT:], 
+            bottom=Comb_Dict["%s_Combined_FF"%(SYS)][ZT_OFF_PLOT:]-Sys_Uncertainty[ZT_OFF_PLOT:],width=zt_box[ZT_OFF_PLOT:], align='center',edgecolor="black",color='white',)
 
         plt.yscale('log')                                                                                                                                                                                                                                                              
         plt.ylabel(r"$\frac{1}{N_{\mathrm{\gamma}}}\frac{\mathrm{d}N}{\mathrm{d}z_{\mathrm{T}} \mathrm{d}\Delta\eta}$",fontsize=20)
@@ -185,10 +186,10 @@ def Plot_pp_pPb_Avg_FF(Comb_Dict):
     
     for SYS in Systems:
         print("                    %s Central Values:"%(SYS))
-        print(Comb_Dict["%s_Combined_FF"%(SYS)][zT_offset:])
+        print(Comb_Dict["%s_Combined_FF"%(SYS)][ZT_OFF_PLOT:])
         print("")
         print("                    %s Stat. Uncertainty:"%(SYS))
-        print(Comb_Dict["%s_Combined_FF_Errors"%(SYS)][zT_offset:])
+        print(Comb_Dict["%s_Combined_FF_Errors"%(SYS)][ZT_OFF_PLOT:])
         print("")
         
     print("                        LaTeX Table")
@@ -243,8 +244,9 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
 
     plt.figure(figsize=(10,7)) 
 
-    Sys_Plot = plt.bar(zT_centers[zT_offset:], Ratio_Systematic[zT_offset:]+Ratio_Systematic[zT_offset:], 
-            bottom=Ratio[zT_offset:]-Ratio_Systematic[zT_offset:], width=zt_box[zT_offset:], align='center',edgecolor="black",color='white',)
+
+    Sys_Plot = plt.bar(zT_centers[ZT_OFF_PLOT:], Ratio_Systematic[ZT_OFF_PLOT:]+Ratio_Systematic[ZT_OFF_PLOT:], 
+            bottom=Ratio[ZT_OFF_PLOT:]-Ratio_Systematic[ZT_OFF_PLOT:], width=zt_box[ZT_OFF_PLOT:], align='center',edgecolor="black",color='white',)
     #Sys_Plot = plt.bar(zT_centers, Ratio_Systematic+Ratio_Systematic, bottom=Ratio-Ratio_Systematic, width=zt_box, align='center',edgecolor="black",color='white',)
 
     empt4, = plt.plot([], [],' ')
@@ -252,7 +254,7 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
     Sys_Box = [0.65,0.69]
     xfill = [0.65,0.7]
 
-    Ratio_Plot = plt.errorbar(zT_centers[zT_offset:], Ratio[zT_offset:], yerr=Ratio_Error[zT_offset:],xerr=zT_widths[zT_offset:], fmt='ko',capsize=3, ms=6,lw=1)
+    Ratio_Plot = plt.errorbar(zT_centers[ZT_OFF_PLOT:], Ratio[ZT_OFF_PLOT:], yerr=Ratio_Error[ZT_OFF_PLOT:],xerr=zT_widths[ZT_OFF_PLOT:], fmt='ko',capsize=3, ms=6,lw=1)
     #Ratio_Plot = plt.errorbar(zT_centers, Ratio, yerr=Ratio_Error,xerr=zT_widths, fmt='ko',capsize=3, ms=6,lw=1)
 
     plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^{\mathrm{h}}/p_\mathrm{T}^\gamma$",fontsize=20)
@@ -262,7 +264,49 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
     plt.xlim(xmin = 0.0,xmax=0.7)
     plt.axhline(y=1, color='r', linestyle='--')
 
-    #leg = plt.legend([Ratio_Plot,Sys_Plot,Norm_Box,empt4],["Statistical Error","Systematic Error","Normalization Error",r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[0],pTbins[N_pT_Bins])],frameon=False,numpoints=1,loc="best",title=' ',prop={'size':18})
+    ### ROOT LINEAR and CONSTANT FITS ###
+    #TGraph_Ratio = TGraphErrors(Ratio.size-zT_offset,zT_centers[zT_offset:],
+    #                        Ratio[zT_offset:],Ratio_Error[zT_offset:])    
+    Ratio_TGraph = TGraphErrors()
+    for izt in range (1,len(Ratio)):
+        Ratio_TGraph.SetPoint(izt,zT_centers[izt],Ratio[izt])
+        Ratio_TGraph.SetPointError(izt,0,Ratio_Error[izt])
+
+    Ratio_TGraph.Fit("pol0","S")
+    f = Ratio_TGraph.GetFunction("pol0")
+    chi2_red  = f.GetChisquare()/f.GetNDF()
+    pval = f.GetProb()
+    p0 = f.GetParameter(0)
+    p0e = f.GetParError(0)
+    p0col = "blue"
+    plt.text(0.01,1.9,"Constant Fit",color=p0col,fontsize=20,alpha=.7)
+    plt.text(0.01,1.81,r"$p0 = {0:.2f} \pm {1:.2f}$".format(p0,p0e),color=p0col,fontsize=18,alpha=.7)
+    plt.text(0.01,1.71,r"$\chi^2_{red} = %1.2f$"%(chi2_red),color=p0col,fontsize=18,alpha=.7)
+    plt.text(0.01,1.63,r"$p_{val} = %1.2f$"%(pval),color=p0col,fontsize=18,alpha=.7)
+    plt.fill_between(np.arange(0,1,0.1), p0+p0e, p0-p0e,color=p0col,alpha=.3)
+
+    Ratio_TGraph.Fit("pol1","S")
+    f2 = Ratio_TGraph.GetFunction("pol1")
+    chi2_red  = f2.GetChisquare()/f2.GetNDF()
+    pval = f2.GetProb()
+    p0 = f2.GetParameter(0)
+    p0e = f2.GetParError(0)
+    p1 = f2.GetParameter(1)
+    p1e = f2.GetParError(1)
+    p1col = "cyan"
+    plt.text(0.01,0.32,"Linear Fit",color=p1col,fontsize=20,alpha=.7)
+    plt.text(0.01,0.23,r"$p1 = {0:.2f} \pm {1:.2f}$".format(p1,p1e),color=p1col,fontsize=18,alpha=.7)
+    plt.text(0.01,0.13,r"$\chi^2_{red} = %1.2f$"%(chi2_red),color=p1col,fontsize=18,alpha=.7)
+    plt.text(0.01,0.03,r"$p_{val} = %1.2f$"%(pval),color=p1col,fontsize=18,alpha=.7)
+    axes = plt.gca()
+    x_vals = np.array(axes.get_xlim())
+    y_vals = p0 + p1 * x_vals
+    plt.plot(x_vals, y_vals, '--',color=p1col,linewidth=2)
+
+
+    ### ROOT DONE ###
+
+
     leg = plt.legend([Ratio_Plot,empt4],["Statistical Error",r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[pT_Start],pTbins[N_pT_Bins])],frameon=False,numpoints=1,loc="best",title=' ',prop={'size':18})
 
 
@@ -276,15 +320,15 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
     plt.show()
 
     print("                Central Values:")
-    print(Ratio[zT_offset:])
+    print(Ratio[ZT_OFF_PLOT:])
 
 
     print("\n                Ratio Uncertainty from Purity:")
-    print(Purity_Uncertainty[zT_offset:])
+    print(Purity_Uncertainty[ZT_OFF_PLOT:])
 
     print("\n                Ratio Uncertainty from Single Track Efficiency:")
-    print(Efficiency_Uncertainty[zT_offset:])
+    print(Efficiency_Uncertainty[ZT_OFF_PLOT:])
 
     print("\n                Full Systematic Uncertainty:")
 
-    print(Ratio_Systematic[zT_offset:])
+    print(Ratio_Systematic[ZT_OFF_PLOT:])
