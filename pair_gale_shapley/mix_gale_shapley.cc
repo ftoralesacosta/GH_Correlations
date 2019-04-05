@@ -242,25 +242,25 @@ void order_preference(std::vector<std::list<index_t> > &up,
 }
 
 std::vector<index_t> gale_shapley(std::vector<std::list<index_t> > &mp,
-								 std::vector<std::list<index_t> > &fp)
+				  std::vector<std::list<index_t> > &fp)
 {
 	std::vector<index_t> m_to_f_engaged(mp.size(), fp.size());
 	std::vector<index_t> f_to_m_engaged(fp.size(), mp.size());
 
 	std::vector<std::vector<std::pair<
-		std::vector<std::list<index_t> >::iterator,
-								std::list<index_t>::iterator> > >
-
-	mp_index;
+	            std::vector<std::list<index_t> >::iterator,
+		    std::list<index_t>::iterator> > > mp_index;
 
 	mp_index.resize(fp.size());
 	for (std::vector<std::list<index_t> >::iterator
-			 iterator_outer = mp.begin();
-		 iterator_outer != mp.end(); iterator_outer++) {
+	     iterator_outer = mp.begin();
+	     iterator_outer != mp.end(); iterator_outer++) {
+	  
 		for (std::list<index_t>::iterator
-				 iterator_inner = iterator_outer->begin();
-			 iterator_inner != iterator_outer->end();
-			 iterator_inner++) {
+		     iterator_inner = iterator_outer->begin();
+		     iterator_inner != iterator_outer->end();
+		     iterator_inner++) {
+
 			mp_index[*iterator_inner].push_back(
 				std::pair<std::vector<std::list<index_t> >::iterator,
 				std::list<index_t>::iterator>(
@@ -270,8 +270,8 @@ std::vector<index_t> gale_shapley(std::vector<std::list<index_t> > &mp,
 
 		if ((iterator_outer - mp.begin()) % 100 == 0) {
 		  fprintf(stderr, "%s:%d: %lu/%lu\n", __FILE__, __LINE__,
-			  iterator_outer - mp.begin(), mp.size());
-		}
+			  iterator_outer - mp.begin(), mp.size()); }
+		
 	}
 
 	for (;;) {
