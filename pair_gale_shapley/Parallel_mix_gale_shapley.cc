@@ -244,14 +244,10 @@ void order_preference(std::vector<std::list<index_t> > &up,
 std::vector<index_t> gale_shapley(std::vector<std::list<index_t> > &mp,
 								 std::vector<std::list<index_t> > &fp)
 {
-	std::vector<index_t> m_to_f_engaged(mp.size(), fp.size());
-	std::vector<index_t> f_to_m_engaged(fp.size(), mp.size());
 
 	std::vector<std::vector<std::pair<
 		std::vector<std::list<index_t> >::iterator,
-								std::list<index_t>::iterator> > >
-
-	mp_index;
+		std::list<index_t>::iterator> > > mp_index;
 
 	mp_index.resize(fp.size());
 	for (std::vector<std::list<index_t> >::iterator
@@ -273,6 +269,32 @@ std::vector<index_t> gale_shapley(std::vector<std::list<index_t> > &mp,
 			  iterator_outer - mp.begin(), mp.size());
 		}
 	}
+
+
+	//Need to split mp (male prefence table that gets edited) and split m_to_f_engaged
+	//f_to_m_engaged must remain GLOBAL, and any WRITES to it must be LOCKED
+
+	std::vector<index_t> f_to_m_engaged(fp.size(), mp.size());
+	std::vector<index_t> m_to_f_engaged;
+	std::vector<std::list<index_t> > mp_thread;
+	//	std::vector<index_t> m_to_f_engaged(mp.size(), fp.size());
+
+	fprintf(stderr,"%s:%d: \n RIGT BEFORE ||",__FILE__,__LINE__); //CRASHES HERE
+
+#ifdef _OPENMP
+#pragma omp parallel for private(m_to_f_engaged)
+#endif
+	for (int m_i = 0; m_i < mp.size(); m_i++) //change to iterators?
+	  m_to_f_engaged.push_back(fp.size());
+
+#ifdef _OPENMP
+#pragma omp parallel for private(mp_thread)
+#endif
+	for (int m_i = 0; m_i < mp.size(); m_i++) //change to iterators?
+	  mp_thread.push_back(mp[m_i]);
+
+	//trouble splitting up mp into thread...
+	fprintf(stderr,"%s:%d: \n RIGT AFTER ||",__FILE__,__LINE__);
 
 	for (;;) {
 		std::vector<index_t>::const_iterator m_iterator =
@@ -299,6 +321,8 @@ std::vector<index_t> gale_shapley(std::vector<std::list<index_t> > &mp,
 			m_to_f_engaged[p] = fp.size();
 		}
 		f_to_m_engaged[w] = m;
+
+#pragma omp critical
 		m_to_f_engaged[m] = w;
 
 		std::list<index_t>::iterator s =
@@ -311,6 +335,7 @@ std::vector<index_t> gale_shapley(std::vector<std::list<index_t> > &mp,
 			 iterator != mp_index[w].end(); iterator++) {
 			iterator->first->erase(iterator->second);
 		}
+#pragma omp critical
 		fp[w].erase(s, fp[w].end());
 	}
 	return m_to_f_engaged;
@@ -339,7 +364,8 @@ void mix_gale_shapley(const char *filename_0, const char *filename_1, const char
 	const size_t n_mix = 300;
 
 	std::vector<std::vector<Long64_t> > Matches;
-
+	
+	//nblock_0 = 1;
 	for(size_t h = 0; h < nblock_0+1; h++){
 	//for(size_t h = nblock_0; h < nblock_0+1; h++){
 	  const size_t event_start_0 = h * nevent_0 / (nblock_0 + 1);
