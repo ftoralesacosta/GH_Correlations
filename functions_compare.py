@@ -26,7 +26,7 @@ def FF_Ratio(FF_Dict):
         plt.ylabel(r"$\frac{\mathrm{p-Pb}}{\mathrm{pp}}$",fontsize=20)
         
         leg = plt.legend([Ratio_Plot,empt4],["Statistical Error",r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],frameon=False,numpoints=1,title=' ',prop={'size':18})
-        leg.set_title("ALICE")
+        leg.set_title("ALICE Work in Progress")
         plt.setp(leg.get_title(),fontsize=20)
         
         plt.xlim(xmin = 0.0,xmax=0.7)
@@ -65,7 +65,7 @@ def Overlay_pT_FF(FF_Dict):
             plt.ylim(ymin = 0.001,ymax=20)
 
         leg = plt.legend(numpoints=1)
-        leg.set_title("ALICE %s $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV"%(SYS))
+        leg.set_title("ALICE Work in Progress %s $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV"%(SYS))
         plt.setp(leg.get_title(),fontsize=20)
 
         plt.title(r'Integrated $\mathrm{\gamma}$-Hadron Correlation: $2\pi/3 < \Delta\varphi < \pi, |\Delta\eta| < %1.1f$ '%(eta_max),fontdict = {'fontsize' : 20})
@@ -175,7 +175,7 @@ def Plot_pp_pPb_Avg_FF(Comb_Dict):
         plt.ylim(ymin = 0.01,ymax=20)
 
     leg = plt.legend(numpoints=1)
-    leg.set_title("ALICE $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV")
+    leg.set_title("ALICE Work in Progress $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV")
     plt.setp(leg.get_title(),fontsize=20)
 
     plt.title(r'Integrated $\mathrm{\gamma}$-Hadron Correlation: $2\pi/3 < \Delta\varphi < \pi, |\Delta\eta| < %1.1f$ '%(eta_max),fontdict = {'fontsize' : 19})
@@ -311,9 +311,9 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
 
 
     #leg = plt.legend(numpoints=1)
-    leg.set_title("ALICE $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV")
+    leg.set_title("ALICE Work in Progress $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV")
     plt.setp(leg.get_title(),fontsize=20)
-    #plt.figtext(0.39,0.85,"ALICE $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV",color='Black', fontsize=20)
+    #plt.figtext(0.39,0.85,"ALICE Work in Progress $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV",color='Black', fontsize=20)
 
     plt.gcf()
     plt.savefig("pics/Averaged_pT_FFunction_ratio_%s.pdf"%(Shower), bbox_inches='tight')

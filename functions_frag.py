@@ -51,9 +51,9 @@ def Plot_UB_Subtraction_old(Dict):
                     loc='best',title = "Alice %s 5 TeV",fontsize=14,frameon=False,numpoints=1)
 
                 if (SYS == 'pp'):
-                    leg.set_title("ALICE, $\sqrt{s}=$5 TeV %s"%(SYS))
+                    leg.set_title("ALICE Work in Progress, $\sqrt{s}=$5 TeV %s"%(SYS))
                 else:
-                    leg.set_title("ALICE, $\sqrt{s_{\mathrm{_{NN}}}}=$5 TeV %s"%(SYS))                
+                    leg.set_title("ALICE Work in Progress, $\sqrt{s_{\mathrm{_{NN}}}}=$5 TeV %s"%(SYS))                
                 plt.setp(leg.get_title(),fontsize=14)
 
 
@@ -79,9 +79,9 @@ def Plot_UB_Subtraction_old(Dict):
                     %(zTbins[izt],zTbins[izt+1]),r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],
                     loc='best',fontsize=14,frameon=False,numpoints=1)
                 if (SYS == 'pp'):
-                    leg.set_title("ALICE, $\sqrt{s}=$5 TeV %s"%(SYS))
+                    leg.set_title("ALICE Work in Progress, $\sqrt{s}=$5 TeV %s"%(SYS))
                 else:
-                    leg.set_title("ALICE, $\sqrt{s_{\mathrm{_{NN}}}}=$5 TeV %s"%(SYS))
+                    leg.set_title("ALICE Work in Progress, $\sqrt{s_{\mathrm{_{NN}}}}=$5 TeV %s"%(SYS))
                 plt.setp(leg.get_title(),fontsize=15)
                 fig.savefig('pics/%s/%s_%s_Gamma_hadron_UE_sub_zT_%i.pdf'%(Shower,Shower,SYS,izt), bbox_inches='tight')
 
@@ -145,9 +145,9 @@ def Plot_UB_Subtraction(Dict):
                     
 
                 if (SYS == 'pp'):
-                    leg.set_title("ALICE, $\sqrt{s}=$5 TeV %s"%(SYS))
+                    leg.set_title("ALICE Work in Progress, $\sqrt{s}=$5 TeV %s"%(SYS))
                 else:
-                    leg.set_title("ALICE, $\sqrt{s_{\mathrm{_{NN}}}}=$5 TeV %s"%(SYS))                
+                    leg.set_title("ALICE Work in Progress, $\sqrt{s_{\mathrm{_{NN}}}}=$5 TeV %s"%(SYS))                
                 plt.setp(leg.get_title(),fontsize=14)
 
                 
@@ -174,9 +174,9 @@ def Plot_UB_Subtraction(Dict):
                             %(zTbins[izt],zTbins[izt+1]),r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],
                             loc='best',fontsize=14,frameon=False,numpoints=1)
                     if (SYS == 'pp'):
-                        leg.set_title("ALICE, $\sqrt{s}=$5 TeV %s"%(SYS))
+                        leg.set_title("ALICE Work in Progress, $\sqrt{s}=$5 TeV %s"%(SYS))
                     else:
-                        leg.set_title("ALICE, $\sqrt{s_{\mathrm{_{NN}}}}=$5 TeV %s"%(SYS))
+                        leg.set_title("ALICE Work in Progress, $\sqrt{s_{\mathrm{_{NN}}}}=$5 TeV %s"%(SYS))
                     plt.setp(leg.get_title(),fontsize=15)
                 fig.savefig('pics/%s/%s_%s_Gamma_hadron_UE_sub_zT_%i.pdf'%(Shower,Shower,SYS,izt), bbox_inches='tight')
 
@@ -229,9 +229,9 @@ def Plot_Sub_UB_Overlay(Dict):
                     "UB Error",r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]),r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],
                     loc='best',title = "Alice %s 5 TeV",fontsize=14,frameon=False,numpoints=1)
                 if (SYS == 'pp'):
-                    leg.set_title("ALICE, $\sqrt{s}=$5 TeV %s"%(SYS))
+                    leg.set_title("ALICE Work in Progress, $\sqrt{s}=$5 TeV %s"%(SYS))
                 else:
-                    leg.set_title("ALICE, $\sqrt{s_{\mathrm{_{NN}}}}=$5 TeV %s"%(SYS))                
+                    leg.set_title("ALICE Work in Progress, $\sqrt{s_{\mathrm{_{NN}}}}=$5 TeV %s"%(SYS))                
                 plt.setp(leg.get_title(),fontsize=14)
             fig.savefig('pics/%s/%s_%s_Region_Overlays_UE_sub_pT_%i.pdf'%(Shower,Shower,SYS,ipt), bbox_inches='tight')
 
@@ -312,7 +312,7 @@ def Plot_pp_pPb_Cs(Dict):
                     r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]),
                     r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],loc = "upper left",fontsize=16,frameon=False,numpoints=1)
 
-            leg.set_title("ALICE")
+            leg.set_title("ALICE Work in Progress")
             leg._legend_box.align = "left"
             plt.setp(leg.get_title(),fontsize=22)
             fig.tight_layout()
@@ -420,7 +420,7 @@ def Plot_FF(FF_Dict):
             leg = plt.legend([pp_plot,pPb_plot,empt],["pp $\sqrt{s} = 5$ TeV","p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV",
                 r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],frameon=False,numpoints=1,title=' ',loc="upper right",prop={'size':14})
 
-        leg.set_title("ALICE")
+        leg.set_title("ALICE Work in Progress")
         plt.setp(leg.get_title(),fontsize=20)
 
         Title = plt.title(r'Integrated $\mathrm{\gamma}$-Hadron Correlation: $2\pi/3 < \Delta\varphi < \pi, |\Delta\eta| < %1.1f$ '%(eta_max),fontsize=15)

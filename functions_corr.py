@@ -273,9 +273,9 @@ def Plot_UB():
                     'ZYAM',r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]),r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],
                     loc='best',title = "Alice %s 5 TeV",fontsize=14,frameon=False,numpoints=1)
                 if (sys == 'pp'):
-                    leg.set_title("ALICE, $\sqrt{s}=$5 TeV %s"%(sys))
+                    leg.set_title("ALICE Work in Progress, $\sqrt{s}=$5 TeV %s"%(sys))
                 else:
-                    leg.set_title("ALICE, $\sqrt{s_{\mathrm{_{NN}}}}=$5 TeV %s"%(sys))                
+                    leg.set_title("ALICE Work in Progress, $\sqrt{s_{\mathrm{_{NN}}}}=$5 TeV %s"%(sys))                
                 plt.setp(leg.get_title(),fontsize=14)
 
 
@@ -307,9 +307,9 @@ def Plot_UB():
                     'ZYAM',r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]),r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],
                     loc='best',fontsize=14,frameon=False,numpoints=1)
                 if (sys == 'pp'):
-                    leg.set_title("ALICE, $\sqrt{s}=$5 TeV %s"%(sys))
+                    leg.set_title("ALICE Work in Progress, $\sqrt{s}=$5 TeV %s"%(sys))
                 else:
-                    leg.set_title("ALICE, $\sqrt{s_{\mathrm{_{NN}}}}=$5 TeV %s"%(sys))
+                    leg.set_title("ALICE Work in Progress, $\sqrt{s_{\mathrm{_{NN}}}}=$5 TeV %s"%(sys))
                 plt.setp(leg.get_title(),fontsize=15)
             fig.savefig('pics/%s/%s_%s_Gamma_hadron_UE_pT_%i__zT_%i.pdf'%(Shower,Shower,sys,ipt,izt), bbox_inches='tight')        
             print("")
