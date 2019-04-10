@@ -28,9 +28,14 @@ def Get_NTriggers(filename,ipt, Signal_DNN=True):
 def ZYAM_Line(Phi_Array, Phi_Error_Array):
     
     z_temp = Phi_Array[2:3]
-    Z_Value = z_temp.mean()
-    
     z_temp_error = Phi_Error_Array[2:3]**2
+
+    if (N_dPhi_Bins == 16):
+        z_temp = Phi_Array[4:6]
+        z_temp_error = Phi_Error_Array[4:6]**2
+
+    Z_Value = z_temp.mean()
+
     Z_Error = z_temp_error.sum()
     Z_Error = math.sqrt(Z_Error)
     Z_Error = Z_Error/len(z_temp_error)
@@ -132,14 +137,15 @@ def GetLEProj(filename, ipt, izt, Signal_DNN=True,DoAverage=True):
     
     #LE_Projection.SetDirectory(0)
     LE_Projection.Add(LE_Projection_pos,1)
-    LE_Projection.Rebin(2)
+    if (N_dPhi_Bins == 8):
+        LE_Projection.Rebin(2)
     LE_Projection.Scale(1.0/1.2) #scale by eta region
     
     file.Close()
     
     LE_Phi_Array = np.zeros(len(delta_phi_centers))
     LE_Error_Array = np.zeros(len(delta_phi_centers))
-    for bin in range(2,9):
+    for bin in range(2,N_dPhi_Bins):
                 LE_Phi_Array[bin-2] = LE_Projection.GetBinContent(bin)
                 LE_Error_Array[bin-2] = LE_Projection.GetBinError(bin)
     
@@ -191,7 +197,8 @@ def GetPhiProj(filename,prfx,ipt, izt, Signal_DNN=True):
                                         100*zTbins[izt+1]),Eta_Axis.FindBin(-eta_max),Eta_Axis.FindBin(eta_max))
                                             
     PhiProjection.SetDirectory(0)
-    PhiProjection.Rebin(2)
+    if (N_dPhi_Bins == 8):
+        PhiProjection.Rebin(2)
     PhiProjection.Scale(1.0/(2*eta_max))
     
     #per trigger yield
@@ -203,7 +210,7 @@ def GetPhiProj(filename,prfx,ipt, izt, Signal_DNN=True):
     
     Phi_Array = np.zeros(len(delta_phi_centers))
     Phi_Error_Array = np.zeros(len(delta_phi_centers))
-    for bin in range(2,9):
+    for bin in range(2,N_dPhi_Bins+1):
         Phi_Array[bin-2] = PhiProjection.GetBinContent(bin)
         Phi_Error_Array[bin-2] = PhiProjection.GetBinError(bin)
     
@@ -260,7 +267,7 @@ def Plot_UB():
                 plt.xticks(fontsize=(fsize))
                 plt.xlim((0.39269908169872414,3.14159))
                 plt.ylabel(r'$1/N_{\mathrm{trig}} \: \: \mathrm{d}N/\mathrm{d}\Delta\eta$',fontsize=fsize+2)
-                plt.ylim((-0.01,1.2*max(Sig_LE_Phi_Array)))
+                plt.ylim((-0.001,1.2*max(Sig_LE_Phi_Array)))
                 empt, = ax.plot([], []," ")
                 empt2, = ax.plot([],[]," ")
                 plt.yticks(fontsize=fsize-5)

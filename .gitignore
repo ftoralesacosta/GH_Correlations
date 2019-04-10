@@ -1,4 +1,4 @@
-
+B
 # Ignore all
 *
 
@@ -25,3 +25,4 @@
 #*.sh
 
 ./batchjobs/res_dir/
+./pair_gale_shapley/vtune_results/

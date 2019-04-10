@@ -26,7 +26,7 @@ def FF_Ratio(FF_Dict):
         plt.ylabel(r"$\frac{\mathrm{p-Pb}}{\mathrm{pp}}$",fontsize=20)
         
         leg = plt.legend([Ratio_Plot,empt4],["Statistical Error",r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],frameon=False,numpoints=1,title=' ',prop={'size':18})
-        leg.set_title("ALICE Work in Progress")
+        leg.set_title("ALICE Work in Progress\n ")
         plt.setp(leg.get_title(),fontsize=20)
         
         plt.xlim(xmin = 0.0,xmax=0.7)
@@ -64,9 +64,9 @@ def Overlay_pT_FF(FF_Dict):
             #plt.xlim(xmin = 0.1,xmax=0.7)
             plt.ylim(ymin = 0.001,ymax=20)
 
-        leg = plt.legend(numpoints=1)
-        leg.set_title("ALICE Work in Progress %s $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV"%(SYS))
-        plt.setp(leg.get_title(),fontsize=20)
+        leg = plt.legend(numpoints=1,frameon=False)
+        leg.set_title("ALICE Work in Progress\n  %s $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV"%(SYS))
+        plt.setp(leg.get_title(),fontsize=18)
 
         plt.title(r'Integrated $\mathrm{\gamma}$-Hadron Correlation: $2\pi/3 < \Delta\varphi < \pi, |\Delta\eta| < %1.1f$ '%(eta_max),fontdict = {'fontsize' : 20})
         plt.gcf()
@@ -166,7 +166,7 @@ def Plot_pp_pPb_Avg_FF(Comb_Dict):
             label=r' %s %1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(SYS,pTbins[0],pTbins[N_pT_Bins]))
 
         Sys_Plot_pp = plt.bar(zT_centers[ZT_OFF_PLOT:], Sys_Uncertainty[ZT_OFF_PLOT:]+Sys_Uncertainty[ZT_OFF_PLOT:], 
-            bottom=Comb_Dict["%s_Combined_FF"%(SYS)][ZT_OFF_PLOT:]-Sys_Uncertainty[ZT_OFF_PLOT:],width=zt_box[ZT_OFF_PLOT:], align='center',edgecolor="black",color='white',)
+            bottom=Comb_Dict["%s_Combined_FF"%(SYS)][ZT_OFF_PLOT:]-Sys_Uncertainty[ZT_OFF_PLOT:],width=zt_box[ZT_OFF_PLOT:], align='center',color='white',)
 
         plt.yscale('log')                                                                                                                                                                                                                                                              
         plt.ylabel(r"$\frac{1}{N_{\mathrm{\gamma}}}\frac{\mathrm{d}N}{\mathrm{d}z_{\mathrm{T}} \mathrm{d}\Delta\eta}$",fontsize=20)
@@ -174,9 +174,9 @@ def Plot_pp_pPb_Avg_FF(Comb_Dict):
         #plt.xlim(xmin = 0.1,xmax=0.7)
         plt.ylim(ymin = 0.01,ymax=20)
 
-    leg = plt.legend(numpoints=1)
-    leg.set_title("ALICE Work in Progress $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV")
-    plt.setp(leg.get_title(),fontsize=20)
+    leg = plt.legend(numpoints=1,frameon=False)
+    leg.set_title("ALICE Work in Progress\n  $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV")
+    plt.setp(leg.get_title(),fontsize=18)
 
     plt.title(r'Integrated $\mathrm{\gamma}$-Hadron Correlation: $2\pi/3 < \Delta\varphi < \pi, |\Delta\eta| < %1.1f$ '%(eta_max),fontdict = {'fontsize' : 19})
     plt.gcf()
@@ -265,8 +265,6 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
     plt.axhline(y=1, color='r', linestyle='--')
 
     ### ROOT LINEAR and CONSTANT FITS ###
-    #TGraph_Ratio = TGraphErrors(Ratio.size-zT_offset,zT_centers[zT_offset:],
-    #                        Ratio[zT_offset:],Ratio_Error[zT_offset:])    
     Ratio_TGraph = TGraphErrors()
     for izt in range (1,len(Ratio)):
         Ratio_TGraph.SetPoint(izt,zT_centers[izt],Ratio[izt])
@@ -303,7 +301,6 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
     y_vals = p0 + p1 * x_vals
     plt.plot(x_vals, y_vals, '--',color=p1col,linewidth=2)
 
-
     ### ROOT DONE ###
 
 
@@ -311,9 +308,9 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
 
 
     #leg = plt.legend(numpoints=1)
-    leg.set_title("ALICE Work in Progress $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV")
+    leg.set_title("ALICE Work in Progress\n  $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV")
     plt.setp(leg.get_title(),fontsize=20)
-    #plt.figtext(0.39,0.85,"ALICE Work in Progress $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV",color='Black', fontsize=20)
+    #plt.figtext(0.39,0.85,"ALICE Work in Progress\n  $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV",color='Black', fontsize=20)
 
     plt.gcf()
     plt.savefig("pics/Averaged_pT_FFunction_ratio_%s.pdf"%(Shower), bbox_inches='tight')

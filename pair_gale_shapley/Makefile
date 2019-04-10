@@ -1,7 +1,6 @@
 CXX =		g++
 CC =		$(CXX)
 CXXFLAGS =      -g -O -s -frounding-math
-CXXFLAGS =      -O
 #CXXFLAGS +=     -Wextra -Wall -Werror -fPIC
 #CXXFLAGS +=	-Wno-unused-variable -Wno-unused-parameter
 CXXFLAGS +=	-Wno-unused-function

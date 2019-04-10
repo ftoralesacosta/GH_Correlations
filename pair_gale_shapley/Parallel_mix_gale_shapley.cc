@@ -322,7 +322,7 @@ std::vector<index_t> gale_shapley(std::vector<std::list<index_t> > &mp,
 		}
 		f_to_m_engaged[w] = m;
 
-#pragma omp critical
+#pragma omp atomic
 		m_to_f_engaged[m] = w;
 
 		std::list<index_t>::iterator s =
@@ -335,7 +335,7 @@ std::vector<index_t> gale_shapley(std::vector<std::list<index_t> > &mp,
 			 iterator != mp_index[w].end(); iterator++) {
 			iterator->first->erase(iterator->second);
 		}
-#pragma omp critical
+#pragma omp atomic  
 		fp[w].erase(s, fp[w].end());
 	}
 	return m_to_f_engaged;
@@ -348,8 +348,12 @@ void mix_gale_shapley(const char *filename_0, const char *filename_1, const char
 	size_t mix_end = atoi(mixing_end);
 	int Track_Skim = atoi(GeV_Track_Skim);
 
-	const size_t nevent_0 = nevent(filename_0);
-	const size_t nevent_1 = nevent(filename_1);
+	// const size_t nevent_0 = nevent(filename_0);
+	// const size_t nevent_1 = nevent(filename_1);
+
+	const size_t nevent_0 = 4000;
+	const size_t nevent_1 = 4000;
+
 
 	size_t block_size_max = 2000;
 	if (Track_Skim == 6) block_size_max = 1000; //FIXME: Set back for 2000 when larger 6GeV Skimmed NTuple available
