@@ -322,7 +322,7 @@ std::vector<index_t> gale_shapley(std::vector<std::list<index_t> > &mp,
 		}
 		f_to_m_engaged[w] = m;
 
-#pragma omp atomic
+#pragma omp critical
 		m_to_f_engaged[m] = w;
 
 		std::list<index_t>::iterator s =
@@ -335,7 +335,7 @@ std::vector<index_t> gale_shapley(std::vector<std::list<index_t> > &mp,
 			 iterator != mp_index[w].end(); iterator++) {
 			iterator->first->erase(iterator->second);
 		}
-#pragma omp atomic  
+#pragma omp critical  
 		fp[w].erase(s, fp[w].end());
 	}
 	return m_to_f_engaged;
