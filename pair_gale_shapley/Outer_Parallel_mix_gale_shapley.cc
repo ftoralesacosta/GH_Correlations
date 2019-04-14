@@ -454,10 +454,10 @@ void mix_gale_shapley(const char *filename_0, const char *filename_1, const char
 	    //    P.push_back(event_start_0+j); //taken out for now such that merging does not constantly contain same event.
 
 	    for (size_t l = 0; l < k.size(); l++){
-#pragma omp atomic
+#pragma omp critical
 	      P.push_back(k[l][j]);
 	    }
-#pragma omp atomic
+#pragma omp critical
 	    Matches.push_back(P);
 	  }
 

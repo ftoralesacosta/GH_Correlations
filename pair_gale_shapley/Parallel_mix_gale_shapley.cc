@@ -348,11 +348,11 @@ void mix_gale_shapley(const char *filename_0, const char *filename_1, const char
 	size_t mix_end = atoi(mixing_end);
 	int Track_Skim = atoi(GeV_Track_Skim);
 
-	// const size_t nevent_0 = nevent(filename_0);
-	// const size_t nevent_1 = nevent(filename_1);
+	const size_t nevent_0 = nevent(filename_0);
+	const size_t nevent_1 = nevent(filename_1);
 
-	const size_t nevent_0 = 4000;
-	const size_t nevent_1 = 4000;
+	// const size_t nevent_0 = 4000;
+	// const size_t nevent_1 = 4000;
 
 
 	size_t block_size_max = 2000;
