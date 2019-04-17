@@ -14,6 +14,7 @@
 //#define HI_TREE "hiEvtAnalyzer/HiTree"
 #define HI_TREE "_tree_event"
 #define HI_TREE_2 "AliAnalysisTaskNTGJ/_tree_event"
+#pragma omp_num_threads(60)
 namespace {
 
 	typedef unsigned short index_t;
