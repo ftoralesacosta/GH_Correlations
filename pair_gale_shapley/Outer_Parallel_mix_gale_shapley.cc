@@ -20,6 +20,7 @@ namespace {
 
 	size_t nevent(const char *filename)
 	{
+
 		TFile *root_file = TFile::Open(filename);
 
 		if (root_file == NULL) {
@@ -110,9 +111,7 @@ namespace {
 
 		for (size_t j = 0; j < n; j++) {
 			float s_j = 0;
-#ifdef _OPENMP
-#pragma omp parallel for shared(u) reduction(+: s_j)
-#endif // _OPENMP
+
 			for (size_t i = 0; i < u.size(); i += n) {
 				s_j += fabsf(u[i + j]);
 			}
@@ -121,9 +120,6 @@ namespace {
 		for (size_t j = 0; j < n; j++) {
 			float s_j = 0;
 
-#ifdef _OPENMP
-#pragma omp parallel for shared(u) reduction(+: s_j)
-#endif // _OPENMP
 			for (size_t i = 0; i < v.size(); i += n) {
 				s_j += fabsf(v[i + j]);
 			}
@@ -132,20 +128,15 @@ namespace {
 		for (size_t j = 0; j < n; j++) {
 			s[j] = (u.size() + v.size()) / s[j];
 
-			fprintf(stderr, "%s:%d: %lu %f\n", __FILE__, __LINE__, j, s[j]);
+			//fprintf(stderr, "%s:%d: %lu %f\n", __FILE__, __LINE__, j, s[j]);
 		}
 
-#ifdef _OPENMP
-#pragma omp parallel for shared(u, s)
-#endif // _OPENMP
 		for (size_t i = 0; i < u.size(); i += n) {
 			for (size_t j = 0; j < n; j++) {
 				u[i + j] *= s[j];
 			}
 		}
-#ifdef _OPENMP
-#pragma omp parallel for shared(v, s)
-#endif // _OPENMP
+
 		for (size_t i = 0; i < v.size(); i += n) {
 			for (size_t j = 0; j < n; j++) {
 				v[i + j] *= s[j];
@@ -168,15 +159,13 @@ void order_preference(std::vector<std::list<index_t> > &up,
 	const size_t u_size_n = u.size() / n;
 	const size_t v_size_n = v.size() / n;
 
-	fprintf(stderr, "%s:%d: %lux%lu\n", __FILE__, __LINE__,
-			u_size_n, v_size_n);
+	// fprintf(stderr, "%s:%d: %lux%lu\n", __FILE__, __LINE__,
+	// 		u_size_n, v_size_n);
 
 	const size_t size_max = std::max(u_size_n, v_size_n);
 
 	up.resize(u_size_n, std::list<index_t>());
-#ifdef _OPENMP
-#pragma omp parallel for shared(up)
-#endif // _OPENMP
+
 	for (size_t i = 0; i < u_size_n; i++) {
 		std::vector<std::pair<float, index_t> > l;
 
@@ -198,16 +187,13 @@ void order_preference(std::vector<std::list<index_t> > &up,
 		}
 		up[i].resize(size_max, v_size_n);
 
-		if (i % 100 == 0) {
-			fprintf(stderr, "%s:%d: %lu/%lu\n", __FILE__, __LINE__,
-					i, u_size_n);
-		}
+		// if (i % 100 == 0) {
+		//   fprintf(stderr, "%s:%d: %lu/%lu\n", __FILE__, __LINE__,i, u_size_n);
+		// }
 	}
 
 	vp.resize(v_size_n * nduplicate_v, std::list<index_t>());
-#ifdef _OPENMP
-#pragma omp parallel for shared(vp)
-#endif // _OPENMP
+
 	for (size_t j = 0; j < v_size_n; j++) {
 		std::vector<std::pair<float, index_t> > l;
 
@@ -232,13 +218,12 @@ void order_preference(std::vector<std::list<index_t> > &up,
 			vp[j * nduplicate_v + k] = b;
 		}
 
-		if (j % 100 == 0) {
-			fprintf(stderr, "%s:%d: %lu/%lu\n", __FILE__, __LINE__,
-					j, v_size_n);
-		}
+		// if (j % 100 == 0) {
+		//   fprintf(stderr, "%s:%d: %lu/%lu\n", __FILE__, __LINE__,j, v_size_n);
+		// }
 	}
 
-	fprintf(stderr, "%s:%d: %s\n", __FILE__, __LINE__, "Order Preference done for this block");
+	//fprintf(stderr, "%s:%d: %s\n", __FILE__, __LINE__, "Order Preference done for this block");
 }
 
 std::vector<index_t> gale_shapley(std::vector<std::list<index_t> > &mp,
@@ -268,9 +253,9 @@ std::vector<index_t> gale_shapley(std::vector<std::list<index_t> > &mp,
 			
 		}
 
-		if ((iterator_outer - mp.begin()) % 100 == 0) {
-		  fprintf(stderr, "%s:%d: %lu/%lu\n", __FILE__, __LINE__,
-			  iterator_outer - mp.begin(), mp.size()); }
+		// if ((iterator_outer - mp.begin()) % 100 == 0) {
+		//   fprintf(stderr, "%s:%d: %lu/%lu\n", __FILE__, __LINE__,
+		// 	  iterator_outer - mp.begin(), mp.size()); }
 		
 	}
 
@@ -286,10 +271,9 @@ std::vector<index_t> gale_shapley(std::vector<std::list<index_t> > &mp,
 		const index_t m = m_iterator - m_to_f_engaged.begin();
 		const index_t w = mp[m].front();
 
-		if (m % 100 == 0 || w % 100 == 0) {
-			fprintf(stderr, "%s:%d: %hu<>%hu\n", __FILE__, __LINE__,
-					m, w);
-		}
+		// if (m % 100 == 0 || w % 100 == 0) {
+		//   fprintf(stderr, "%s:%d: %hu<>%hu\n", __FILE__, __LINE__,m, w);
+		// }
 
 		// Some man p is engaged to w
 		index_t p = f_to_m_engaged[w];
@@ -323,11 +307,11 @@ void mix_gale_shapley(const char *filename_0, const char *filename_1, const char
 	size_t mix_end = atoi(mixing_end);
 	int Track_Skim = atoi(GeV_Track_Skim);
 
-	const size_t nevent_0 = nevent(filename_0);
-	const size_t nevent_1 = nevent(filename_1);
+	// const size_t nevent_0 = nevent(filename_0);
+	// const size_t nevent_1 = nevent(filename_1);
 
-	// const size_t nevent_0 = 4000;
-	// const size_t nevent_1 = 4000;
+	const size_t nevent_0 = 32*2000;
+	const size_t nevent_1 = 32*2000;
 
 
 	size_t block_size_max = 2000;
@@ -346,39 +330,22 @@ void mix_gale_shapley(const char *filename_0, const char *filename_1, const char
 
 	for(size_t h = 0; h < nblock_0+1; h++){
 	//for(size_t h = nblock_0; h < nblock_0+1; h++){
+
 	  const size_t event_start_0 = h * nevent_0 / (nblock_0 + 1);
 	  size_t event_end_0 = (h + 1) * nevent_0 / (nblock_0 + 1);
 	  size_t hblock_nevents_0 = event_end_0 - event_start_0;	  
+
 	  std::vector<std::vector<Long64_t> > k;		  
 	  
 	  std::vector<float> feature_0 =
 	      feature_extract(filename_0, event_start_0, event_end_0,nfeature);
 	    
-	  fprintf(stderr,"%s:%d: %s %lu %s %lu\n",__FILE__,__LINE__,"Block",h,"of",nblock_0);
-	    
-// //foregoing this block structure as number of events to be mixed approaches nblocks*nmix	    
-// if (h < width) {
-//   lmin = 0; 
-//   lmax = 2*width+1;
-// }
-// else if (h+width > nblock_1) {
-//   lmin = nblock_1-2*width; 
-//   lmax = nblock_1+1;
-//   if(h+width > nblock_1){
-// 	lmin = 0;
-// 	lmax = 2*width+1;
-//   }
-// }
-// else {
-//   lmin = h-width;  	 
-//   lmax = h+width+1;
-// }
-// for (size_t i = lmin+mix_start; i < lmin+mix_end+1; i++) {
-//size_t imax = std::min(n_mix,nblock_1);
-//for (size_t i = h; i < h+n_mix+1; i++) {
-//for (size_t i = 0; i < n_mix; i++) {
+	  fprintf(stderr,"%s:%d: %s %lu %s %lu\n",__FILE__,__LINE__,"Block",h,"of",nblock_0);	   
+
+	  //#pragma omp parallel for shared(i)
+
 #ifdef _OPENMP
-#pragma omp parallel for
+#pragma omp parallel for shared(feature_0)
 #endif	
 	    for (size_t i = mix_start; i < mix_end+1; i++) {
 	     	    
@@ -391,18 +358,18 @@ void mix_gale_shapley(const char *filename_0, const char *filename_1, const char
 		event_end_1 = (i + 1) * nevent_1 / (nblock_1+1);
 	      
 	      size_t iblock_nevents_1 = event_end_1 - event_start_1; //might fail if remainder is < 2000....
-	      fprintf(stderr,"%s:%d: %lu %lu\n",__FILE__,__LINE__,hblock_nevents_0,iblock_nevents_1);
+	      //fprintf(stderr,"%s:%d: %lu %lu\n",__FILE__,__LINE__,hblock_nevents_0,iblock_nevents_1);
 
 	      //block SIZES MUST be EQUAL.
 	      while (hblock_nevents_0 > iblock_nevents_1) {
 	      	event_end_1 += 1; //FIXME: A bit hacky. May fail in edge cases.
 		iblock_nevents_1 = event_end_1 - event_start_1;
-	      	fprintf(stderr,"%s:%d: %lu %lu\n",__FILE__,__LINE__,hblock_nevents_0,iblock_nevents_1);
+	      	//fprintf(stderr,"%s:%d: %lu %lu\n",__FILE__,__LINE__,hblock_nevents_0,iblock_nevents_1);
 	      }
 	      while (hblock_nevents_0 < iblock_nevents_1) {
 	      	event_end_1 -= 1; 
 		iblock_nevents_1 = event_end_1 - event_start_1;
-	      	fprintf(stderr,"%s:%d: %lu %lu\n",__FILE__,__LINE__,hblock_nevents_0,iblock_nevents_1);
+	      	//fprintf(stderr,"%s:%d: %lu %lu\n",__FILE__,__LINE__,hblock_nevents_0,iblock_nevents_1);
 	      }
 
 	      //Prevent Segfaults of long jobs
@@ -411,13 +378,13 @@ void mix_gale_shapley(const char *filename_0, const char *filename_1, const char
 		continue; }
 
 
-	      fprintf(stderr,"%s:%d:%s %lu %s %lu: %s %zu %s %lu, Event in larger NTuple: %zu \n\n",
+	      // fprintf(stderr,"%s:%d:%s %lu %s %lu: %s %zu %s %lu, Event in larger NTuple: %zu \n\n",
+	      // 	      __FILE__, __LINE__,"Block",h,"of",nblock_0, "Mixed Event",i-mix_start, 
+	      // 	      "of",mix_End-mix_start, event_start_1);
 
-		      __FILE__, __LINE__,"Block",h,"of",nblock_0, "Mixed Event",i-mix_start, "of",mix_end-mix_start, event_start_1);
-
-		std::vector<float> feature_1 =
- 			feature_extract(filename_1, event_start_1, event_end_1,
-							nfeature);
+	      std::vector<float> feature_1;
+ #pragma omp critical
+ 	      feature_1 = feature_extract(filename_1, event_start_1, event_end_1,nfeature);
 
 		{
 			std::vector<float> feature_0_scaled = feature_0;
@@ -436,8 +403,7 @@ void mix_gale_shapley(const char *filename_0, const char *filename_1, const char
 			std::vector <index_t> m;
 			m = gale_shapley(preference_0, preference_1);
 
-			const size_t feature_1_size_nfeature =
-			  feature_1.size() / nfeature;
+			const size_t feature_1_size_nfeature = feature_1.size() / nfeature;
 
 			std::vector <Long64_t>tempflat;
 
@@ -445,19 +411,16 @@ void mix_gale_shapley(const char *filename_0, const char *filename_1, const char
 			  Long64_t q = event_start_1 + (m[j] % feature_1_size_nfeature);
 			  tempflat.push_back(q);
 			}			
+#pragma omp critical
 			k.push_back(tempflat);
 		}
-	  } //i
+	    } //i
 	  for (size_t j = 0; j < k[0].size(); j++){
 	    std::vector <Long64_t> P;
 
-	    //    P.push_back(event_start_0+j); //taken out for now such that merging does not constantly contain same event.
-
 	    for (size_t l = 0; l < k.size(); l++){
-#pragma omp critical
 	      P.push_back(k[l][j]);
 	    }
-#pragma omp critical
 	    Matches.push_back(P);
 	  }
 

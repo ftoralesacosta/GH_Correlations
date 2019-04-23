@@ -273,28 +273,29 @@ std::vector<index_t> gale_shapley(std::vector<std::list<index_t> > &mp,
 		  fprintf(stderr, "%s:%d: %lu/%lu\n", __FILE__, __LINE__,
 			  iterator_outer - mp.begin(), mp.size()); }
 		
-	}//Done with mp_index structure
+	}//mp_index structure
 
 
 	//Pairing
-	std::vector<index_t> f_to_m_engaged(fp.size(), mp.size());
 	//std::vector<index_t> m_to_f_engaged(mp.size(), fp.size());
+	std::vector<index_t> f_to_m_engaged(fp.size(), mp.size());
 	std::vector<index_t> m_to_f_engaged_combined;
 
-	int m_i;
-#pragma omp parallel 
+	omp_lock_t mpindex_lock;
+	omp_init_lock(&mpindex_lock);
+
+
+#pragma omp parallel shared(f_to_m_engaged,mp_index)
 	{
 	  
 	  std::vector<index_t> m_to_f_engaged;
 	  std::vector<std::list<index_t> > mp_thread;
 
-#pragma omp parallel for shared(m_i)
-	  for (m_i = 0; m_i < mp.size(); m_i++)
+#pragma omp for
+	  for (int m_i = 0; m_i < mp.size(); m_i++){
 	    m_to_f_engaged.push_back(fp.size());
-
-#pragma omp parallel for shared(m_i)
-	  for (m_i = 0; m_i < mp.size(); m_i++)
 	    mp_thread.push_back(mp[m_i]);
+	  }
 
 	  for (;;) {
 		std::vector<index_t>::const_iterator m_iterator =
@@ -322,34 +323,53 @@ std::vector<index_t> gale_shapley(std::vector<std::list<index_t> > &mp,
 		}
 
 		m_to_f_engaged[m] = w;
-		fprintf(stderr,"\n %d: THREAD NUMBER %i: \n\n",__LINE__,omp_get_thread_num());
+
+		// fprintf(stderr,"\n %d: THREAD NUMBER %i: \n\n",__LINE__,omp_get_thread_num());
 
 #pragma omp critical
 		f_to_m_engaged[w] = m;
 
 		std::list<index_t>::iterator s =
 			std::find(fp[w].begin(), fp[w].end(), m);
-
 		s++;
 
-		fprintf(stderr,"\n LINE %d LINE \n",__LINE__);
+
+		omp_set_lock(&mpindex_lock);
 
 		for (std::vector<std::pair<std::vector<std::list<index_t> >::
 				 iterator, std::list<index_t>::iterator> >::iterator
 				 iterator = mp_index[w].begin();
-			 iterator != mp_index[w].end(); iterator++) {
-			iterator->first->erase(iterator->second);
-		}
-		fprintf(stderr,"\n LINE %d LINE \n",__LINE__);
+			iterator != mp_index[w].begin(); iterator++) 
+		  {
+		    iterator->first->erase(iterator->second);
+		    //break;
+		  }
+
+		omp_unset_lock(&mpindex_lock);
+
+		//fprintf(stderr,"\n LINE %d LINE \n",__LINE__);
+
 #pragma omp critical
-		fp[w].erase(s, fp[w].end());
-	}
-	//combine m_to_f from each thread
-#pragma omp critical
-	m_to_f_engaged_combined.insert(m_to_f_engaged_combined.end(), m_to_f_engaged.begin(), m_to_f_engaged.end());
+		//fp[w].erase(s);
+		fp[w].erase(s, fp[w].end()); 
+	  }
+	  
+	  fprintf(stderr,"\n %d: Combining Thread Output \n",__LINE__);
+
+//Fill in ORDER, important for final TTree
+#pragma omp for ordered
+	  for(int t=0; t<omp_get_num_threads(); t++) {
+
+#pragma omp ordered
+	    m_to_f_engaged_combined.insert(m_to_f_engaged_combined.end(), 
+			   m_to_f_engaged.begin(), m_to_f_engaged.end());
+	  }
 
 	}//omp
-	
+
+	omp_destroy_lock(&mpindex_lock);
+
+	fprintf(stderr,"\n %d: Threads combined \n",__LINE__);
 	return m_to_f_engaged_combined;
 }
 
