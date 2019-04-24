@@ -350,7 +350,6 @@ std::vector<index_t> gale_shapley(std::vector<std::list<index_t> > &mp,
 		//fprintf(stderr,"\n LINE %d LINE \n",__LINE__);
 
 #pragma omp critical
-		//fp[w].erase(s);
 		fp[w].erase(s, fp[w].end()); 
 	  }
 	  
