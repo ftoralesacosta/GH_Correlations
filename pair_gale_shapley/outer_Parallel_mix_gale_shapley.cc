@@ -301,11 +301,17 @@ std::vector<index_t> gale_shapley(std::vector<std::list<index_t> > &mp,
 	return m_to_f_engaged;
 }
 
-void mix_gale_shapley(const char *filename_0, const char *filename_1, 
+std::map<size_t,std::vector<Long64_t> > mix_gale_shapley(const char *filename_0, const char *filename_1, 
 		      const char *mixing_start, const char *mixing_end,
 		      const char *GeV_Track_Skim, const int nfeature, 
 		      const int nduplicate)
 {
+
+	std::map<size_t,std::vector<Long64_t> > Matches;
+
+        double time_spent = 0.0;
+	clock_t begin = clock();
+
         size_t mix_start = atoi(mixing_start);
 	size_t mix_end = atoi(mixing_end);
 	int Track_Skim = atoi(GeV_Track_Skim);
@@ -313,10 +319,10 @@ void mix_gale_shapley(const char *filename_0, const char *filename_1,
 	const size_t nevent_0 = nevent(filename_0);
 	const size_t nevent_1 = nevent(filename_1);
 
-	fprintf(stderr,"\n N EVENTS IN %s = %u \n",filename_0,nevent_0);
+	// const size_t nevent_0 = 4*2000; //Testing
+	// const size_t nevent_1 = 4*2000;
 
-	// const size_t nevent_0 = 30*2000; //Testing
-	// const size_t nevent_1 = 30*2000;
+	fprintf(stderr,"\n N EVENTS IN %s = %u \n",filename_0,nevent_0);
 
 	size_t block_size = 2000;
 	if (Track_Skim == 6) block_size = 1000; //few events with 6GeV Tracks
@@ -336,9 +342,7 @@ void mix_gale_shapley(const char *filename_0, const char *filename_1,
 
 	size_t width = 150; //if changed, also must change when writing to Tree
 	const size_t n_mix = 300;
-
-	std::vector<std::vector<Long64_t> > Matches;
-
+	
 	std::vector<std::vector<float> >feature_0_vec;
 	std::vector<std::vector<float> >feature_1_vec;
 
@@ -366,13 +370,14 @@ void mix_gale_shapley(const char *filename_0, const char *filename_1,
 	  fprintf(stderr,"\n %d: MB EVENT START=%u || EVENT END=%u",
 		  __LINE__,event_start_1,event_end_1);
 	    
-
 	}
 
 #pragma omp parallel for
 	for(size_t h = 0; h < nblocks_0; h++){
 
 	  fprintf(stderr,"%s:%d: %s %lu %s %lu\n",__FILE__,__LINE__,"Block",h,"of",nblocks_0);	   
+
+	  size_t event_start_0 = h * block_size;
 	  std::vector<std::vector<Long64_t> > k;		  
 
 	  for (size_t i = mix_start; i < mix_end; i++) {
@@ -406,81 +411,102 @@ void mix_gale_shapley(const char *filename_0, const char *filename_1,
 			
 	    }//mixed events
 
-	  //ADD OMP COMBINE in ORDER
-	    for (size_t j = 0; j < k[0].size(); j++){
+	  for (size_t j = 0; j < k[0].size(); j++)
+	    {
 	      std::vector <Long64_t> P;
-
-	    for (size_t l = 0; l < k.size(); l++){
-	      P.push_back(k[l][j]);
-	    }
-
+	      
+	      size_t event_num =  event_start_0+j;
+	      
+	      for (size_t l = 0; l < k.size(); l++){
+		P.push_back(k[l][j]);
+	      }	     
 #pragma omp critical
-	    Matches.push_back(P);
-	    }
-
+	      Matches[event_num] = P;
+	    }	    
 	}//h
-	  //    write to txt
+
+	 clock_t end = clock();
+	 time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+	 fprintf(stderr,"\n\n\n%d: Time elpased is %f seconds\n",__LINE__,time_spent);
+	 return Matches;
+}
+
+void write_txt(std::map<size_t,std::vector<Long64_t> > Matches,
+	       const char *filename_0, const char *mixing_start, 
+	       const char *mixing_end, const char *GeV_Track_Skim)
+{
+
+	fprintf(stderr,"\n%d: WRITING TO TEXT FILE, GALE DONE!\n",__LINE__);
+
+        size_t mix_start = atoi(mixing_start);
+        size_t mix_end = atoi(mixing_end);
+        int Track_Skim = atoi(GeV_Track_Skim);
 
 	size_t lastindex = std::string(filename_0).find_last_of("."); 
 	std::string rawname = std::string(filename_0).substr(0, lastindex);
 	FILE * txtfile = fopen (Form("../InputData/%s_%iGeVTrack_Pairs_%lu_to_%lu.txt",rawname.data(),Track_Skim,mix_start,mix_end),"w");
-	  for (size_t t=0; t<Matches.size();t++){
-	    for (size_t s=0; s<Matches[t].size();s++){
+	for (size_t t=0; t<Matches.size();t++){ 
+	  for (size_t s=0; s<Matches[t].size();s++){
 	      fprintf(txtfile, "%lld\t", Matches[t][s]);
 	    }
 	    fprintf(txtfile, "%s\n","");
 	  }
 	 fclose (txtfile);
+    }
 
-	// write to TTree
-	  // TFile *root_file = new TFile(filename_0,"update");
+void write_root(std::map<size_t,std::vector<Long64_t> > Matches, 
+		const char *filename_0, const char *GeV_Track_Skim, unsigned int n_mix_events)
+{
 
-	  // TTree *hi_tree = dynamic_cast<TTree *>(root_file->Get(HI_TREE));
-	  // if (hi_tree == NULL) {
-	  //   hi_tree = dynamic_cast<TTree *>(root_file->Get(HI_TREE_2));		
-	  //   if(hi_tree == NULL){
-	  //     fprintf(stderr, "%s:%d: TREE FAIL\n",__FILE__, __LINE__);
-	  //     return;
-	  //   }
-	  // }
+          fprintf(stderr,"\n%d: Paring Done, writing to ROOT file \n",__LINE__);
+          int Track_Skim = atoi(GeV_Track_Skim);
 
-	  // TFile *newfile = new TFile(Form("../InputData/13defv1_c_%lu_%lu_%iGeV_TrackSkim_mixed.root",mix_start,mix_end,Track_Skim),"recreate");	  
-	  // TTree *newtree = hi_tree->CloneTree(0);
+	  TFile *root_file = new TFile(filename_0,"update");
+	  TTree *hi_tree = dynamic_cast<TTree *>(root_file->Get(HI_TREE));
+	  if (hi_tree == NULL) {
+	    hi_tree = dynamic_cast<TTree *>(root_file->Get(HI_TREE_2));		
+	    if(hi_tree == NULL){
+	      fprintf(stderr, "%s:%d: TREE FAIL\n",__FILE__, __LINE__);
+	      return;
+	    }
+	  }
 
-	  // unsigned int n_mix_events = 2*width;
-	  // ULong64_t nentries = hi_tree->GetEntries();    
-	  // Long64_t Mix_Events[n_mix_events];
-
-	  // fprintf(stderr, "%llu\n",nentries);
+	  size_t lastindex = std::string(filename_0).find_last_of("."); 
+	  std::string rawname = std::string(filename_0).substr(0, lastindex);
 	  
-	  // TBranch *MixE = newtree->Branch("Mix_Events", Mix_Events, "&Mix_Events[300]/L");
+	  TFile *newfile = new TFile(Form("%s_%luGeVTrack_paired.root",rawname.data(),Track_Skim),"recreate");
+	  TTree *newtree = hi_tree->CloneTree(0);
+
+	  ULong64_t nentries = hi_tree->GetEntries();    
+	  Long64_t Mix_Events[n_mix_events];
+
+	  TBranch *MixE = newtree->Branch("Mix_Events", Mix_Events, "&Mix_Events[300]/L");
 	  
-	  // for (ULong64_t t = 0; t<nentries;t++){
-	  //   hi_tree->GetEntry(t);
+	  for (ULong64_t t = 0; t<nentries;t++){ //Event # is key used in map <Matches>
+	  //for (ULong64_t t = 0; t<10000;t++){ //Event # is key used in map <Matches>
+	    hi_tree->GetEntry(t);
 	    
-	  //   if(t < Matches.size()){
+	    if(t < Matches.size()){
 
-	  //     for (size_t s=0; s<(Matches[t]).size();s++){ //s=1 for same event start. s=0 when taken out
-	  // 	Mix_Events[s]=Matches[t][s]; //edit may 17: changed s-1 -> s
-	  // 	fprintf(stderr, "%s:%d:  %llu:%lld\n\n",__FILE__,__LINE__,t,Mix_Events[s]); //same edit
-	  //     }
-	  //   }
+	      for (size_t s=0; s<(Matches[t]).size();s++){
+	  	Mix_Events[s]=Matches[t][s]; 
+		//fprintf(stderr, "%s:%d:  %llu:%lld\n\n",__FILE__,__LINE__,t,Mix_Events[s]);
+	      }
+	    }	    
+	    //small remainder of unpared events due to block structure
+	    else if (t >= Matches.size()){
+	      for(size_t u = 0; u<n_mix_events; u++)
+	  	Mix_Events[u] = 999999999;
+	      //if (t % 500 == 0) fprintf(stderr, "%s:%d: %llu:%lld\n\n",__FILE__,__LINE__,t,999999999);
+	    }
 	    
-	  //   else if (t >= Matches.size()){
-	  //     for(size_t u = 0; u<n_mix_events; u++){
-	  // 	//Mix_Events[u] = t; //Fill with own event number. Skip During correlation function
-	  // 	Mix_Events[u] = 999999999;
-	  //     if (t % 500 == 0) fprintf(stderr, "%s:%d: %llu:%lld\n\n",__FILE__,__LINE__,t,Mix_Events[u]);
-	  //     }
-	  //   }
+	    newtree->Fill();  
 	    
-	  //   newtree->Fill();  
-	    
-	  // }//End loop over entries
-	  // newtree->Write();
+	  }//End loop over entries
+	  newtree->Write();
 
-	  // delete root_file;
-	  // delete newfile;
+	  delete root_file;
+	  delete newfile;
 	
 	gSystem->Exit(0);
 }
@@ -491,5 +517,8 @@ int main(int argc, char *argv[])
 	  fprintf(stderr,"%s\n","Argument Syntax is [Command] [File] [File] [mix start] [mix end] [GeV Track Skim]");
 		return EXIT_FAILURE;
 	}
-	mix_gale_shapley(argv[1], argv[2], argv[3], argv[4],argv[5], 2, 1);
+
+	std::map<size_t,std::vector<Long64_t> >	Matches = mix_gale_shapley(argv[1], argv[2], argv[3], argv[4],argv[5], 2, 1);
+
+	write_root(Matches,argv[1],argv[5],300);
 }
