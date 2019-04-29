@@ -6,7 +6,7 @@
 #define HI_TREE "_tree_event"
 #define HI_TREE_2 "AliAnalysisTaskNTGJ/_tree_event"
 
-void write_root(const char *filename_0)
+void write_root(const char *filename_0,const char *version)
 {
 
   TFile *root_file = new TFile(filename_0,"update");
@@ -21,19 +21,21 @@ void write_root(const char *filename_0)
   
 
   ULong64_t nentries = hi_tree->GetEntries();    
+  int ver = atoi(version);
+
   size_t lastindex = std::string(filename_0).find_last_of("."); 
   std::string rawname = std::string(filename_0).substr(0, lastindex);
     
-  TFile *newfile = new TFile(Form("%s_%s.root",rawname.data(),"Uncompressed"),"recreate","uncomp",0);// 0 means no compression
-  TTree *newtree = hi_tree->CloneTree(0);
+  TFile *newfile = new TFile(Form("%s_%s_v%i.root",rawname.data(),"Uncompressed",ver),"recreate","uncomp",0);// 0 means no compression
+  TTree *newtree = hi_tree->CloneTree();
     
-  for (ULong64_t t = 0; t<nentries;t++){ //Event # is key used in map <Matches>
-    fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, t, nentries);
-    hi_tree->GetEntry(t);
+  // for (ULong64_t t = 0; t<nentries;t++){ //Event # is key used in map <Matches>
+  //   fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, t, nentries);
+  //   hi_tree->GetEntry(t);
                 
-    newtree->Fill();  
+  //   newtree->Fill();  
         
-  }//End loop over entries
+  // }//End loop over entries
   newtree->Write();
 
   delete root_file;
@@ -49,5 +51,5 @@ int main(int argc, char *argv[])
     return EXIT_FAILURE;
   }
 
-  write_root(argv[1]);
+  write_root(argv[1],argv[2]);
 }
