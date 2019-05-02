@@ -563,7 +563,10 @@ int main(int argc, char *argv[])
     for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
       //for(Long64_t ievent = 0; ievent < 200; ievent++){
 
-      fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, ievent, nentries);
+      if (ievent%1000==0)
+	fprintf(stderr,"%s:%d: %llu / %llu  THREAD %i", __FILE__, __LINE__, ievent, nentries, omp_get_thread_num());
+
+      //fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, ievent, nentries);
       _tree_event->GetEntry(ievent);
 
       float multiplicity_sum = 0;
