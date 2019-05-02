@@ -13,7 +13,6 @@
 #include <fstream>
 #include "H5Cpp.h"
 #include <chrono>
-
 #include "omp.h"
 
 #define NTRACK_MAX (1U << 14)
@@ -35,7 +34,7 @@ int main(int argc, char *argv[])
     exit(EXIT_FAILURE);
   }
 
-  std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+  //std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
 
   int dummyc = 1;
@@ -46,7 +45,8 @@ int main(int argc, char *argv[])
   TString root_file = (TString)argv[1];
   std::cout << "Opening: " << (TString)argv[1] << std::endl;
 
-  const H5std_string hdf5_file_name(argv[2]);
+  std::string file_str = argv[2];
+  const H5std_string hdf5_file_name(file_str.c_str());
   TString hdf5_file = (TString)argv[2];
   fprintf(stderr,hdf5_file);
 
@@ -456,17 +456,19 @@ int main(int argc, char *argv[])
 
     //Using low level hdf5 API
     //open hdf5: Define size of data from file, explicitly allocate memory in hdf5 space and array size
-    const H5std_string track_ds_name( "track" );
-    H5File h5_file( hdf5_file_name, H5F_ACC_RDONLY );
-    DataSet track_dataset = h5_file.openDataSet( track_ds_name );
+
+    const std::string track_ds_name("track");
+    //H5File h5_file( hdf5_file_name, H5F_ACC_RDONLY );
+    H5File h5_file( file_str.c_str(), H5F_ACC_RDONLY );
+    DataSet track_dataset = h5_file.openDataSet( track_ds_name.c_str());
     DataSpace track_dataspace = track_dataset.getSpace();
     
-    const H5std_string cluster_ds_name( "cluster" );
-    DataSet cluster_dataset = h5_file.openDataSet( cluster_ds_name );
+    const std::string cluster_ds_name( "cluster" );
+    DataSet cluster_dataset = h5_file.openDataSet( cluster_ds_name.c_str() );
     DataSpace cluster_dataspace = cluster_dataset.getSpace();
 
-    const H5std_string event_ds_name( "event" );
-    DataSet event_dataset = h5_file.openDataSet( event_ds_name );
+    const std::string event_ds_name( "event" );
+    DataSet event_dataset = h5_file.openDataSet( event_ds_name.c_str() );
     DataSpace event_dataspace = event_dataset.getSpace();
 
     //Initialize Track Dimensions
@@ -609,7 +611,7 @@ int main(int argc, char *argv[])
 	}
 #pragma omp parallel
    {   
-        #pragma omp for nowait
+#pragma omp for nowait
 	for (Long64_t imix = mix_start; imix < mix_end+1; imix++){
 	  Long64_t mix_event = mix_events[imix];
 
@@ -756,8 +758,8 @@ int main(int argc, char *argv[])
 
     fout->Close();     
     
-    std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
-    std::cout << "Time difference in micro seconds = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() <<std::endl;
+    // std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
+    // std::cout << "Time difference in micro seconds = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() <<std::endl;
     //std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() <<std::endl;
 
     std::cout << " ending " << std::endl;
