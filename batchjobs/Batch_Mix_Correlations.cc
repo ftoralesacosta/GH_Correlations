@@ -548,11 +548,11 @@ int main(int argc, char *argv[])
 
     //Define hyperslab size and offset in  FILE;
     hsize_t track_offset[3] = {0, 0, 0};
-    hsize_t track_count[3] = {2000, ntrack_max, NTrack_Vars};
+    hsize_t track_count[3] = {1, ntrack_max, NTrack_Vars};
     hsize_t cluster_offset[3] = {0, 0, 0};
-    hsize_t cluster_count[3] = {2000, ncluster_max, NCluster_Vars};
+    hsize_t cluster_count[3] = {1, ncluster_max, NCluster_Vars};
     hsize_t event_offset[2] = {0,0};
-    hsize_t event_count[2] = {2000, NEvent_Vars};
+    hsize_t event_count[2] = {1, NEvent_Vars};
 
     track_dataspace.selectHyperslab( H5S_SELECT_SET, track_count, track_offset );
     cluster_dataspace.selectHyperslab( H5S_SELECT_SET, cluster_count, cluster_offset );
@@ -572,9 +572,9 @@ int main(int argc, char *argv[])
     hsize_t event_offset_out[2] = {0};
 
     //define Dimensions of array, for writing slab to array
-    hsize_t track_count_out[3] = {2000, ntrack_max, NTrack_Vars};
-    hsize_t cluster_count_out[3] = {2000, ncluster_max, NCluster_Vars};
-    hsize_t event_count_out[2] = {2000, NEvent_Vars};
+    hsize_t track_count_out[3] = {1, ntrack_max, NTrack_Vars};
+    hsize_t cluster_count_out[3] = {1, ncluster_max, NCluster_Vars};
+    hsize_t event_count_out[2] = {1, NEvent_Vars};
 
     //define space in memory for hyperslab, then write from file to memory
     track_memspace.selectHyperslab( H5S_SELECT_SET, track_count_out, track_offset_out );
@@ -617,24 +617,19 @@ int main(int argc, char *argv[])
 
 	  Long64_t mix_event = mix_events[imix];
 	  if(mix_event >= 9999999) continue;  
-	  mix_min = std::min(mix_min,mix_event);
-	  mix_max = std::max(mix_max,mix_event);
-      }
 
-      mix_range = mix_max-mix_min+1;
-
-	  track_offset[0]=mix_min; 	  //adjust offset for next mixed event
+	  track_offset[0]=mix_event; 	  //adjust offset for next mixed event
 	  track_dataspace.selectHyperslab( H5S_SELECT_SET, track_count, track_offset );
 	  track_dataset.read( track_data_out, PredType::NATIVE_FLOAT, track_memspace, track_dataspace );
 
-	  cluster_offset[0]=mix_min;
+	  cluster_offset[0]=mix_event;
 	  cluster_dataspace.selectHyperslab( H5S_SELECT_SET, cluster_count, cluster_offset );
 	  cluster_dataset.read( cluster_data_out, PredType::NATIVE_FLOAT, cluster_memspace, cluster_dataspace );
 
-	  event_offset[0]=mix_min;
+	  event_offset[0]=mix_event;
 	  event_dataspace.selectHyperslab( H5S_SELECT_SET, event_count, event_offset );
 	  event_dataset.read( event_data_out, PredType::NATIVE_FLOAT, event_memspace, event_dataspace );
-	  
+      }	  
 
     std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
     std::cout << "HDF5 READ Time difference in micro seconds = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() <<std::endl;
@@ -686,21 +681,10 @@ int main(int argc, char *argv[])
 #pragma omp parallel 
    {   
 #pragma omp for schedule(dynamic,1)
-	for (Long64_t mix_count = mix_start; mix_count < mix_end+1; mix_count++){
+	for (Long64_t imix = mix_start; imix < mix_end+1; imix++){
 	  
-	  Long64_t mix_event = mix_events[mix_count];
+	  Long64_t mix_event = mix_events[imix];
 	  if(mix_event >= 9999999) continue;  
-	  Long64_t imix = mix_event-mix_start;
-
-	  // int rank, thread1, thread2, requested, provided;
-	  // cpu_set_t coremask1, coremask2;
-	  // char clbuf1[7 * CPU_SETSIZE], hnbuf1[64];
-	  // memset(clbuf1, 0, sizeof(clbuf1));
-	  // (void)sched_getaffinity(0, sizeof(coremask1), &coremask1);
-	  // cpuset_to_cstr(&coremask1, clbuf1);
-	  // // #pragma omp barrier
-	  // printf("Level 1: thread level 1= %3d (core affinity = %s)\n",thread1, clbuf1);
-
 
 	  //fprintf(stderr,"\n%s:%d: %llu / %llu  THREAD %i\n", __FILE__, __LINE__, ievent, nentries, omp_get_thread_num());
 	  //fprintf(stderr,"\n%s:%d: Mixed Event: %imix  THREAD %i\n", __FILE__, __LINE__, imix, omp_get_thread_num());
