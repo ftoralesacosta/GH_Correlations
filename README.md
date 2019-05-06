@@ -1,7 +1,7 @@
 # GH_Correlations
 
 
-Azimutha correlation of isolated, high-pT trigger photon. This analysis uses NTuples created by https://github.com/yslai/ntuple-gj . The full analysis procedure is:
+Azimuthal correlation of isolated, high-pT trigger photon. This analysis uses NTuples created by https://github.com/yslai/ntuple-gj . The full analysis procedure is:
 
 1. Run same event correlations on a gamma-triggered NTupple
 2. Run Event Mixing
@@ -16,7 +16,9 @@ Azimutha correlation of isolated, high-pT trigger photon. This analysis uses NTu
    1. Open pythonic_correlatinos.ipynb
    2. edit defaulty_values.py for desired settings
    3. Run notebook
-      1. Uncorrelated background subtraction
-      2. Correlated Background subtraction (using purity based on https://github.berkeley.edu/alwina/photon-correlations)
-      3. Away side integration of correltation for fragmentation
-      4. Comparasion between collision systems
+
+The notebook goes throgh the following steps:
+1. Uncorrelated background subtraction
+2. Correlated Background subtraction (using purity based on https://github.berkeley.edu/alwina/photon-correlations)
+3. Away side integration of correltation for fragmentation
+4. Comparasion between collision systems
