@@ -11,7 +11,7 @@ Azimuthal correlation of isolated, high-pT trigger photon. This analysis uses NT
    4. Repeat for track skimming for higher track-pt correlations with high statistics
    5. Divide Same event correlations by normalized mixed event correlations
 3. Repeat steps 1-2 for all datasets individually
-4. Combine correlations fo same collision system (pp, pPb, PbPb)
+4. Combine correlations for same collision system (pp, pPb, PbPb)
 5. Analysis of correlations and fragmentation with Jupyter Notebooks
    1. Open pythonic_correlatinos.ipynb
    2. edit defaulty_values.py for desired settings
