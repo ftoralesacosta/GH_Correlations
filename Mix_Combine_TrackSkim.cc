@@ -18,11 +18,11 @@
 //int main(int argc, char *argv[])
 int main()
 {
-//    if (argc < 3){
-//     std::cout<<"Syntax is [Command] [Same_Event_root_file] [Mixed_Event_root_file]"<<std::endl;
-//     exit(EXIT_FAILURE);
-//   }
-//    TFile *corr = TFile::Open((TString)argv[1]);
+  //    if (argc < 3){
+  //     std::cout<<"Syntax is [Command] [Same_Event_root_file] [Mixed_Event_root_file]"<<std::endl;
+  //     exit(EXIT_FAILURE);
+  //   }
+  //    TFile *corr = TFile::Open((TString)argv[1]);
 
   int nTrackSkims = 3;
   float* trackPtSkims;
@@ -67,23 +67,23 @@ int main()
 
 	  fprintf(stderr,"pt min max: %1.2f %1.2f, zt min max %1.2f %1.2f\n",ptbins[ipt],ptbins[ipt+1],ztbins[izt],ztbins[izt+1]);
 	  fprintf(stderr,"Track pT between %1.2f and %1.2f\n",ptbins[ipt]*ztbins[izt],ptbins[ipt+1]*ztbins[izt+1]);
-	  
+	    
 	  Mix_DNN1_Corr[izt+ipt*nztbins] = (TH2F*)MixFile[iSkim]->Get(
-          Form("DNN%i_Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",
-          1,ptbins[ipt],ptbins[ipt+1],10*ztbins[izt],10*ztbins[izt+1]));   
+								      Form("DNN%i_Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",
+									   1,ptbins[ipt],ptbins[ipt+1],10*ztbins[izt],10*ztbins[izt+1]));   
 
 	  if (Mix_DNN1_Corr[izt+ipt*nztbins] == NULL) {
 	    std::cout << " mix TH2D DNN1 read fail "<<"Mix file "<<iSkim<< std::endl;
 	    exit(EXIT_FAILURE);}
       
 	  Mix_DNN2_Corr[izt+ipt*nztbins] = (TH2F*)MixFile[iSkim]->Get(
-          Form("DNN%i_Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",
-	  2,ptbins[ipt],ptbins[ipt+1],10*ztbins[izt],10*ztbins[izt+1]));
+								      Form("DNN%i_Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",
+  2,ptbins[ipt],ptbins[ipt+1],10*ztbins[izt],10*ztbins[izt+1]));
 
-	  if (Mix_DNN2_Corr[izt+ipt*nztbins] == NULL) {
-	    std::cout << " mix TH2D DNN2 read fail "<<"Mix file "<<iSkim<<std::endl;
-	    exit(EXIT_FAILURE);}     
-	}
+  if (Mix_DNN2_Corr[izt+ipt*nztbins] == NULL) {
+    std::cout << " mix TH2D DNN2 read fail "<<"Mix file "<<iSkim<<std::endl;
+    exit(EXIT_FAILURE);}     
+}
 
       }
       
@@ -103,4 +103,3 @@ int main()
 
   return 0;
 }
-    
