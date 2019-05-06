@@ -35,37 +35,6 @@ enum isolationDet {CLUSTER_ISO_TPC_04, CLUSTER_ISO_ITS_04, CLUSTER_FRIXIONE_TPC_
 using namespace H5;
 
 
-static char *cpuset_to_cstr(cpu_set_t *mask, char *str)
-{
-  char *ptr = str;
-  int i, j, entry_made = 0;
-  for (i = 0; i < CPU_SETSIZE; i++) {
-    if (CPU_ISSET(i, mask)) {
-      int run = 0;
-      entry_made = 1;
-      for (j = i + 1; j < CPU_SETSIZE; j++) {
-        if (CPU_ISSET(j, mask)) run++;
-        else break;
-      }
-      if (!run)
-        sprintf(ptr, "%d,", i);
-      else if (run == 1) {
-        sprintf(ptr, "%d,%d,", i, i + 1);
-        i++;
-      } else {
-        sprintf(ptr, "%d-%d,", i, i + run);
-        i += run;
-      }
-      while (*ptr != 0) ptr++;
-    }
-  }
-  ptr -= entry_made;
-  *ptr = 0;
-  return(str);
-}
-
-
-
 //int main(int argc, const char rootfilename, const char hdf5filename, const char *mixing_start, const char *mixing_end)
 int main(int argc, char *argv[])
 {
@@ -73,8 +42,6 @@ int main(int argc, char *argv[])
     fprintf(stderr,"\n Batch Syntax is [Gamma-Triggered Paired Root], [Min-Bias HDF5] [Mix Start] [Mix End] [Track Skim GeV] \n");
     exit(EXIT_FAILURE);
   }
-
-  //std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
 
   int dummyc = 1;
@@ -136,10 +103,10 @@ int main(int argc, char *argv[])
 
   // Read/Loop through config file
   char line[MAX_INPUT_LENGTH];
-  fprintf(stderr,"\nTEST: %d",__LINE__);      
+
   while (fgets(line, MAX_INPUT_LENGTH, config) != NULL) {
       if (line[0] == '#') continue;
-        fprintf(stderr,"\nTEST: %d",__LINE__);      
+
       char key[MAX_INPUT_LENGTH];
       char dummy[MAX_INPUT_LENGTH];
       char value[MAX_INPUT_LENGTH];
@@ -542,17 +509,19 @@ int main(int argc, char *argv[])
     fprintf(stderr, "\n%s:%d: maximum tracks:%i maximum clusters:%i\n", __FILE__, __LINE__, ntrack_max,ncluster_max);
 
     //Define array hyperslab will be read into
-    float track_data_out[2000][ntrack_max][NTrack_Vars];
-    float cluster_data_out[2000][ncluster_max][NCluster_Vars];
-    float event_data_out[2000][NEvent_Vars];
+    const Long64_t block_size = 600000;
+    //const Long64_t block_size = 2000;
+    float track_data_out[block_size][ntrack_max][NTrack_Vars];
+    float cluster_data_out[block_size][ncluster_max][NCluster_Vars];
+    float event_data_out[block_size][NEvent_Vars];
 
     //Define hyperslab size and offset in  FILE;
     hsize_t track_offset[3] = {0, 0, 0};
-    hsize_t track_count[3] = {1, ntrack_max, NTrack_Vars};
+    hsize_t track_count[3] = {block_size, ntrack_max, NTrack_Vars};
     hsize_t cluster_offset[3] = {0, 0, 0};
-    hsize_t cluster_count[3] = {1, ncluster_max, NCluster_Vars};
+    hsize_t cluster_count[3] = {block_size, ncluster_max, NCluster_Vars};
     hsize_t event_offset[2] = {0,0};
-    hsize_t event_count[2] = {1, NEvent_Vars};
+    hsize_t event_count[2] = {block_size, NEvent_Vars};
 
     track_dataspace.selectHyperslab( H5S_SELECT_SET, track_count, track_offset );
     cluster_dataspace.selectHyperslab( H5S_SELECT_SET, cluster_count, cluster_offset );
@@ -572,9 +541,9 @@ int main(int argc, char *argv[])
     hsize_t event_offset_out[2] = {0};
 
     //define Dimensions of array, for writing slab to array
-    hsize_t track_count_out[3] = {1, ntrack_max, NTrack_Vars};
-    hsize_t cluster_count_out[3] = {1, ncluster_max, NCluster_Vars};
-    hsize_t event_count_out[2] = {1, NEvent_Vars};
+    hsize_t track_count_out[3] = {block_size, ntrack_max, NTrack_Vars};
+    hsize_t cluster_count_out[3] = {block_size, ncluster_max, NCluster_Vars};
+    hsize_t event_count_out[2] = {block_size, NEvent_Vars};
 
     //define space in memory for hyperslab, then write from file to memory
     track_memspace.selectHyperslab( H5S_SELECT_SET, track_count_out, track_offset_out );
@@ -589,12 +558,34 @@ int main(int argc, char *argv[])
     event_dataset.read( event_data_out, PredType::NATIVE_FLOAT, event_memspace, event_dataspace);
 
     Long64_t nentries = _tree_event->GetEntries();   
-    //Long64_t nentries = 100;   
+    //Long64_t nentries = 70;   
 
-   int skip_counter = 0;
+      std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+      //INITIALIZE MIXED EVENTS
 
+      //Long64_t mix_offset = block_size;
+      Long64_t mix_offset = 0;
+	  track_offset[0]=mix_offset; 	  //adjust offset for next mixed event
+	  track_dataspace.selectHyperslab( H5S_SELECT_SET, track_count, track_offset );
+	  track_dataset.read( track_data_out, PredType::NATIVE_FLOAT, track_memspace, track_dataspace );
 
-   std::vector<double> vec;
+	  cluster_offset[0]=mix_offset;
+	  cluster_dataspace.selectHyperslab( H5S_SELECT_SET, cluster_count, cluster_offset );
+	  cluster_dataset.read( cluster_data_out, PredType::NATIVE_FLOAT, cluster_memspace, cluster_dataspace );
+
+	  event_offset[0]=mix_offset;
+	  event_dataspace.selectHyperslab( H5S_SELECT_SET, event_count, event_offset );
+	  event_dataset.read( event_data_out, PredType::NATIVE_FLOAT, event_memspace, event_dataspace );
+	  
+	  // fprintf(stderr,"%d: Track_Value begin = %f",__LINE__,track_data_out[0][0][0]);
+	  fprintf(stderr,"%d: Track_Value end = %f\n",__LINE__,track_data_out[1000][0][0]);
+	  //fprintf(stderr,"%d: Track_Value end = %f\n",__LINE__,track_data_out[328730][0][0]);
+	  // fprintf(stderr,"%d: Mix OFFSET = %lu",__LINE__,mix_offset);
+	  fprintf(stderr,"\n READ OUT ENTIRE HDF5 FILE \n");
+
+	  std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
+    std::cout << "HDF5 READ Time difference in micro seconds = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() <<std::endl;
+
 
     for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
       //for(Long64_t ievent = 0; ievent < 200; ievent++){
@@ -602,39 +593,11 @@ int main(int argc, char *argv[])
       fprintf(stderr, "\n%s:%d: %llu / %llu \n", __FILE__, __LINE__, ievent, nentries);
       _tree_event->GetEntry(ievent);
 
+
       float multiplicity_sum = 0;
       for (int k = 0; k < 64; k++)  multiplicity_sum += multiplicity_v0[k];
 
       int ME_pass_Counter = 0;
-
-      Long64_t mix_min = mix_events[0];
-      Long64_t mix_max = mix_events[0];
-      Long64_t mix_range;
-
-      std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-      //INITIALIZE MIXED EVENTS
-      for (Long64_t imix = mix_start; imix < mix_end; imix++){
-
-	  Long64_t mix_event = mix_events[imix];
-	  if(mix_event >= 9999999) continue;  
-
-	  track_offset[0]=mix_event; 	  //adjust offset for next mixed event
-	  track_dataspace.selectHyperslab( H5S_SELECT_SET, track_count, track_offset );
-	  track_dataset.read( track_data_out, PredType::NATIVE_FLOAT, track_memspace, track_dataspace );
-
-	  cluster_offset[0]=mix_event;
-	  cluster_dataspace.selectHyperslab( H5S_SELECT_SET, cluster_count, cluster_offset );
-	  cluster_dataset.read( cluster_data_out, PredType::NATIVE_FLOAT, cluster_memspace, cluster_dataspace );
-
-	  event_offset[0]=mix_event;
-	  event_dataspace.selectHyperslab( H5S_SELECT_SET, event_count, event_offset );
-	  event_dataset.read( event_data_out, PredType::NATIVE_FLOAT, event_memspace, event_dataspace );
-      }	  
-
-    std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
-    std::cout << "HDF5 READ Time difference in micro seconds = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() <<std::endl;
-
-
 
       bool first_cluster = true;
 
@@ -678,15 +641,16 @@ int main(int argc, char *argv[])
 
 	begin = std::chrono::steady_clock::now();
 
+
 #pragma omp parallel 
    {   
 #pragma omp for schedule(dynamic,1)
-	for (Long64_t imix = mix_start; imix < mix_end+1; imix++){
+	for (Long64_t mix_counter = mix_start; mix_counter < mix_end+1; mix_counter++){
 	  
-	  Long64_t mix_event = mix_events[imix];
+	  Long64_t mix_event = mix_events[mix_counter];
 	  if(mix_event >= 9999999) continue;  
+	  Long64_t imix = mix_event;
 
-	  //fprintf(stderr,"\n%s:%d: %llu / %llu  THREAD %i\n", __FILE__, __LINE__, ievent, nentries, omp_get_thread_num());
 	  //fprintf(stderr,"\n%s:%d: Mixed Event: %imix  THREAD %i\n", __FILE__, __LINE__, imix, omp_get_thread_num());
 
 	  //Cut Paring Tails
@@ -695,10 +659,8 @@ int main(int argc, char *argv[])
 	  if (std::abs(primary_vertex[2]-event_data_out[imix][0]) > 2) continue;
 	  if (std::abs(multiplicity_sum - event_data_out[imix][1]) > 40) continue;
 	  if (first_cluster) ME_pass_Counter ++;  //simple conuter for ME that pass
-
 	  //MIX with Associated Tracks
 
-      std::chrono::steady_clock::time_point begin_track = std::chrono::steady_clock::now();
 	  for (ULong64_t itrack = 0; itrack < ntrack_max; itrack++) {
 	    if (std::isnan(track_data_out[imix][itrack][1])) continue;
 	    //if ((int(track_data_out[imix][itrack][4]+0.5)&selection_number)==0) continue;
@@ -709,7 +671,6 @@ int main(int argc, char *argv[])
 	    if (track_data_out[imix][itrack][7] < 4) continue;
 	    if ((track_data_out[imix][itrack][8]/track_data_out[imix][itrack][7]) > 36) continue;
 	    if( not(TMath::Abs(track_data_out[imix][itrack][9])<0.0231+0.0315/TMath::Power(track_data_out[imix][itrack][4],1.3 ))) continue;
-
 	    double dRmin = 0.02;
 	    //veto charged particles from mixed event tracks
 	    bool MixTrack_HasMatch = false;
@@ -722,13 +683,12 @@ int main(int argc, char *argv[])
 		break; 
 	    }
 	    //if (MixTrack_HasMatch) continue;
-	    
+
 	    //Observables
  	    Double_t zt = track_data_out[imix][itrack][1]/cluster_pt[n];
 	    Float_t DeltaPhi = TMath::Abs(TVector2::Phi_mpi_pi(cluster_phi[n] - track_data_out[imix][itrack][3]));
 	    Float_t DeltaEta = cluster_eta[n] - track_data_out[imix][itrack][2];
 	    if ((TMath::Abs(DeltaPhi) < 0.005) && (TMath::Abs(DeltaEta) < 0.005)) continue;
-
 	    for (int ipt = 0; ipt < nptbins; ipt++){
 	      if (cluster_pt[n] >ptbins[ipt] && cluster_pt[n] <ptbins[ipt+1]){
 		for(int izt = 0; izt<nztbins ; izt++){
@@ -737,17 +697,17 @@ int main(int argc, char *argv[])
 		    if(isolation< iso_max){
 		      if (Signal){
 			//IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
-			MixCorr_Signal[imix][izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
+			MixCorr_Signal[mix_counter][izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
 		      }
 		    }
 		    if(isolation<iso_max){
 		      if (Background)
 			//BKGD_IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);}
-			MixCorr_BKGD[imix][izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
+			MixCorr_BKGD[mix_counter][izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
 		    }
 		    if(isolation<iso_max){
 		      //Corr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
-		      MixCorr[imix][izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta); 
+		      MixCorr[mix_counter][izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta); 
 		    }
 		    
 		  }//if in zt bin
@@ -755,8 +715,6 @@ int main(int argc, char *argv[])
 	      }//end if in pt bin
 	    }//end pt loop bin
 	  }//end loop over tracks
-	  std::chrono::steady_clock::time_point end_track= std::chrono::steady_clock::now();
-	  std::cout << "TRACKING Time difference in micro seconds = " << std::chrono::duration_cast<std::chrono::microseconds>(end_track - begin_track).count() <<std::endl;
 	}//end loop over mixed events
    } //Parallel
    end= std::chrono::steady_clock::now();
