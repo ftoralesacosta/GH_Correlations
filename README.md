@@ -7,7 +7,7 @@ Azimutha correlation of isolated, high-pT trigger photon. This analysis uses NTu
 2. Run Event Mixing
    1. Run pairing between gamma triggered and min-bias NTupples
    2. Convert minimum bias NTupple to hdf5 format
-   3. Run mixed event correlations between paired,gamma-triggered NTupple (output of step 2.1) and min-bias hdf5 file (output of step 2.2)
+   3. Run mixed event correlations between paired, gamma-triggered NTupple (output of step 2.i) and min-bias hdf5 file (output of step 2.ii)
    4. Repeat for track skimming for higher track-pt correlations with high statistics
    5. Divide Same event correlations by normalized mixed event correlations
 3. Repeat steps 1-2 for all datasets individually
