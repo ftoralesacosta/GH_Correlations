@@ -1,8 +1,9 @@
 CXX =		g++
 CC =		$(CXX)
+#CXXFLAGS =      -g -O3 -march=knl -mtune=knl -s -frounding-math
 CXXFLAGS =      -g -O -s -frounding-math
-CXXFLAGS =      -O
 CXXFLAGS +=	-fopenmp
+#CXXFLAGS =      -O
 #CXXFLAGS +=     -Wextra -Wall -Werror -fPIC
 #CXXFLAGS +=	-Wno-unused-variable -Wno-unused-parameter
 CXXFLAGS +=	-Wno-unused-function
@@ -13,12 +14,14 @@ ifeq ($(findstring g++,$(CXX)),g++)
                 -D_FORTIFY_SOURCE=1 -fstack-protector
 endif
 CXXFLAGS +=     -std=c++11
+CXXFLAGS +=	-fopenmp
 CXXFLAGS +=	$(shell root-config --cflags)
 LDFLAGS =	$(shell root-config --ldflags)
 LDLIBS =	$(shell root-config --libs)
 
 #HDF5_ROOT =	/opt/local/
-HDF5_ROOT = 	/usr/common/usg/software/hdf5/1.8.13/
+#HDF5_ROOT = 	/usr/common/usg/software/hdf5/1.8.13/
+HDF5_ROOT = 	/usr/common/software/hdf5/1.10.2/intel
 CXXFLAGS +=	-I$(HDF5_ROOT)/include
 LDLIBS +=	 -L$(HDF5_ROOT)/lib -lhdf5_cpp -lhdf5
 CXXFLAGS +=	-I$(BOOST_ROOT)/include
