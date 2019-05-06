@@ -559,11 +559,8 @@ int main(int argc, char *argv[])
     event_dataset.read( event_data_out, PredType::NATIVE_FLOAT, event_memspace, event_dataspace);
 
     std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
-    std::cout << "HDF5 READ Time difference in micro seconds = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() <<std::endl;
-
-    Long64_t nentries = _tree_event->GetEntries();   
-    //Long64_t nentries = 70;   
-
+    std::cout << "HDF5 READ Time in micro seconds = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() <<std::endl;
+    fprintf(stderr,"%d: Track_Value end = %f\n",__LINE__,track_data_out[550000][0][0]);
 
       //INITIALIZE MIXED EVENTS
 
@@ -589,10 +586,15 @@ int main(int argc, char *argv[])
 
 
     auto event_begin = std::chrono::steady_clock::now();
+
+
+    Long64_t nentries = _tree_event->GetEntries();   
+    //Long64_t nentries = 70;   
+
     for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
       //for(Long64_t ievent = 0; ievent < 200; ievent++){
 
-      fprintf(stderr, "\n%s:%d: %llu / %llu \n", __FILE__, __LINE__, ievent, nentries);
+      fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, ievent, nentries);
       _tree_event->GetEntry(ievent);
 
 
@@ -602,6 +604,10 @@ int main(int argc, char *argv[])
       int ME_pass_Counter = 0;
 
       bool first_cluster = true;
+
+#pragma omp parallel 
+   {   
+#pragma omp for schedule(dynamic,1)
 
       for (ULong64_t n = 0; n < ncluster; n++) {
 	if( not(cluster_pt[n]>pT_min and cluster_pt[n]<pT_max)) continue;   //select pt of photons
@@ -643,10 +649,6 @@ int main(int argc, char *argv[])
 
 	begin = std::chrono::steady_clock::now();
 
-
-#pragma omp parallel 
-   {   
-#pragma omp for schedule(dynamic,1)
 	for (Long64_t mix_counter = mix_start; mix_counter < mix_end+1; mix_counter++){
 	  
 	  Long64_t mix_event = mix_events[mix_counter];
