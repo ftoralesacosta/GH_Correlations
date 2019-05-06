@@ -23,6 +23,6 @@ B
 *.out
 *.txt
 #*.sh
-
+.ipynb_checkpoints  
 ./batchjobs/res_dir/
 ./pair_gale_shapley/vtune_results/
