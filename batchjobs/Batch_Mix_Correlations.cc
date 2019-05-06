@@ -545,7 +545,7 @@ int main(int argc, char *argv[])
     hsize_t cluster_count_out[3] = {block_size, ncluster_max, NCluster_Vars};
     hsize_t event_count_out[2] = {block_size, NEvent_Vars};
 
-    //define space in memory for hyperslab, then write from file to memory
+    //define space in memory for hyperslab, then write ENTIRE file to memory
     track_memspace.selectHyperslab( H5S_SELECT_SET, track_count_out, track_offset_out );
     track_dataset.read( track_data_out, PredType::NATIVE_FLOAT, track_memspace, track_dataspace );
     fprintf(stderr, "%s:%d: %s\n", __FILE__, __LINE__, "track dataset read into array: OK"); //Test only
@@ -586,7 +586,7 @@ int main(int argc, char *argv[])
 	  std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
     std::cout << "HDF5 READ Time difference in micro seconds = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() <<std::endl;
 
-
+    auto event_begin = std::chrono::steady_clock::now();
     for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
       //for(Long64_t ievent = 0; ievent < 200; ievent++){
 
@@ -717,13 +717,17 @@ int main(int argc, char *argv[])
 	  }//end loop over tracks
 	}//end loop over mixed events
    } //Parallel
-   end= std::chrono::steady_clock::now();
-   std::cout << "PARALLEL LOOP Time difference in micro seconds = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() <<std::endl;
+
+   // end= std::chrono::steady_clock::now();
+   // std::cout << "PARALLEL LOOP Time difference in micro seconds = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() <<std::endl;
 
    first_cluster = false;
       }//end loop on clusters.
 	//N_ME->Fill(ME_pass_Counter,multiplicity_sum);       
     } //end loop over events   
+    auto event_end = std::chrono::steady_clock::now();
+   std::cout << "EVENT LOOP Time difference in micro seconds = " << std::chrono::duration_cast<std::chrono::microseconds>(event_end - event_begin).count() <<std::endl;
+
     
     //}//end loop over samples
     // Write to fout    
