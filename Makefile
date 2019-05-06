@@ -1,6 +1,5 @@
 CXX =		g++
 CC =		$(CXX)
-#CXXFLAGS =      -g -O3 -march=knl -mtune=knl -s -frounding-math
 CXXFLAGS =      -g -O -s -frounding-math
 CXXFLAGS +=	-fopenmp
 #CXXFLAGS =      -O
