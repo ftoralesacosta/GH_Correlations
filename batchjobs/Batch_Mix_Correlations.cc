@@ -546,6 +546,7 @@ int main(int argc, char *argv[])
     hsize_t event_count_out[2] = {block_size, NEvent_Vars};
 
     //define space in memory for hyperslab, then write ENTIRE file to memory
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     track_memspace.selectHyperslab( H5S_SELECT_SET, track_count_out, track_offset_out );
     track_dataset.read( track_data_out, PredType::NATIVE_FLOAT, track_memspace, track_dataspace );
     fprintf(stderr, "%s:%d: %s\n", __FILE__, __LINE__, "track dataset read into array: OK"); //Test only
@@ -557,34 +558,35 @@ int main(int argc, char *argv[])
     event_memspace.selectHyperslab( H5S_SELECT_SET, event_count_out, event_offset_out );
     event_dataset.read( event_data_out, PredType::NATIVE_FLOAT, event_memspace, event_dataspace);
 
+    std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
+    std::cout << "HDF5 READ Time difference in micro seconds = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() <<std::endl;
+
     Long64_t nentries = _tree_event->GetEntries();   
     //Long64_t nentries = 70;   
 
-      std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
       //INITIALIZE MIXED EVENTS
 
       //Long64_t mix_offset = block_size;
-      Long64_t mix_offset = 0;
-	  track_offset[0]=mix_offset; 	  //adjust offset for next mixed event
-	  track_dataspace.selectHyperslab( H5S_SELECT_SET, track_count, track_offset );
-	  track_dataset.read( track_data_out, PredType::NATIVE_FLOAT, track_memspace, track_dataspace );
+      // Long64_t mix_offset = 0;
+      // 	  track_offset[0]=mix_offset; 	  //adjust offset for next mixed event
+      // 	  track_dataspace.selectHyperslab( H5S_SELECT_SET, track_count, track_offset );
+      // 	  track_dataset.read( track_data_out, PredType::NATIVE_FLOAT, track_memspace, track_dataspace );
 
-	  cluster_offset[0]=mix_offset;
-	  cluster_dataspace.selectHyperslab( H5S_SELECT_SET, cluster_count, cluster_offset );
-	  cluster_dataset.read( cluster_data_out, PredType::NATIVE_FLOAT, cluster_memspace, cluster_dataspace );
+      // 	  cluster_offset[0]=mix_offset;
+      // 	  cluster_dataspace.selectHyperslab( H5S_SELECT_SET, cluster_count, cluster_offset );
+      // 	  cluster_dataset.read( cluster_data_out, PredType::NATIVE_FLOAT, cluster_memspace, cluster_dataspace );
 
-	  event_offset[0]=mix_offset;
-	  event_dataspace.selectHyperslab( H5S_SELECT_SET, event_count, event_offset );
-	  event_dataset.read( event_data_out, PredType::NATIVE_FLOAT, event_memspace, event_dataspace );
+      // 	  event_offset[0]=mix_offset;
+      // 	  event_dataspace.selectHyperslab( H5S_SELECT_SET, event_count, event_offset );
+      // 	  event_dataset.read( event_data_out, PredType::NATIVE_FLOAT, event_memspace, event_dataspace );
 	  
-	  // fprintf(stderr,"%d: Track_Value begin = %f",__LINE__,track_data_out[0][0][0]);
-	  fprintf(stderr,"%d: Track_Value end = %f\n",__LINE__,track_data_out[1000][0][0]);
-	  //fprintf(stderr,"%d: Track_Value end = %f\n",__LINE__,track_data_out[328730][0][0]);
-	  // fprintf(stderr,"%d: Mix OFFSET = %lu",__LINE__,mix_offset);
-	  fprintf(stderr,"\n READ OUT ENTIRE HDF5 FILE \n");
+      // 	  // fprintf(stderr,"%d: Track_Value begin = %f",__LINE__,track_data_out[0][0][0]);
+      // 	  fprintf(stderr,"%d: Track_Value end = %f\n",__LINE__,track_data_out[1000][0][0]);
+      // 	  //fprintf(stderr,"%d: Track_Value end = %f\n",__LINE__,track_data_out[328730][0][0]);
+      // 	  // fprintf(stderr,"%d: Mix OFFSET = %lu",__LINE__,mix_offset);
+      // 	  fprintf(stderr,"\n READ OUT ENTIRE HDF5 FILE \n");
 
-	  std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
-    std::cout << "HDF5 READ Time difference in micro seconds = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() <<std::endl;
 
     auto event_begin = std::chrono::steady_clock::now();
     for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
