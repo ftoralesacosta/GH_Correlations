@@ -277,10 +277,11 @@ int main(int argc, char *argv[])
   TH2D* BKGD_pT_Dist = new TH2D("BKGD_pT_Dist","Cluster Pt Spectrum For Isolation (its_04) bins 0.0 < DNN < 0.3",24,10,16,5,-0.5,2);
 
   TH2D* Corr[nztbins*nptbins];
-  TH2D* IsoCorr[nztbins*nptbins];
-  TH2D* BKGD_IsoCorr[nztbins*nptbins];
+  TH2D* Signal_Corr[nztbins*nptbins];
+  TH2D* BKGD_Corr[nztbins*nptbins];
 
   Long64_t mix_range = mix_end-mix_start+1;
+  mix_range = 50; //NUMBER OF CULSTERS MAX
   TH2D* MixCorr[mix_range][nztbins*nptbins];
   TH2D* MixCorr_Signal[mix_range][nztbins*nptbins*mix_range];
   TH2D* MixCorr_BKGD[mix_range][nztbins*nptbins*mix_range];
@@ -303,8 +304,6 @@ int main(int argc, char *argv[])
 
 
 
-  //FIXME: Add to config file
-
     for (int ipt = 0; ipt <nptbins; ipt++) {
       H_Signal_Triggers[ipt] = new TH1D(
       Form("N_DNN%i_Triggers_pT%1.0f_%1.0f",1,ptbins[ipt],ptbins[ipt+1]),
@@ -322,24 +321,24 @@ int main(int argc, char *argv[])
       Corr[izt+ipt*nztbins]->Sumw2();
       Corr[izt+ipt*nztbins]->SetMinimum(0.);
 
-      IsoCorr[izt+ipt*nztbins] = new TH2D(Form("DNN%i_Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",1,ptbins[ipt],ptbins[ipt+1],
+      Signal_Corr[izt+ipt*nztbins] = new TH2D(Form("DNN%i_Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",1,ptbins[ipt],ptbins[ipt+1],
       100*ztbins[izt],100*ztbins[izt+1]),"#gamma-H [Iso] Correlation", n_phi_bins,0,M_PI,n_eta_bins, -1.4, 1.4);
 
-      IsoCorr[izt+ipt*nztbins]->Sumw2();
-      IsoCorr[izt+ipt*nztbins]->SetMinimum(0.);
+      Signal_Corr[izt+ipt*nztbins]->Sumw2();
+      Signal_Corr[izt+ipt*nztbins]->SetMinimum(0.);
 
-      BKGD_IsoCorr[izt+ipt*nztbins] = new TH2D(Form("DNN%i_Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",2,ptbins[ipt],ptbins[ipt+1],
+      BKGD_Corr[izt+ipt*nztbins] = new TH2D(Form("DNN%i_Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",2,ptbins[ipt],ptbins[ipt+1],
       100*ztbins[izt],100*ztbins[izt+1]),"#gamma-H [AntiIso] Correlation", n_phi_bins,0,M_PI, n_eta_bins, -1.4, 1.4);
 
-      BKGD_IsoCorr[izt+ipt*nztbins]->Sumw2();
-      BKGD_IsoCorr[izt+ipt*nztbins]->SetMinimum(0.);
+      BKGD_Corr[izt+ipt*nztbins]->Sumw2();
+      BKGD_Corr[izt+ipt*nztbins]->SetMinimum(0.);
 
     }//zt bins
   }//pt bins                           
   
     //Temp Histos
 
-    for (Long64_t imix = mix_start; imix < mix_end+1; imix++){
+    for (Long64_t imix = 0; imix < mix_range; imix++){
       for (int ipt = 0; ipt <nptbins; ipt++) {
 	for (int izt = 0; izt<nztbins; izt++){
 	  MixCorr[imix][izt+ipt*nztbins] = new TH2D(Form("Mix_Correlation__ME_%i_pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",imix,ptbins[ipt],ptbins[ipt+1],
@@ -545,6 +544,8 @@ int main(int argc, char *argv[])
     hsize_t cluster_count_out[3] = {block_size, ncluster_max, NCluster_Vars};
     hsize_t event_count_out[2] = {block_size, NEvent_Vars};
 
+
+    //READ Min Bias MIXED EVENTS
     //define space in memory for hyperslab, then write ENTIRE file to memory
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     track_memspace.selectHyperslab( H5S_SELECT_SET, track_count_out, track_offset_out );
@@ -559,40 +560,19 @@ int main(int argc, char *argv[])
     event_dataset.read( event_data_out, PredType::NATIVE_FLOAT, event_memspace, event_dataspace);
 
     std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
-    std::cout << "HDF5 READ Time difference in micro seconds = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() <<std::endl;
+    std::cout << "HDF5 READ Time in micro seconds = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() <<std::endl;
+    fprintf(stderr,"%d: Track_Value end = %f\n",__LINE__,track_data_out[550000][0][0]);
+
+    auto event_begin = std::chrono::steady_clock::now();
+
 
     Long64_t nentries = _tree_event->GetEntries();   
     //Long64_t nentries = 70;   
 
-
-      //INITIALIZE MIXED EVENTS
-
-      //Long64_t mix_offset = block_size;
-      // Long64_t mix_offset = 0;
-      // 	  track_offset[0]=mix_offset; 	  //adjust offset for next mixed event
-      // 	  track_dataspace.selectHyperslab( H5S_SELECT_SET, track_count, track_offset );
-      // 	  track_dataset.read( track_data_out, PredType::NATIVE_FLOAT, track_memspace, track_dataspace );
-
-      // 	  cluster_offset[0]=mix_offset;
-      // 	  cluster_dataspace.selectHyperslab( H5S_SELECT_SET, cluster_count, cluster_offset );
-      // 	  cluster_dataset.read( cluster_data_out, PredType::NATIVE_FLOAT, cluster_memspace, cluster_dataspace );
-
-      // 	  event_offset[0]=mix_offset;
-      // 	  event_dataspace.selectHyperslab( H5S_SELECT_SET, event_count, event_offset );
-      // 	  event_dataset.read( event_data_out, PredType::NATIVE_FLOAT, event_memspace, event_dataspace );
-	  
-      // 	  // fprintf(stderr,"%d: Track_Value begin = %f",__LINE__,track_data_out[0][0][0]);
-      // 	  fprintf(stderr,"%d: Track_Value end = %f\n",__LINE__,track_data_out[1000][0][0]);
-      // 	  //fprintf(stderr,"%d: Track_Value end = %f\n",__LINE__,track_data_out[328730][0][0]);
-      // 	  // fprintf(stderr,"%d: Mix OFFSET = %lu",__LINE__,mix_offset);
-      // 	  fprintf(stderr,"\n READ OUT ENTIRE HDF5 FILE \n");
-
-
-    auto event_begin = std::chrono::steady_clock::now();
     for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
       //for(Long64_t ievent = 0; ievent < 200; ievent++){
 
-      fprintf(stderr, "\n%s:%d: %llu / %llu \n", __FILE__, __LINE__, ievent, nentries);
+      fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, ievent, nentries);
       _tree_event->GetEntry(ievent);
 
 
@@ -603,6 +583,10 @@ int main(int argc, char *argv[])
 
       bool first_cluster = true;
 
+#pragma omp parallel 
+   {   
+#pragma omp for schedule(dynamic,1)
+
       for (ULong64_t n = 0; n < ncluster; n++) {
 	if( not(cluster_pt[n]>pT_min and cluster_pt[n]<pT_max)) continue;   //select pt of photons
 	if( not(TMath::Abs(cluster_eta[n])<Eta_max)) continue;              //cut edges of detector                                                                          
@@ -611,6 +595,8 @@ int main(int argc, char *argv[])
         if( not(cluster_distance_to_bad_channel[n]>=Cluster_DtoBad)) continue; //removes clusters near bad channels
         //if( not(cluster_nlocal_maxima[n] < Cluster_NLocal_Max)) continue; //require to have at most 2 local maxima.
         if( not(cluster_nlocal_maxima[n] < 3)) continue; //require to have at most 2 local maxima.
+
+	//fprintf(stderr,"\n%s:%d: Cluster Number: %i  THREAD %i\n", __FILE__, __LINE__, n, omp_get_thread_num());
 
         float isolation;
         if (determiner == CLUSTER_ISO_TPC_04) isolation = cluster_iso_tpc_04[n];
@@ -643,10 +629,6 @@ int main(int argc, char *argv[])
 
 	begin = std::chrono::steady_clock::now();
 
-
-#pragma omp parallel 
-   {   
-#pragma omp for schedule(dynamic,1)
 	for (Long64_t mix_counter = mix_start; mix_counter < mix_end+1; mix_counter++){
 	  
 	  Long64_t mix_event = mix_events[mix_counter];
@@ -698,18 +680,18 @@ int main(int argc, char *argv[])
 
 		    if(isolation< iso_max){
 		      if (Signal){
-			//IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
-			MixCorr_Signal[mix_counter][izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
+			//Signal_Corr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
+			MixCorr_Signal[n][izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
 		      }
 		    }
 		    if(isolation<iso_max){
 		      if (Background)
-			//BKGD_IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);}
-			MixCorr_BKGD[mix_counter][izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
+			//BKGD_Corr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);}
+			MixCorr_BKGD[n][izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
 		    }
 		    if(isolation<iso_max){
 		      //Corr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
-		      MixCorr[mix_counter][izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta); 
+		      MixCorr[n][izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta); 
 		    }
 		    
 		  }//if in zt bin
@@ -727,8 +709,9 @@ int main(int argc, char *argv[])
       }//end loop on clusters.
 	//N_ME->Fill(ME_pass_Counter,multiplicity_sum);       
     } //end loop over events   
+
     auto event_end = std::chrono::steady_clock::now();
-   std::cout << "EVENT LOOP Time difference in micro seconds = " << std::chrono::duration_cast<std::chrono::microseconds>(event_end - event_begin).count() <<std::endl;
+    std::cout << "EVENT LOOP Time difference in micro seconds = " << std::chrono::duration_cast<std::chrono::microseconds>(event_end - event_begin).count() <<std::endl;
 
     
     //}//end loop over samples
@@ -745,19 +728,25 @@ int main(int argc, char *argv[])
     else
       fout = new TFile(Form("%s_%luGeVTracks_Correlation_%1.1lu_to_%1.1lu.root",rawname.data(),GeV_Track_Skim,mix_start,mix_end),"RECREATE");
 
-    for (Long64_t imix =0; imix < mix_range; imix++ ){
-    for (int ipt = 0; ipt<nptbins; ipt++){    
-      for (int izt = 0; izt<nztbins; izt++){
-	MixCorr[imix][izt+ipt*nztbins]->Write();
+    //Combine and Write Histograms
+      for (int ipt = 0; ipt<nptbins; ipt++){    
+	for (int izt = 0; izt<nztbins; izt++){
+	  for (Long64_t imix =0; imix < mix_range; imix++ ){
+	    Corr[izt+ipt*nztbins]->Add(MixCorr[imix][izt+ipt*nztbins],1);
+	    Signal_Corr[izt+ipt*nztbins]->Add(MixCorr_Signal[imix][izt+ipt*nztbins],1);
+	    BKGD_Corr[izt+ipt*nztbins]->Add(MixCorr_BKGD[imix][izt+ipt*nztbins],1);
+	  }
+	  Corr[izt+ipt*nztbins]->Write();	  
+	}
+	for (int izt = 0; izt<nztbins; izt++){
+	  Signal_Corr[izt+ipt*nztbins]->Write();
+	}
+	for (int izt = 0; izt<nztbins; izt++){
+	  BKGD_Corr[izt+ipt*nztbins]->Write();
+	}
       }
-      for (int izt = 0; izt<nztbins; izt++){ 
-	MixCorr_Signal[imix][izt+ipt*nztbins]->Write();
-      }
-      for (int izt = 0; izt<nztbins; izt++){
-	MixCorr_BKGD[imix][izt+ipt*nztbins]->Write();	
-      }
-    }
-    }
+      
+
     z_Vertices->Write();
     Multiplicity->Write();
     z_Vertices_individual->Write();
