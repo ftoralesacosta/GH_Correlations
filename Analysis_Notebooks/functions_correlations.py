@@ -3,7 +3,7 @@
 import matplotlib.pyplot as plt
 import matplotlib
 from default_values import *
-from functions_corr import ZYAM_Line
+from functions_root_nparray import ZYAM_Line
 
 def Plot_UB_Subtraction_old(Dict):
     fsize = 20

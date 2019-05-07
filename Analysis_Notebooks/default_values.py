@@ -6,8 +6,8 @@ import math
 
 Shower = "LO"
 
-pPb_File = 'InputData/pPb_SE_L0_Correlation_GMB_Ratio_Track.root'
-pp_File = 'InputData/pp_SE_L0_Correlation_GMB_Ratio_Track.root'
+pPb_File = '../InputData/pPb_SE_L0_Correlation_GMB_Ratio_Track.root'
+pp_File = '../InputData/pp_SE_L0_Correlation_GMB_Ratio_Track.root'
 
 Systems = ["pp","p-Pb"]
 Files = [pp_File,pPb_File]
@@ -69,8 +69,8 @@ Use_MC = False
 pT_Rebin = False
 
 if (Shower == "LO"):
-    pPb_File = 'InputData/pPb_SE_L0_Correlation_GMB_Ratio_Track.root'
-    pp_File = 'InputData/pp_SE_L0_Correlation_GMB_Ratio_Track.root'
+    pPb_File = '../InputData/pPb_SE_L0_Correlation_GMB_Ratio_Track.root'
+    pp_File = '../InputData/pp_SE_L0_Correlation_GMB_Ratio_Track.root'
 
     if (CorrectedP):
         purity = np.asarray([0.208095, 0.339478, 0.483944, 0.509])
@@ -80,8 +80,8 @@ if (Shower == "LO"):
         purity = [0.35]
         
     if (pT_Rebin):
-        pPb_File = 'InputData/pPb_SE_L0_Correlation_GMB_Ratio_pTRebin.root'
-        pp_File = 'InputData/pp_SE_L0_Correlation_GMB_Ratio_pTRebin.root'
+        pPb_File = '../InputData/pPb_SE_L0_Correlation_GMB_Ratio_pTRebin.root'
+        pp_File = '../InputData/pp_SE_L0_Correlation_GMB_Ratio_pTRebin.root'
         
         purity = np.asarray([0.260799,0.511580])
         purity_Uncertainty = np.asarray([0.0287628,0.0362961])
@@ -91,8 +91,8 @@ if (Shower == "LO"):
         Files = [pp_File,pPb_File]
 
 if (Shower == "NN"):
-        pPb_File = 'InputData/pPb_SE_NN_Correlation_GMB_Ratio_Track.root'
-        pp_File = 'InputData/pp_SE_NN_Correlation_GMB_Ratio_Track.root'
+        pPb_File = '../InputData/pPb_SE_NN_Correlation_GMB_Ratio_Track.root'
+        pp_File = '../InputData/pp_SE_NN_Correlation_GMB_Ratio_Track.root'
                 
         if (CorrectedP):
             purity = np.asarray([0.238477, 0.341009, 0.479701, 0.532013])
@@ -100,7 +100,7 @@ if (Shower == "NN"):
         else:
             purity = [0.352546]
 
-MC_File = 'InputData/18b10a_pthat_1_2_SE_NN_Correlation_GMB_Ratio.root'
+MC_File = '../InputData/18b10a_pthat_1_2_SE_NN_Correlation_GMB_Ratio.root'
 
 if(Use_MC):
     Systems = ["pp","p-Pb","MC"]
