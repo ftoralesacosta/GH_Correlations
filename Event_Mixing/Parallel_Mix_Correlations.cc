@@ -545,8 +545,11 @@ int main(int argc, char *argv[])
 
     UInt_t N_mix_Histos = 0; //Temporary Histograms for THREADING
     Long64_t nentries = _tree_event->GetEntries();   
+    fprintf(stderr,"Obtainng max no. clusters, used for threading\n\n");
+
     for(Long64_t ievent = 0; ievent < nentries ; ievent++) 
       {
+	fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, ievent, nentries);
 	_tree_event->GetEntry(ievent);
 	N_mix_Histos = std::max(N_mix_Histos,ncluster);
       }
@@ -635,7 +638,7 @@ int main(int argc, char *argv[])
 
 	begin = std::chrono::steady_clock::now();
 
-	for (Long64_t mix_counter = mix_start; mix_counter < mix_end+1; mix_counter++){
+	for (Long64_t mix_counter = mix_start; mix_counter < mix_end; mix_counter++){
 	  
 	  Long64_t mix_event = mix_events[mix_counter];
 	  if(mix_event >= 9999999) continue;  
@@ -720,21 +723,17 @@ int main(int argc, char *argv[])
     std::cout << "\nEVENT LOOP Time difference in micro seconds = " << std::chrono::duration_cast<std::chrono::microseconds>(event_end - event_begin).count() <<std::endl;
 
     
-    //}//end loop over samples
     // Write to fout    
-    size_t lastindex = std::string(root_file).find_last_of("."); 
-    std::string rawname = std::string(root_file).substr(0, lastindex);
-    //std::string rawname = std::string(argv[1]);
+    std::string basic_name = std::string(root_file);
+    std::string::size_type pos = basic_name.find('_');
+    if (pos != std::string::npos)
+      basic_name = basic_name.substr(0, pos);
 
     TFile* fout;
-    if (strcmp(shower_shape.data(),"Lambda")== 0)
-      fout = new TFile(Form("%s_%luGeVTracks_Correlation_Lambda_%1.1lu_to_%1.1lu.root",rawname.data(),GeV_Track_Skim,mix_start,mix_end),"RECREATE");
-    else if (strcmp(shower_shape.data(),"DNN")== 0)
-      fout = new TFile(Form("%s_%luGeVTracks_Correlation_DNN_%1.1lu_to_%1.1lu.root",rawname.data(),GeV_Track_Skim,mix_start,mix_end),"RECREATE");
-    else
-      fout = new TFile(Form("%s_%luGeVTracks_Correlation_%1.1lu_to_%1.1lu.root",rawname.data(),GeV_Track_Skim,mix_start,mix_end),"RECREATE");
+    fout = new TFile(Form("%s_%luGeVTracks_Mixed_%lu_Correlation_%s.root",basic_name.data(),GeV_Track_Skim,(mix_end-mix_start),shower_shape.data()),"RECREATE");
+    //File name something like: 13d_0GeVTracks_Mixed_Correlation_Lambda.root
 
-    //Combine and Write Histograms
+    //Combine and Write Histograms to File
       for (int ipt = 0; ipt<nptbins; ipt++){    
 	for (int izt = 0; izt<nztbins; izt++){
 	  for (Long64_t imix =0; imix < N_mix_Histos; imix++ ){
