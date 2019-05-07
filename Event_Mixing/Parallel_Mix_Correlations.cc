@@ -81,6 +81,7 @@ int main(int argc, char *argv[])
   float Cluster_DtoBad = 0;
   UChar_t Cluster_NLocal_Max = 0;
   double EcrossoverE_min = 0;
+  float track_pT_min = 0.0;
   int Track_Cut_Bit = 0;
   double iso_max = 0;
   double noniso_min = 0;
@@ -180,6 +181,11 @@ int main(int argc, char *argv[])
       else if (strcmp(key, "N_Eta_Bins") == 0) {
         n_eta_bins = atoi(value);
 	std::cout << "Number of Eta Bins: " << n_eta_bins << std::endl; }
+
+      else if (strcmp(key, "Track_pT_Min") == 0) {
+          track_pT_min = atof(value);
+          std::cout << "Track pT Min: " << track_pT_min << std::endl; }
+
 
       else if (strcmp(key, "Track_Cut_Bit") == 0) {
           Track_Cut_Bit = atoi(value);
@@ -581,7 +587,6 @@ int main(int argc, char *argv[])
       for (int k = 0; k < 64; k++)  multiplicity_sum += multiplicity_v0[k];
 
       int ME_pass_Counter = 0;
-
       bool first_cluster = true;
 
 #pragma omp parallel 
@@ -650,8 +655,8 @@ int main(int argc, char *argv[])
 	    if (std::isnan(track_data_out[imix][itrack][1])) continue;
 	    //if ((int(track_data_out[imix][itrack][4]+0.5)&selection_number)==0) continue;
 	    if ((int(track_data_out[imix][itrack][4]+ 0.5)&Track_Cut_Bit)==0) continue; //selection 16
-	    if (track_data_out[imix][itrack][1] < 0.5) continue; //less than 1GeV
-	    if (track_data_out[imix][itrack][1] > 30) continue; //less than 1GeV
+	    if (track_data_out[imix][itrack][1] < track_pT_min) continue; //less than 1GeV or 0.5GeV (YAML)
+	    if (track_data_out[imix][itrack][1] > 30) continue;
 	    if (abs(track_data_out[imix][itrack][2]) > 0.8) continue;
 	    if (track_data_out[imix][itrack][7] < 4) continue;
 	    if ((track_data_out[imix][itrack][8]/track_data_out[imix][itrack][7]) > 36) continue;
@@ -712,7 +717,7 @@ int main(int argc, char *argv[])
     } //end loop over events   
 
     auto event_end = std::chrono::steady_clock::now();
-    std::cout << "EVENT LOOP Time difference in micro seconds = " << std::chrono::duration_cast<std::chrono::microseconds>(event_end - event_begin).count() <<std::endl;
+    std::cout << "\nEVENT LOOP Time difference in micro seconds = " << std::chrono::duration_cast<std::chrono::microseconds>(event_end - event_begin).count() <<std::endl;
 
     
     //}//end loop over samples

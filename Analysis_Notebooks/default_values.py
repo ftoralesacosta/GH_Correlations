@@ -1,8 +1,8 @@
 import numpy as np
 import math
 
-        #DEFAULTS:
 
+        #DEFAULTS:
 
 Shower = "LO"
 
@@ -40,14 +40,11 @@ zt_box = np.ones(NzT) * 0.03 #plotting Uncert. Boxes
 eta_max = 1.2 #Range of Signal Correlations
 
 #dPhi
-#N_dPhi_Bins = 8
-N_dPhi_Bins = 16
+N_dPhi_Bins = 8
 dPhi_Bins = [i*math.pi/N_dPhi_Bins for i in range(0,N_dPhi_Bins)]
 delta_phi_centers = [i*math.pi/N_dPhi_Bins+math.pi/N_dPhi_Bins/2 for i in range(1,N_dPhi_Bins)] #skip first dPhi bin to avoid Isolation
 
-#dPhi_Integration
-#N_Phi_Integrate = 3 #Number of dPhi Bins for away-side integration. 3 Corresponds to dphi > 2.1
-N_Phi_Integrate = 6
+N_Phi_Integrate = 3 #Number of dPhi Bins for away-side integration. 3 Corresponds to dphi > 2.1
 Integration_Width = math.pi/(len(delta_phi_centers)+1) * N_Phi_Integrate
 phi_width = math.pi/(N_dPhi_Bins)/2
 
@@ -58,7 +55,6 @@ ue_error_bar = [dPhi_Bins[1],dPhi_Bins[2]] #Horiz. width of UE at first plotted 
 Ped_Sub_First = True
 
 
-
                 #####CASE SWITCHING#####
 
 #Shower = "NN"
@@ -67,6 +63,14 @@ Use_Weights = True
 CorrectedP = True  # FALSE FOR HARDPROBES
 Use_MC = False
 pT_Rebin = False
+N_dPhi_Bins = 16
+
+if not(N_dPhi_Bins == 8):
+    dPhi_Bins = [i*math.pi/N_dPhi_Bins for i in range(0,N_dPhi_Bins)]
+    delta_phi_centers = [i*math.pi/N_dPhi_Bins+math.pi/N_dPhi_Bins/2 for i in range(1,N_dPhi_Bins)]
+    N_Phi_Integrate = 6
+    Integration_Width = math.pi/(len(delta_phi_centers)+1) * N_Phi_Integrate
+    phi_width = math.pi/(N_dPhi_Bins)/2
 
 if (Shower == "LO"):
     pPb_File = '../InputData/pPb_SE_L0_Correlation_GMB_Ratio_Track.root'

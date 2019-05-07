@@ -161,11 +161,9 @@ int main(int argc, char *argv[])
         n_eta_bins = atoi(value);
 	std::cout << "Number of Eta Bins: " << n_eta_bins << std::endl; }
 
-
       else if (strcmp(key, "Track_pT_Min") == 0) {
-          track_pT_min = atoi(value);
+          track_pT_min = atof(value);
           std::cout << "Track Min pT: " << track_pT_min << std::endl; }
-
 
       else if (strcmp(key, "Track_Cut_Bit") == 0) {
           Track_Cut_Bit = atoi(value);
