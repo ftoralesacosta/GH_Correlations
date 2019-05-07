@@ -537,7 +537,14 @@ int main(int argc, char *argv[])
 
 
 
-    UInt_t N_mix_Histos = ncluster_max; //Temporary Histograms for THREADING
+    UInt_t N_mix_Histos = 0; //Temporary Histograms for THREADING
+    Long64_t nentries = _tree_event->GetEntries();   
+    for(Long64_t ievent = 0; ievent < nentries ; ievent++) 
+      {
+	_tree_event->GetEntry(ievent);
+	N_mix_Histos = std::max(N_mix_Histos,ncluster);
+      }
+
     
     TH2D* MixCorr[N_mix_Histos][nztbins*nptbins];
     TH2D* MixCorr_Signal[N_mix_Histos][nztbins*nptbins];
@@ -563,17 +570,12 @@ int main(int argc, char *argv[])
     }
 
 
-
+    //MAIN LOOP
     auto event_begin = std::chrono::steady_clock::now();
-
-
-    Long64_t nentries = _tree_event->GetEntries();   
-
     for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
 
       fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, ievent, nentries);
       _tree_event->GetEntry(ievent);
-
 
       float multiplicity_sum = 0;
       for (int k = 0; k < 64; k++)  multiplicity_sum += multiplicity_v0[k];
