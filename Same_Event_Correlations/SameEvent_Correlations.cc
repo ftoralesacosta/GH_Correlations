@@ -46,6 +46,7 @@ int main(int argc, char *argv[])
   float Cluster_DtoBad = 0;
   UChar_t Cluster_NLocal_Max = 0;
   double EcrossoverE_min = 0;
+  float track_pT_min = 0.0;
   int Track_Cut_Bit = 0;
   double iso_max = 0;
   double noniso_min = 0;
@@ -159,6 +160,12 @@ int main(int argc, char *argv[])
       else if (strcmp(key, "N_Eta_Bins") == 0) {
         n_eta_bins = atoi(value);
 	std::cout << "Number of Eta Bins: " << n_eta_bins << std::endl; }
+
+
+      else if (strcmp(key, "Track_pT_Min") == 0) {
+          track_pT_min = atoi(value);
+          std::cout << "Track Min pT: " << track_pT_min << std::endl; }
+
 
       else if (strcmp(key, "Track_Cut_Bit") == 0) {
           Track_Cut_Bit = atoi(value);
@@ -754,7 +761,7 @@ int main(int argc, char *argv[])
 
 	//Track Loop
 	for (ULong64_t itrack = 0; itrack < ntrack; itrack++) {            
- 	  if(track_pt[itrack] < 0.5) continue; //500 MeV Tracks
+ 	  if(track_pt[itrack] < track_pT_min) continue; //500 MeV Tracks or 1GeV Tracks
  	  if(track_pt[itrack] > 30) continue;
  	  if((track_quality[itrack]&Track_Cut_Bit)==0) continue; //select only tracks that pass selection 
 	  if(abs(track_eta[itrack]) > 0.8) continue;
