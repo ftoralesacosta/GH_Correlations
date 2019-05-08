@@ -174,7 +174,7 @@ int main(int argc, char *argv[])
   TString root_file = (TString)argv[1];
   size_t lastindex = std::string(root_file).find_last_of(".");
   std::string rawname = std::string(root_file).substr(0, lastindex);
-  TFile *MyFile = new TFile(Form("%s_GMB_Ratio_pTRebin.root",rawname.data()),"RECREATE");
+  TFile *MyFile = new TFile(Form("%s_GMB_Ratio.root",rawname.data()),"RECREATE");
   //TFile* fout = new TFile(Form("%s_%luGeVTracks_Correlation_%1.1lu_to_%1.1lu.root",rawname.data(),GeV_Track_Skim,mix_start,mix_end),"RECREATE");
 
 

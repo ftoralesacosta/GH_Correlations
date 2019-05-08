@@ -114,6 +114,8 @@ def Plot_UB_Subtraction(Dict):
                         ax = fig.add_subplot(2,4,(2*ztb+1))
                     elif (NzT ==6):
                         ax = fig.add_subplot(3,4,(2*ztb+1))
+                    elif(NzT ==7):
+                        ax = fig.add_subplot(4,4,(2*ztb+1))
                         #ax.plot(delta_phi_centers,Dict["%s_CSR"%(SYS)][ipt][ztb],'bo',ms=10)
                     
                     UE_Band = ax.fill_between(ue_error_bar,-Dict["%s_Uncorr_Error"%(SYS)][ipt][ztb][0],
@@ -203,6 +205,8 @@ def Plot_Sub_UB_Overlay(Dict):
                     ax = fig.add_subplot(1,4,(ztb+1))
                 elif (NzT == 6):
                     ax = fig.add_subplot(1,6,(ztb+1))
+                elif (NzT == 7):
+                    ax = fig.add_subplot(2,6,(ztb+1))
 
                 ax.plot(delta_phi_centers,Dict["%s_CSR"%(SYS)][ipt][ztb],'bo',color="blue",ms=10)
                 s_plot = ax.errorbar(delta_phi_centers,Dict["%s_CSR"%(SYS)][ipt][ztb],xerr=phi_width,
@@ -274,10 +278,12 @@ def Plot_pp_pPb_Cs(Dict):
         for izt in range (zT_offset,NzT+zT_offset):
             ztb = izt-zT_offset
 
-            #if (NzT ==4):
-            #    ax = fig.add_subplot(2,2,ztb+1)
-            #elif (NzT ==6):
-            ax = fig.add_subplot(2,3,ztb+1)
+            if (NzT ==4):
+                ax = fig.add_subplot(2,2,ztb+1)
+            elif (NzT ==6):
+                ax = fig.add_subplot(2,3,ztb+1)
+            elif (NzT ==7):
+                ax = fig.add_subplot(3,3,ztb+1)
 
             pPb = plt.errorbar(delta_phi_centers,Dict["p-Pb_CSR"][ipt][ztb],xerr=phi_width,yerr=Dict["p-Pb_CSR_Errors"][ipt][ztb],fmt='bo',capsize=4,markersize=11)
             pp = plt.errorbar(delta_phi_centers,Dict["pp_CSR"][ipt][ztb],xerr=phi_width,yerr=Dict["pp_CSR_Errors"][ipt][ztb],fmt='ro',capsize=4,markersize=11)
@@ -395,7 +401,9 @@ def Plot_FF(FF_Dict):
                 break
         
         ax = fig.add_subplot((N_pT_Bins/2),2,ipt+1)
-        
+        if (ipt>0):
+            ax = fig.add_subplot((N_pT_Bins/2),2,ipt+1,sharey=ax_old)
+            
         pPb_plot = plt.errorbar(zT_centers, FF_Dict["p-Pb_FF"][ipt],xerr=zT_widths,yerr=FF_Dict["p-Pb_FF_Errors"][ipt],linewidth=1, fmt='bo',capsize=1,label='p-Pb')
         pp_plot = plt.errorbar(zT_centers, FF_Dict["pp_FF"][ipt],xerr=zT_widths,yerr=FF_Dict["pp_FF_Errors"][ipt],linewidth=1,fmt='ro',capsize=1,label='pp')
 
@@ -426,6 +434,7 @@ def Plot_FF(FF_Dict):
         Title = plt.title(r'Integrated $\mathrm{\gamma}$-Hadron Correlation: $2\pi/3 < \Delta\varphi < \pi, |\Delta\eta| < %1.1f$ '%(eta_max),fontsize=15)
         plt.gcf()
         plt.savefig("pics/Systems_FFunction_%i.pdf"%(ipt), bbox_inches='tight')
+        ax_old = ax
 
     plt.gcf()
     plt.savefig("pics/Systems_FFunction_All.pdf", bbox_inches='tight')

@@ -252,6 +252,8 @@ def Plot_UB():
                     ax = fig.add_subplot(2,4,(2*ztb+1))
                 elif (NzT ==6):
                     ax = fig.add_subplot(3,4,(2*ztb+1))
+                elif (NzT ==7):
+                    ax = fig.add_subplot(4,4,(2*ztb+1))
                     
 
                 fsize = 20
@@ -291,7 +293,9 @@ def Plot_UB():
                     ax = fig.add_subplot(2,4,(2*ztb+2))
                 elif (NzT ==6):
                     ax = fig.add_subplot(3,4,(2*ztb+2))
-
+                elif (NzT ==7):
+                    ax = fig.add_subplot(4,4,(2*ztb+2))
+                    
                 #ax = fig.add_subplot(1,2,1)
                 plt.xlabel(r'|$\Delta \varphi$|',fontsize=fsize+4)
                 plt.xticks(fontsize=(fsize))
@@ -344,7 +348,7 @@ def ROOT_to_nparray():
     for SYS,ifile in zip(Systems,Files):    
         for ipt in range (N_pT_Bins):
 
-            for izt in range (zT_offset,NzT+zT_offset):
+            for izt in range (zT_offset,NzT+zT_offset-1):
                 ztb = izt-zT_offset
 
                 SR_UB = 0

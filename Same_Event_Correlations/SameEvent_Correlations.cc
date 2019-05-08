@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
   dummyv[0] = strdup("main");
   
   //Config File
-  FILE* config = fopen("Corr_config.yaml", "r");
+  FILE* config = fopen("../Corr_config.yaml", "r");
   double DNN_min = 0;
   double DNN_max = 0;
   double DNN_Bkgd = 0;

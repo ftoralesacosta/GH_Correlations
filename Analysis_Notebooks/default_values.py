@@ -6,8 +6,8 @@ import math
 
 Shower = "LO"
 
-pPb_File = '../InputData/pPb_SE_L0_Correlation_GMB_Ratio_Track.root'
-pp_File = '../InputData/pp_SE_L0_Correlation_GMB_Ratio_Track.root'
+pPb_File = '../InputData/05zT/pPb_SE_L0_Correlation_GMB_Ratio_Track.root'
+pp_File = '../InputData/05zT/pp_SE_L0_Correlation_GMB_Ratio_Track.root'
 
 Systems = ["pp","p-Pb"]
 Files = [pp_File,pPb_File]
@@ -28,12 +28,13 @@ pTbins = [12,15,19,26,40]
 N_pT_Bins = len(pTbins)-1
 
 #zT
-zTbins = np.asarray([0.05, 0.07670637, 0.11767734, 0.18053204, 0.27695915, 0.42489062, 0.65183634]) #0.65-1 skipped for now
+zTbins = np.asarray([0.05, 0.07670637, 0.11767734, 0.18053204, 0.27695915, 0.42489062, 0.65183634,1]) #0.65-1 skipped for now
 zT_centers = (zTbins[1:] + zTbins[:-1]) / 2
 zT_widths = [(j-i)/2 for i, j in zip(zTbins[:-1], zTbins[1:])]
 zT_offset = 0
-ZT_OFF_PLOT = 1 #Offset for FF plotting
-NzT = len(zTbins)-1-zT_offset
+ZT_OFF_PLOT = 0 #Offset for FF plotting
+NzT = len(zTbins)-zT_offset-1
+print(NzT)
 zt_box = np.ones(NzT) * 0.03 #plotting Uncert. Boxes
 
 #deta
