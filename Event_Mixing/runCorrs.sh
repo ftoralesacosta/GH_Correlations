@@ -19,7 +19,7 @@ do
     #name=$(basename ../${1}..root)
     echo $name
 
-    if [ "17q" = "$name" ]; then #account for 17q-17p mixing
+    if [ "../InputData/17q" = "$name" ]; then #account for 17q-17p mixing
 	echo "./Parallel_Mix_Correlations ../InputData/${name}_${p}GeVTrack_paired.root ../InputData/17p_MB_${p}GeV.hdf5 0 $n_mix $p"
 	./Parallel_Mix_Correlations ../InputData/${name}_${p}GeVTrack_paired.root ../InputData/17p_MB_${p}GeV.hdf5 0 $n_mix $p
     else

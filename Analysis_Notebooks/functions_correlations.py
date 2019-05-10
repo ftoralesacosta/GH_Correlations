@@ -97,17 +97,23 @@ def Plot_UB_Subtraction(Dict):
 
 
         for ipt in range (N_pT_Bins):
-            fig = plt.figure(figsize=(34,17))
+            fig = plt.figure(figsize=(37,17))
             if not(Ped_Sub_First):
-                fig = plt.figure(figsize=(17,12))
+                fig = plt.figure(figsize=(18,12))
             #if (ipt > 0): continue
             #ipt = ipt+2
-            for izt in range (zT_offset,NzT+zT_offset):
+            for izt in range (0,NzT):
                 ztb = izt-zT_offset
 
                 UE_Band = "None"
                 if not(Ped_Sub_First):
-                    ax = fig.add_subplot(2,3,(ztb+1))
+                    #ax = fig.add_subplot(2,3,(ztb+1))
+                    if (NzT ==4):
+                        ax = fig.add_subplot(2,3,(ztb+1))
+                    elif (NzT ==6):
+                        ax = fig.add_subplot(2,3,(ztb+1))
+                    elif(NzT ==7):
+                        ax = fig.add_subplot(3,3,(ztb+1))
                 else:
                     #Sig
                     if (NzT ==4):
@@ -151,6 +157,8 @@ def Plot_UB_Subtraction(Dict):
                 else:
                     leg.set_title("ALICE Work in Progress, $\sqrt{s_{\mathrm{_{NN}}}}=$5 TeV %s"%(SYS))                
                 plt.setp(leg.get_title(),fontsize=14)
+                if not(Ped_Sub_First):
+                    plt.setp(leg.get_title(),fontsize=14)
 
                 
                 if (Ped_Sub_First):
@@ -159,6 +167,8 @@ def Plot_UB_Subtraction(Dict):
                         ax = fig.add_subplot(2,4,(2*ztb+2))
                     elif (NzT ==6):
                         ax = fig.add_subplot(3,4,(2*ztb+2))
+                    elif(NzT ==7):
+                        ax = fig.add_subplot(4,4,(2*ztb+1))
 
                     plt.xlabel(r'|$\Delta \varphi$|',fontsize=fsize+4)
                     plt.xticks(fontsize=(fsize))
@@ -206,7 +216,7 @@ def Plot_Sub_UB_Overlay(Dict):
                 elif (NzT == 6):
                     ax = fig.add_subplot(1,6,(ztb+1))
                 elif (NzT == 7):
-                    ax = fig.add_subplot(2,6,(ztb+1))
+                    ax = fig.add_subplot(1,7,(ztb+1))
 
                 ax.plot(delta_phi_centers,Dict["%s_CSR"%(SYS)][ipt][ztb],'bo',color="blue",ms=10)
                 s_plot = ax.errorbar(delta_phi_centers,Dict["%s_CSR"%(SYS)][ipt][ztb],xerr=phi_width,
@@ -275,6 +285,8 @@ def Plot_pp_pPb_Cs(Dict):
         #ipt = ipt+2
         #plt.figure(figsize=(10,7))
         fig = plt.figure(figsize=(24,12))
+        if (NzT==7):
+            fig = plt.figure(figsize=(24,18))
         for izt in range (zT_offset,NzT+zT_offset):
             ztb = izt-zT_offset
 
@@ -338,8 +350,8 @@ def Integrate_Away_Side(Phi_array,Phi_Errors,LE_Error):
     if Use_Uncorr_Error:
         LE_Error = LE_Error*Integration_Width
     for ipt in range(N_pT_Bins):
-        for izt in range(zT_offset, NzT+zT_offset):
-            ztb = izt-zT_offset
+        for izt in range(0, NzT):
+            ztb = izt
             zT_width = zTbins[izt+1]-zTbins[izt]
 
             temp_phi = Phi_array[ipt][ztb][(len(Phi_Errors[ipt][ztb])-N_Phi_Integrate):len(Phi_array[ipt][ztb])]
@@ -402,7 +414,7 @@ def Plot_FF(FF_Dict):
         
         ax = fig.add_subplot((N_pT_Bins/2),2,ipt+1)
         if (ipt>0):
-            ax = fig.add_subplot((N_pT_Bins/2),2,ipt+1,sharey=ax_old)
+            ax = fig.add_subplot((N_pT_Bins/2),2,ipt+1)
             
         pPb_plot = plt.errorbar(zT_centers, FF_Dict["p-Pb_FF"][ipt],xerr=zT_widths,yerr=FF_Dict["p-Pb_FF_Errors"][ipt],linewidth=1, fmt='bo',capsize=1,label='p-Pb')
         pp_plot = plt.errorbar(zT_centers, FF_Dict["pp_FF"][ipt],xerr=zT_widths,yerr=FF_Dict["pp_FF_Errors"][ipt],linewidth=1,fmt='ro',capsize=1,label='pp')
@@ -417,7 +429,7 @@ def Plot_FF(FF_Dict):
         plt.ylabel(r"$\frac{1}{N_{\mathrm{\gamma}}}\frac{\mathrm{d}N}{\mathrm{d}z_{\mathrm{T}} \mathrm{d}\Delta\eta}$",fontsize=20)
         plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^\mathrm{h}/p_\mathrm{T}^\mathrm{\gamma}$",fontsize=20)
         #plt.xlim(xmin = 0.1,xmax=0.7)
-        #plt.ylim(ymin = 0.001,ymax=10)
+        plt.ylim(ymin = 0.001,ymax=10)
 
         if(Use_MC):
             leg = plt.legend([pp_plot,pPb_plot,MC_plot,pp_bar,pPb_bar,empt],["pp $\sqrt{s} = 5$ TeV","p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV","Pythia GJ $\sqrt{s} = 5$ TeV",
@@ -434,7 +446,6 @@ def Plot_FF(FF_Dict):
         Title = plt.title(r'Integrated $\mathrm{\gamma}$-Hadron Correlation: $2\pi/3 < \Delta\varphi < \pi, |\Delta\eta| < %1.1f$ '%(eta_max),fontsize=15)
         plt.gcf()
         plt.savefig("pics/Systems_FFunction_%i.pdf"%(ipt), bbox_inches='tight')
-        ax_old = ax
 
     plt.gcf()
     plt.savefig("pics/Systems_FFunction_All.pdf", bbox_inches='tight')

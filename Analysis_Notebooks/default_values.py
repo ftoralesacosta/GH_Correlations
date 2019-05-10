@@ -6,8 +6,13 @@ import math
 
 Shower = "LO"
 
-pPb_File = '../InputData/05zT/pPb_SE_L0_Correlation_GMB_Ratio_Track.root'
-pp_File = '../InputData/05zT/pp_SE_L0_Correlation_GMB_Ratio_Track.root'
+description_string="05zT"
+#description_string="1zT"
+#description_string="15zT"
+#description_string="2zT"
+
+pPb_File = '../InputData/%s/pPb_SE_L0_Correlation_GMB_Ratio.root'%(description_string)
+pp_File = '../InputData/%s/pp_SE_L0_Correlation_GMB_Ratio.root'%(description_string)
 
 Systems = ["pp","p-Pb"]
 Files = [pp_File,pPb_File]
@@ -28,13 +33,13 @@ pTbins = [12,15,19,26,40]
 N_pT_Bins = len(pTbins)-1
 
 #zT
-zTbins = np.asarray([0.05, 0.07670637, 0.11767734, 0.18053204, 0.27695915, 0.42489062, 0.65183634,1]) #0.65-1 skipped for now
-zT_centers = (zTbins[1:] + zTbins[:-1]) / 2
-zT_widths = [(j-i)/2 for i, j in zip(zTbins[:-1], zTbins[1:])]
+zTbins = np.asarray([0.05, 0.07670637, 0.11767734, 0.18053204, 0.27695915, 0.42489062, 0.65183634,1])
+#zTbins = np.asarray([0.05, 0.07670637, 0.11767734, 0.18053204, 0.27695915, 0.42489062, 0.65183634])#0.65-1 skipped for now
 zT_offset = 0
+zT_widths = [(j-i)/2 for i, j in zip(zTbins[zT_offset:-1], zTbins[zT_offset+1:])]
+zT_centers = (zTbins[1+zT_offset:] + zTbins[zT_offset:-1]) / 2
 ZT_OFF_PLOT = 0 #Offset for FF plotting
 NzT = len(zTbins)-zT_offset-1
-print(NzT)
 zt_box = np.ones(NzT) * 0.03 #plotting Uncert. Boxes
 
 #deta
@@ -51,9 +56,8 @@ phi_width = math.pi/(N_dPhi_Bins)/2
 
 #UE
 Uncorr_Estimate = "ZYAM"
-Average_UE = False
 ue_error_bar = [dPhi_Bins[1],dPhi_Bins[2]] #Horiz. width of UE at first plotted dphi point
-Ped_Sub_First = True
+
 
 
                 #####CASE SWITCHING#####
@@ -64,7 +68,9 @@ Use_Weights = True
 CorrectedP = True  # FALSE FOR HARDPROBES
 Use_MC = False
 pT_Rebin = False
-N_dPhi_Bins = 16
+N_dPhi_Bins = 8
+Ped_Sub_First = False
+Average_UE = False
 
 if not(N_dPhi_Bins == 8):
     dPhi_Bins = [i*math.pi/N_dPhi_Bins for i in range(0,N_dPhi_Bins)]

@@ -40,6 +40,7 @@ int main(int argc, char *argv[])
   TString root_file = (TString)argv[1];
   std::cout << "Opening: " << (TString)argv[1] << std::endl;
 
+  std::string file_str = argv[2];
   const H5std_string hdf5_file_name(argv[2]);
   TString hdf5_file = (TString)argv[2];
   fprintf(stderr,hdf5_file);
@@ -56,7 +57,7 @@ int main(int argc, char *argv[])
   fprintf(stderr,"Number of Mixed Events: %i \n",nmix);
 
   //Config File
-  FILE* config = fopen("../Corr_config.yaml", "r");
+  FILE* config = fopen("../../Corr_config.yaml", "r");
   double DNN_min = 0;
   double DNN_max = 0;
   double Lambda0_cut = 0;
@@ -431,17 +432,17 @@ int main(int argc, char *argv[])
 
     //Using low level hdf5 API
     //open hdf5: Define size of data from file, explicitly allocate memory in hdf5 space and array size
-    const H5std_string track_ds_name( "track" );
-    H5File h5_file( hdf5_file_name, H5F_ACC_RDONLY );
-    DataSet track_dataset = h5_file.openDataSet( track_ds_name );
+    const std::string track_ds_name( "track" );
+    H5File h5_file( file_str.c_str(), H5F_ACC_RDONLY );
+    DataSet track_dataset = h5_file.openDataSet( track_ds_name.c_str() );
     DataSpace track_dataspace = track_dataset.getSpace();
     
-    const H5std_string cluster_ds_name( "cluster" );
-    DataSet cluster_dataset = h5_file.openDataSet( cluster_ds_name );
+    const std::string cluster_ds_name( "cluster" );
+    DataSet cluster_dataset = h5_file.openDataSet( cluster_ds_name.c_str() );
     DataSpace cluster_dataspace = cluster_dataset.getSpace();
 
-    const H5std_string event_ds_name( "event" );
-    DataSet event_dataset = h5_file.openDataSet( event_ds_name );
+    const std::string event_ds_name( "event" );
+    DataSet event_dataset = h5_file.openDataSet( event_ds_name.c_str() );
     DataSpace event_dataspace = event_dataset.getSpace();
 
     //Initialize Track Dimensions

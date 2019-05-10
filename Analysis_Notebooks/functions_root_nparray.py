@@ -348,7 +348,7 @@ def ROOT_to_nparray():
     for SYS,ifile in zip(Systems,Files):    
         for ipt in range (N_pT_Bins):
 
-            for izt in range (zT_offset,NzT+zT_offset-1):
+            for izt in range (0,NzT):
                 ztb = izt-zT_offset
 
                 SR_UB = 0

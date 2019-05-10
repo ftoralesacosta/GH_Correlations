@@ -34,7 +34,6 @@ enum isolationDet {CLUSTER_ISO_TPC_04, CLUSTER_ISO_ITS_04, CLUSTER_FRIXIONE_TPC_
 
 using namespace H5;
 
-
 //int main(int argc, const char rootfilename, const char hdf5filename, const char *mixing_start, const char *mixing_end)
 int main(int argc, char *argv[])
 {
@@ -285,7 +284,8 @@ int main(int argc, char *argv[])
   TH2D* Corr[nztbins*nptbins];
   TH2D* Signal_Corr[nztbins*nptbins];
   TH2D* BKGD_Corr[nztbins*nptbins];
-  
+  TH2D* Inclusive_Corr[nztbins*nptbins];  
+
   TH1D* H_Signal_Triggers[nptbins];
   TH1D* H_BKGD_Triggers[nptbins];
   float N_Signal_Triggers = 0;
@@ -332,6 +332,12 @@ int main(int argc, char *argv[])
 
       BKGD_Corr[izt+ipt*nztbins]->Sumw2();
       BKGD_Corr[izt+ipt*nztbins]->SetMinimum(0.);
+
+      Inclusive_Corr[izt+ipt*nztbins] = new TH2D(Form("Inclusive_Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",ptbins[ipt],ptbins[ipt+1],
+      100*ztbins[izt],100*ztbins[izt+1]),"#gamma-H Isclusive Correlation", n_phi_bins,0,M_PI, n_eta_bins, -1.4, 1.4);
+
+      Inclusive_Corr[izt+ipt*nztbins]->Sumw2();
+      Inclusive_Corr[izt+ipt*nztbins]->SetMinimum(0.);
 
     }//zt bins
   }//pt bins                           
@@ -539,8 +545,6 @@ int main(int argc, char *argv[])
 
     std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
     std::cout << "HDF5 READ Time in micro seconds = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() <<std::endl;
-    fprintf(stderr,"%d: Track_Value end = %f\n",__LINE__,track_data_out[550000][0][0]);
-
 
 
     UInt_t N_mix_Histos = 0; //Temporary Histograms for THREADING
@@ -553,12 +557,12 @@ int main(int argc, char *argv[])
 	_tree_event->GetEntry(ievent);
 	N_mix_Histos = std::max(N_mix_Histos,ncluster);
       }
-
     
     TH2D* MixCorr[N_mix_Histos][nztbins*nptbins];
     TH2D* MixCorr_Signal[N_mix_Histos][nztbins*nptbins];
     TH2D* MixCorr_BKGD[N_mix_Histos][nztbins*nptbins];
-    
+    TH2D* MixInclusiveCorr[N_mix_Histos][nztbins*nptbins];
+
     for (Long64_t imix = 0; imix < N_mix_Histos; imix++){
       for (int ipt = 0; ipt <nptbins; ipt++) {
 	for (int izt = 0; izt<nztbins; izt++){
@@ -573,6 +577,10 @@ int main(int argc, char *argv[])
 	  MixCorr_BKGD[imix][izt+ipt*nztbins] = new TH2D(Form("DNN%i_Mix_Correlation__ME_%i_pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",2,imix,ptbins[ipt],ptbins[ipt+1],
 	  100*ztbins[izt],100*ztbins[izt+1]),"#gamma-H [all] Background Correlation", n_phi_bins,0,M_PI, n_eta_bins, -1.4, 1.4);
 	  MixCorr_BKGD[imix][izt+ipt*nztbins]->Sumw2();
+
+	  MixInclusiveCorr[imix][izt+ipt*nztbins] = new TH2D(Form("Mix_Inclusive_Correlation__ME_%i_pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",imix,ptbins[ipt],ptbins[ipt+1],
+	  100*ztbins[izt],100*ztbins[izt+1]),"#gamma-H [all] Correlation", n_phi_bins,0,M_PI, n_eta_bins, -1.4, 1.4);
+	  MixInclusiveCorr[imix][izt+ipt*nztbins]->Sumw2();
 
 	}
       }
@@ -638,7 +646,7 @@ int main(int argc, char *argv[])
 
 	begin = std::chrono::steady_clock::now();
 
-	for (Long64_t mix_counter = mix_start; mix_counter < mix_end; mix_counter++){
+	for (Long64_t mix_counter = mix_start; mix_counter < mix_end+1; mix_counter++){
 	  
 	  Long64_t mix_event = mix_events[mix_counter];
 	  if(mix_event >= 9999999) continue;  
@@ -656,7 +664,6 @@ int main(int argc, char *argv[])
 
 	  for (ULong64_t itrack = 0; itrack < ntrack_max; itrack++) {
 	    if (std::isnan(track_data_out[imix][itrack][1])) continue;
-	    //if ((int(track_data_out[imix][itrack][4]+0.5)&selection_number)==0) continue;
 	    if ((int(track_data_out[imix][itrack][4]+ 0.5)&Track_Cut_Bit)==0) continue; //selection 16
 	    if (track_data_out[imix][itrack][1] < track_pT_min) continue; //less than 1GeV or 0.5GeV (YAML)
 	    if (track_data_out[imix][itrack][1] > 30) continue;
@@ -702,6 +709,7 @@ int main(int argc, char *argv[])
 		      //Corr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
 		      MixCorr[n][izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta); 
 		    }
+		    MixInclusiveCorr[n][izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
 		    
 		  }//if in zt bin
 		} // end loop over zt bins

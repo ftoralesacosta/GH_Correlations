@@ -31,38 +31,12 @@ int main(int argc, char *argv[])
     exit(EXIT_FAILURE);
   }
   
-  int nTrackSkims = 2;
-  float* trackPtSkims;
-  trackPtSkims = new float[nTrackSkims+1];
-
-  trackPtSkims[0] = 0.0; //trackPtSkims[1] = 40.0;
-  trackPtSkims[1] = 4.0; //trackPtSkims[2] = 6.0;
-  trackPtSkims[2] = 40.0;
-
-    std::string basic_name = argv[1];
-    std::string::size_type pos = basic_name.find('_');
-    if (pos != std::string::npos)
-      basic_name = basic_name.substr(0, pos);
-    fprintf(stderr,"%d: basic_name = %s \n",__LINE__,basic_name.c_str());
-
-  TFile* MixFile[nTrackSkims];
-  for (int iSkim = 0; iSkim < nTrackSkims; iSkim ++){
-    MixFile[iSkim] = TFile::Open(Form("%s_%1.0fGeV_Skim_Correlation.root",basic_name.c_str(),trackPtSkims[iSkim]));
-
-    //std::cout<<Form("%s_%1.0fGeVTracks.root",basic_name.c_str(),trackPtSkims[iSkim])<<std::endl;
-    //MixFile[iSkim] = TFile::Open((TString)argv[2]);
-
-    if (MixFile[iSkim] == NULL) {
-      std::cout<<MixFile[iSkim]<<std::endl;
-      std::cout << " Mixed file "<<iSkim<<" failed" << std::endl;
-      exit(EXIT_FAILURE);}
-  }
-
-
-  FILE* config = fopen("Corr_config.yaml", "r");
+  FILE* config = fopen("../Corr_config.yaml", "r");
 
   int n_eta_bins = 0;
   int n_phi_bins = 0;
+
+  std::string shower_shape = "Lambda";
 
   //FIXME add Corr_config.yaml support
   int nztbins = 7;
@@ -98,6 +72,15 @@ int main(int argc, char *argv[])
     else if (strcmp(key, "N_Eta_Bins") == 0) {
       n_eta_bins = atoi(value);
       std::cout << "Number of Eta Bins: " << n_eta_bins << std::endl; }
+
+
+    else if (strcmp(key, "Shower_Shape") == 0){
+      shower_shape = value;
+      std::cout<<"Shower Shape: "<<shower_shape.data()<<std::endl;
+      //if (strcmp(shower_shape.data(),"Lambda")== 0) std::cout<<"test worked"<<std::endl;
+    }
+
+
 
     else if (strcmp(key, "Zt_bins") == 0) {
       nztbins = -1;
@@ -153,7 +136,38 @@ int main(int argc, char *argv[])
   //Config File Done -------------//
 
 
-  TH2F* Same_Inclusive_Corr[nztbins*nptbins];
+  int nTrackSkims = 2;
+  float* trackPtSkims;
+  trackPtSkims = new float[nTrackSkims+1];
+
+  trackPtSkims[0] = 0.0; //trackPtSkims[1] = 40.0;
+  trackPtSkims[1] = 4.0; //trackPtSkims[2] = 6.0;
+  trackPtSkims[2] = 40.0;
+
+    std::string basic_name = argv[1];
+    std::string::size_type pos = basic_name.find('_');
+    if (pos != std::string::npos)
+      basic_name = basic_name.substr(0, pos);
+    fprintf(stderr,"%d: basic_name = %s \n",__LINE__,basic_name.c_str());
+
+  TFile* MixFile[nTrackSkims];
+  for (int iSkim = 0; iSkim < nTrackSkims; iSkim ++){
+    // MixFile[iSkim] = TFile::Open(Form("%s_%1.0fGeV_Skim_Correlation.root",basic_name.c_str(),trackPtSkims[iSkim]));
+    MixFile[iSkim] = TFile::Open(Form("%s_%1.0fGeVTracks_Mixed_%i_Correlation_%s.root",basic_name.c_str(),trackPtSkims[iSkim],300,shower_shape.data()));
+    //MixFile[iSkim] = TFile::Open(Form("%s_%1.0fGeVTrack_paired_%1.0fGeVTracks_Correlation_Lambda_0_to_300.root",basic_name.c_str(),trackPtSkims[iSkim],trackPtSkims[iSkim]));
+
+    //std::cout<<Form("%s_%1.0fGeVTracks.root",basic_name.c_str(),trackPtSkims[iSkim])<<std::endl;
+
+    //MixFile[iSkim] = TFile::Open((TString)argv[2]);
+
+    if (MixFile[iSkim] == NULL) {
+      std::cout<<MixFile[iSkim]<<std::endl;
+      std::cout << " Mixed file "<<iSkim<<" failed" << std::endl;
+      exit(EXIT_FAILURE);}
+  }
+  
+
+TH2F* Same_Inclusive_Corr[nztbins*nptbins];
   TH2F* Same_Isolated_Corr[nztbins*nptbins];
   TH2F* Same_DNN1_Corr[nztbins*nptbins];
   TH2F* Same_DNN2_Corr[nztbins*nptbins];
