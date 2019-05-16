@@ -99,23 +99,26 @@ def Weighted_Average(FF,FF_Errors,purity_FF_Errors):
     
     for izt in range (0,NzT):
         weight_sum = 0
-
+        
         for ipt in range(0,N_pT_Bins):
 
             if (ipt>2 and izt>4): continue #Tracking efficiency limit
 
-            if (description_string == "05zT" or description_string == "05zT_working_old"): #Cut low pT Crap
-                if (ipt<1 and izt < 2): continue
-                if(ipt<2 and izt<1): continue
+            #if (description_string == "05zT" or description_string == "05zT_working_old"): #Cut low pT Crap
+            #    if (ipt<1 and izt < 2): continue
+            #    if(ipt<2 and izt<1): continue
+                    
+            if (description_string == "05zT_2bins"):
+                if (ipt <2 and izt <1): continue
+            if (description_string == "05zT_3bins"):
+                if (ipt <1 and izt <1): continue
             
             if (math.isnan(Rel_Stat_Erorr[ipt][izt]) or math.isnan(Rel_Purity_Error[ipt][izt]) or math.isnan(FF[ipt][izt])): continue
             Combined[izt] += 1/((Rel_Stat_Erorr[ipt][izt]**2) + (Rel_Purity_Error[ipt][izt]**2)) * FF[ipt][izt] 
             weight_sum += 1/((Rel_Stat_Erorr[ipt][izt]**2) + (Rel_Purity_Error[ipt][izt]**2))
-
-            
+    
         Combined[izt] = Combined[izt]/weight_sum
 
-#PUT A LOOP OF ZT on the OUTSIDE
     for izt in range(0,NzT):
         for ipt in range (N_pT_Bins):
             if (math.isnan(FF_Errors[ipt][izt]) or math.isnan(purity_FF_Errors[ipt][izt])): continue
@@ -368,8 +371,8 @@ def Compare_pp_pPB_Avg_Ratio(Ratio,Ratio_Error,string_descr,Ratio2,Ratio_Error2,
 
     plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^{\mathrm{h}}/p_\mathrm{T}^\gamma$",fontsize=20)
     plt.ylabel(r"$\frac{\mathrm{p-Pb}}{\mathrm{pp}}$",fontsize=20)
-    plt.ylim((-1.5, 2))
-    plt.yticks(np.arange(-0, 2, step=0.2))
+    #plt.ylim((-1.5, 2))
+    #plt.yticks(np.arange(-0, 2, step=0.2))
     
     if(NzT == 6):
         plt.xlim(xmin = 0.0,xmax=0.7)
@@ -397,17 +400,38 @@ def Compare_pp_pPB_Avg_Ratio(Ratio,Ratio_Error,string_descr,Ratio2,Ratio_Error2,
     
     
     
-def Compare_pp_pPB_Avg_Ratio_lists(strings,string_descrp_list,colors):
+def Compare_pp_pPB_Avg_Ratio_lists(strings,string_descrp_list,colors,Show_Fits):
         
-    plt.figure(figsize=(10,7)) 
-
+    plt.figure(figsize=(15,10.5)) 
     
     for (string,string_descr,colr) in zip(strings,string_descrp_list,colors):
         
         Ratio = np.load("npy_files/LO_Averaged_FF_Ratio_%s.npy"%(string))
         Ratio_Error = np.load("npy_files/LO_Averaged_FF_Ratio_Errors_%s.npy"%(string))
+
+        Zbins = np.geomspace(0.05, 1.0, num=len(Ratio)+1)
+        zT_centers = (Zbins[1:] + Zbins[:-1]) / 2
+        zT_widths = [(j-i)/2 for i, j in zip(Zbins[:-1], Zbins[1:])]
         
-        plt.errorbar(zT_centers[ZT_OFF_PLOT:], Ratio[ZT_OFF_PLOT:], yerr=Ratio_Error[ZT_OFF_PLOT:],xerr=zT_widths[ZT_OFF_PLOT:],capsize=3, fmt ="o",color=colr,alpha=1,ms=6,lw=1,label=string_descr)
+        
+        ### ROOT LINEAR and CONSTANT FITS ###
+        Ratio_TGraph = TGraphErrors()
+        for izt in range (ZT_OFF_PLOT,len(Ratio)):
+        #for izt in range (2,len(Ratio)-1):
+            Ratio_TGraph.SetPoint(izt,zT_centers[izt],Ratio[izt])
+            Ratio_TGraph.SetPointError(izt,0,Ratio_Error[izt])
+
+        Ratio_TGraph.Fit("pol0","S")
+        f = Ratio_TGraph.GetFunction("pol0")
+        chi2_red  = f.GetChisquare()/f.GetNDF()
+        pval = f.GetProb()
+        p0 = f.GetParameter(0)
+        p0e = f.GetParError(0)
+        p0col = colr
+        if (Show_Fits):
+            plt.fill_between(np.arange(0,1.1,0.1), p0+p0e, p0-p0e,color=p0col,alpha=.3)
+        
+        plt.errorbar(zT_centers[ZT_OFF_PLOT:], Ratio[ZT_OFF_PLOT:], yerr=Ratio_Error[ZT_OFF_PLOT:],xerr=zT_widths[ZT_OFF_PLOT:],capsize=3, fmt ="o",color=colr,alpha=0.7,ms=6,lw=1,label=string_descr)
 
     empt4, = plt.plot([], [],' ',label=r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[0],pTbins[N_pT_Bins]))
     
@@ -416,10 +440,10 @@ def Compare_pp_pPB_Avg_Ratio_lists(strings,string_descrp_list,colors):
     #plt.ylim((-1.5, 2))
     #plt.yticks(np.arange(-0, 2, step=0.2))
     
-    if(NzT == 6):
-        plt.xlim(xmin = 0.0,xmax=0.7)
-    elif(NzT==7):
-        plt.xlim(xmin = 0.0,xmax=1.0)
+    #if(NzT == 6):
+    #    plt.xlim(xmin = 0.0,xmax=0.7)
+    #elif(NzT==7):
+    plt.xlim(xmin = 0.0,xmax=1.0)
     plt.axhline(y=1, color='r', linestyle='--')
 
     leg = plt.legend(frameon=False,numpoints=1,loc="best",title=' ',prop={'size':18})

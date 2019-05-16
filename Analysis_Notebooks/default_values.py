@@ -20,8 +20,13 @@ Show_Fits = False
 
 Shower = "LO"
 
+
+
 #description_string="05zT"
-#description_string="05zT_working_old"
+#description_string="05zT_3bins"
+#description_string="05zT_2bins"
+
+description_string="05zT_working_old"
 #description_string="1zT"
 #description_string="15zT"
 #description_string="2zT"
@@ -29,9 +34,13 @@ Shower = "LO"
 #description_string="pT_Rebin_3"
 #description_string="pT_Rebin_5"
 
-description_string = "zT_Rebin_5"
+#description_string = "zT_Rebin_5"
+#description_string = "zT_Rebin_6"
+#description_string = "zT_Rebin_8"
 #description_string = "zT_Rebin_9"
 #description_string = "zT_Rebin_15"
+
+#description_string = "dPhi_Rebin_16"
 
 
 pPb_File = '../InputData/%s/pPb_SE_L0_Correlation_GMB_Ratio.root'%(description_string)
@@ -83,8 +92,14 @@ ue_error_bar = [dPhi_Bins[1],dPhi_Bins[2]] #Horiz. width of UE at first plotted 
 if (description_string == "zT_Rebin_5"):
     zTbins = np.asarray([0.05, 0.09, 0.17, 0.30, 0.55, 1.00])
 
+if (description_string == "zT_Rebin_6"):
+    zTbins = np.asarray([0.05, 0.08, 0.14, 0.22, 0.37, 0.61, 1.00])
+    
+if (description_string == "zT_Rebin_8"):
+    zTbins = np.asarray([0.05, 0.07, 0.11, 0.15, 0.22, 0.33, 0.47, 0.69, 1.00])
+
 if (description_string == "zT_Rebin_9"):
-    zTbins = np.asarray([0.05, 0.16, 0.26, 0.37, 0.47, 0.58, 0.68, 0.79, 0.89, 1.00])
+    zTbins = np.asarray([0.05, 0.07, 0.10, 0.14, 0.19, 0.26, 0.37, 0.51, 0.72, 1.00])
     
 if (description_string == "zT_Rebin_15"):
     zTbins = np.asarray([0.05, 0.06, 0.08, 0.10, 0.12, 0.15, 0.18, 0.22, 0.28, 0.34, 0.42, 0.53, 0.65, 0.81, 1.00])
@@ -96,6 +111,8 @@ if (description_string == "pT_Rebin_5"):
 
 N_pT_Bins = len(pTbins)-1
 
+if (description_string == "dPhi_Rebin_16"):
+    N_dPhi_Bins = 16
 
 def Get_Purity(filename):
     file = ROOT.TFile(filename)
@@ -112,6 +129,7 @@ def Get_Purity(filename):
 
 if not(description_string == "05zT_working_old"):
     purity,purity_Uncertainty = Get_Purity(Files[1])
+    
 print("purities:")
 print(purity)
 print(purity_Uncertainty)
@@ -122,7 +140,7 @@ NzT = len(zTbins)-zT_offset-1
 zt_box = np.ones(NzT) * 0.03 #plotting Uncert. Boxes
 
 
-if not(N_dPhi_Bins == 8):
+if (N_dPhi_Bins == 16):
     dPhi_Bins = [i*math.pi/N_dPhi_Bins for i in range(0,N_dPhi_Bins)]
     delta_phi_centers = [i*math.pi/N_dPhi_Bins+math.pi/N_dPhi_Bins/2 for i in range(1,N_dPhi_Bins)]
     N_Phi_Integrate = 6
