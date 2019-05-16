@@ -1,4 +1,4 @@
-#include <TFile.h>
+1;95;0c#include <TFile.h>
 #include <TTree.h>
 #include <TLorentzVector.h>
 
@@ -81,6 +81,7 @@ int main(int argc, char *argv[])
   UChar_t Cluster_NLocal_Max = 0;
   double EcrossoverE_min = 0;
   float track_pT_min = 0.0;
+  float track_pT_max = 0.0;
   int Track_Cut_Bit = 0;
   double iso_max = 0;
   double noniso_min = 0;
@@ -185,6 +186,9 @@ int main(int argc, char *argv[])
           track_pT_min = atof(value);
           std::cout << "Track pT Min: " << track_pT_min << std::endl; }
 
+      else if (strcmp(key, "Track_pT_Max") == 0) {
+          track_pT_max = atof(value);
+          std::cout << "Track pT Max: " << track_pT_max << std::endl; }
 
       else if (strcmp(key, "Track_Cut_Bit") == 0) {
           Track_Cut_Bit = atoi(value);
@@ -547,16 +551,19 @@ int main(int argc, char *argv[])
     std::cout << "HDF5 READ Time in micro seconds = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() <<std::endl;
 
 
-    UInt_t N_mix_Histos = 0; //Temporary Histograms for THREADING
-    Long64_t nentries = _tree_event->GetEntries();   
-    fprintf(stderr,"Obtainng max no. clusters, used for threading\n\n");
 
-    for(Long64_t ievent = 0; ievent < nentries ; ievent++) 
-      {
-	fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, ievent, nentries);
-	_tree_event->GetEntry(ievent);
-	N_mix_Histos = std::max(N_mix_Histos,ncluster);
-      }
+    Long64_t nentries = _tree_event->GetEntries();   
+    UInt_t N_mix_Histos = 50; //Temporary Histograms for THREADING
+
+    // fprintf(stderr,"Obtainng max no. clusters, used for threading\n\n");
+
+    //UInt_t N_mix_Histos = 0; //Temporary Histograms for THREADING
+    // for(Long64_t ievent = 0; ievent < nentries ; ievent++) 
+    //   {
+    // 	fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, ievent, nentries);
+    // 	_tree_event->GetEntry(ievent);
+    // 	N_mix_Histos = std::max(N_mix_Histos,ncluster);
+    //   }
     
     TH2D* MixCorr[N_mix_Histos][nztbins*nptbins];
     TH2D* MixCorr_Signal[N_mix_Histos][nztbins*nptbins];
@@ -666,7 +673,7 @@ int main(int argc, char *argv[])
 	    if (std::isnan(track_data_out[imix][itrack][1])) continue;
 	    if ((int(track_data_out[imix][itrack][4]+ 0.5)&Track_Cut_Bit)==0) continue; //selection 16
 	    if (track_data_out[imix][itrack][1] < track_pT_min) continue; //less than 1GeV or 0.5GeV (YAML)
-	    if (track_data_out[imix][itrack][1] > 30) continue;
+	    if (track_data_out[imix][itrack][1] > track_pT_max) continue;
 	    if (abs(track_data_out[imix][itrack][2]) > 0.8) continue;
 	    if (track_data_out[imix][itrack][7] < 4) continue;
 	    if ((track_data_out[imix][itrack][8]/track_data_out[imix][itrack][7]) > 36) continue;

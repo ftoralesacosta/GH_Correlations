@@ -22,7 +22,8 @@ def Get_NTriggers(filename,ipt, Signal_DNN=True):
                 NTriggers = ntrig_histo.GetEntries()
     file.Close()
     return NTriggers
-
+    
+    
 #UNCORRELATED BACKGROUND:
 
 def ZYAM_Line(Phi_Array, Phi_Error_Array):

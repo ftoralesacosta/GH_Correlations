@@ -145,15 +145,35 @@ int main(int argc, char *argv[])
   trackPtSkims[2] = 40.0;
 
     std::string basic_name = argv[1];
-    std::string::size_type pos = basic_name.find('_');
-    if (pos != std::string::npos)
-      basic_name = basic_name.substr(0, pos);
+
+    // std::string::size_type pos = basic_name.find('_');
+    // if (pos != std::string::npos)
+    //   basic_name = basic_name.substr(0, pos);
+
+    int n = 3; //Number of "_" to skip
+    int i;
+    for (i = 0; i < basic_name.length(); i++)
+      {
+        if (argv[1][i] == '_')
+    	  {
+            n--;
+            if (n == 0)
+    	      {
+                break;
+    	      }
+    	  }
+      }
+
+    basic_name = basic_name.substr(0, i);
     fprintf(stderr,"%d: basic_name = %s \n",__LINE__,basic_name.c_str());
+
+
 
   TFile* MixFile[nTrackSkims];
   for (int iSkim = 0; iSkim < nTrackSkims; iSkim ++){
-    // MixFile[iSkim] = TFile::Open(Form("%s_%1.0fGeV_Skim_Correlation.root",basic_name.c_str(),trackPtSkims[iSkim]));
     MixFile[iSkim] = TFile::Open(Form("%s_%1.0fGeVTracks_Mixed_%i_Correlation_%s.root",basic_name.c_str(),trackPtSkims[iSkim],300,shower_shape.data()));
+
+
     //MixFile[iSkim] = TFile::Open(Form("%s_%1.0fGeVTrack_paired_%1.0fGeVTracks_Correlation_Lambda_0_to_300.root",basic_name.c_str(),trackPtSkims[iSkim],trackPtSkims[iSkim]));
 
     //std::cout<<Form("%s_%1.0fGeVTracks.root",basic_name.c_str(),trackPtSkims[iSkim])<<std::endl;
@@ -184,6 +204,10 @@ TH2F* Same_Inclusive_Corr[nztbins*nptbins];
   TH1D* N_BKGD_Triggers[nptbins];
   TH1D* N_Signal_Overlap_Triggers[nptbins];
   TH1D* N_BKGD_Overlap_Triggers[nptbins];
+
+  TH1D* H_purity[nptbins];
+  TH1D* H_purity_Uncertainty[nptbins];
+
 
   TString root_file = (TString)argv[1];
   size_t lastindex = std::string(root_file).find_last_of(".");
@@ -317,7 +341,7 @@ TH2F* Same_Inclusive_Corr[nztbins*nptbins];
     Mix_DNN1_Corr[izt+ipt*nztbins]->Scale(1.0/mix_DNN1_intgrl);
     Mix_DNN2_Corr[izt+ipt*nztbins]->Scale(1.0/mix_DNN2_intgrl);
 
-    fprintf(stderr, "%s: %d: scaled Mixed Events by max ME value: %f\n",__FILE__,__LINE__,mix_DNN1_intgrl);
+    fprintf(stderr, "%s: %d: scaled Mixed Events by max ME value: %f\n",__FILE__,__LINE__,mix_Isolated_intgrl);
 
     //DIVIDE MIXING (by ISOLATED, NO SHOWERSHAP for better statistics. Less than 2.0% deviation from region division)
     //Same_Inclusive_Corr[izt+ipt*nztbins]->Divide(Mix_Inclusive_Corr[izt+ipt*nztbins]);
@@ -359,6 +383,9 @@ TH2F* Same_Inclusive_Corr[nztbins*nptbins];
     N_Signal_Overlap_Triggers[ipt] = (TH1D*)corr->Get(Form("N_DNN%i_Overlap_Triggers_pT%1.0f_%1.0f",1,ptbins[ipt],ptbins[ipt+1]));
     N_BKGD_Overlap_Triggers[ipt] = (TH1D*)corr->Get(Form("N_DNN%i_Overlap_Triggers_pT%1.0f_%1.0f",2,ptbins[ipt],ptbins[ipt+1]));
 
+    H_purity[ipt] = (TH1D*)corr->Get(Form("H_Purities_pT%1.0f_%1.0f",ptbins[ipt],ptbins[ipt+1]));
+    H_purity_Uncertainty[ipt] = (TH1D*)corr->Get(Form("H_Purity_Uncertanty_pT%1.0f_%1.0f",ptbins[ipt],ptbins[ipt+1]));
+
     fprintf(stderr, "%s: %d: Write Trigger Get OK",__FILE__,__LINE__);
 
     //N_Incl_Triggers[ipt]->Write();
@@ -368,6 +395,10 @@ TH2F* Same_Inclusive_Corr[nztbins*nptbins];
     N_Signal_Overlap_Triggers[ipt]->Write();
     N_BKGD_Overlap_Triggers[ipt]->Write();
     std::cout<<N_Sig_Triggers[ipt]->GetEntries()<<std::endl;
+
+    H_purity[ipt]->Write();
+    H_purity_Uncertainty[ipt]->Write();
+
   }//ipt
 
   corr->Close();

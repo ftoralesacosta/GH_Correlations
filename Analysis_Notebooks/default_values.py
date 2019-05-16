@@ -1,15 +1,38 @@
 import numpy as np
 import math
+import ROOT
 
+
+                 #####CASE SWITCHING#####
+
+#Shower = "NN"
+Shower = "LO"
+Use_Weights = True
+CorrectedP = True  # FALSE FOR HARDPROBES
+Use_MC = False
+pT_Rebin = False
+N_dPhi_Bins = 8
+Ped_Sub_First = False
+Average_UE = False
+Show_Fits = False
 
         #DEFAULTS:
 
 Shower = "LO"
 
-description_string="05zT"
+#description_string="05zT"
+#description_string="05zT_working_old"
 #description_string="1zT"
 #description_string="15zT"
 #description_string="2zT"
+
+#description_string="pT_Rebin_3"
+#description_string="pT_Rebin_5"
+
+description_string = "zT_Rebin_5"
+#description_string = "zT_Rebin_9"
+#description_string = "zT_Rebin_15"
+
 
 pPb_File = '../InputData/%s/pPb_SE_L0_Correlation_GMB_Ratio.root'%(description_string)
 pp_File = '../InputData/%s/pp_SE_L0_Correlation_GMB_Ratio.root'%(description_string)
@@ -20,27 +43,22 @@ Files = [pp_File,pPb_File]
 purity = np.asarray([0.208095, 0.339478, 0.483944, 0.509])
 purity_Uncertainty = np.asarray([0.0376517,0.0476880,0.0489686,0.0480000])
 
+#print("purities:")
+#print(purity)
+#print(purity_Uncertainty)
 
-Corrections = np.asarray([1.007,0.982,0.957,0.926,0.894,0.853,0.817,0.757,0.681,0.673,0.619,0.469,0.342,0.301])
-Fake_Rate = np.asarray([0.0179,0.0197,0.0249,0.0355,0.0475,0.0722,0.0902,0.1298,0.1407,0.2130,0.2175,0.2376,0.2611,0.2611])
-oneminFake = np.ones(len(Fake_Rate))-Fake_Rate
 
 
         # RANGE & BINNING:
 
 #pT
 pTbins = [12,15,19,26,40]
-N_pT_Bins = len(pTbins)-1
+#N_pT_Bins = len(pTbins)-1
 
 #zT
 zTbins = np.asarray([0.05, 0.07670637, 0.11767734, 0.18053204, 0.27695915, 0.42489062, 0.65183634,1])
-#zTbins = np.asarray([0.05, 0.07670637, 0.11767734, 0.18053204, 0.27695915, 0.42489062, 0.65183634])#0.65-1 skipped for now
 zT_offset = 0
-zT_widths = [(j-i)/2 for i, j in zip(zTbins[zT_offset:-1], zTbins[zT_offset+1:])]
-zT_centers = (zTbins[1+zT_offset:] + zTbins[zT_offset:-1]) / 2
 ZT_OFF_PLOT = 0 #Offset for FF plotting
-NzT = len(zTbins)-zT_offset-1
-zt_box = np.ones(NzT) * 0.03 #plotting Uncert. Boxes
 
 #deta
 eta_max = 1.2 #Range of Signal Correlations
@@ -60,17 +78,49 @@ ue_error_bar = [dPhi_Bins[1],dPhi_Bins[2]] #Horiz. width of UE at first plotted 
 
 
 
-                #####CASE SWITCHING#####
 
-#Shower = "NN"
-Shower = "LO"
-Use_Weights = True
-CorrectedP = True  # FALSE FOR HARDPROBES
-Use_MC = False
-pT_Rebin = False
-N_dPhi_Bins = 8
-Ped_Sub_First = False
-Average_UE = False
+                 #####CASE SWITCHING#####
+if (description_string == "zT_Rebin_5"):
+    zTbins = np.asarray([0.05, 0.09, 0.17, 0.30, 0.55, 1.00])
+
+if (description_string == "zT_Rebin_9"):
+    zTbins = np.asarray([0.05, 0.16, 0.26, 0.37, 0.47, 0.58, 0.68, 0.79, 0.89, 1.00])
+    
+if (description_string == "zT_Rebin_15"):
+    zTbins = np.asarray([0.05, 0.06, 0.08, 0.10, 0.12, 0.15, 0.18, 0.22, 0.28, 0.34, 0.42, 0.53, 0.65, 0.81, 1.00])
+    
+if (description_string == "pT_Rebin_3"):
+    pTbins = [12.00, 21.33, 30.67, 40.00]
+if (description_string == "pT_Rebin_5"):    
+    pTbins = [12.00, 15.27, 19.42, 24.71, 31.44, 40.00]
+
+N_pT_Bins = len(pTbins)-1
+
+
+def Get_Purity(filename):
+    file = ROOT.TFile(filename)
+    purities = np.zeros(N_pT_Bins)
+    p_uncertainties = np.zeros(N_pT_Bins)
+    
+    for ipt in range(N_pT_Bins):
+        purity_histo = file.Get('H_Purities_pT%1.0f_%1.0f' %(pTbins[ipt],pTbins[ipt+1]))
+        purity_uncertainty_histo = file.Get('H_Purity_Uncertanty_pT%1.0f_%1.0f' %(pTbins[ipt],pTbins[ipt+1]))
+        purities[ipt] = purity_histo.GetMean()
+        p_uncertainties[ipt] = purity_uncertainty_histo.GetMean()
+    
+    return purities, p_uncertainties
+
+if not(description_string == "05zT_working_old"):
+    purity,purity_Uncertainty = Get_Purity(Files[1])
+print("purities:")
+print(purity)
+print(purity_Uncertainty)
+    
+zT_widths = [(j-i)/2 for i, j in zip(zTbins[zT_offset:-1], zTbins[zT_offset+1:])]
+zT_centers = (zTbins[1+zT_offset:] + zTbins[zT_offset:-1]) / 2
+NzT = len(zTbins)-zT_offset-1
+zt_box = np.ones(NzT) * 0.03 #plotting Uncert. Boxes
+
 
 if not(N_dPhi_Bins == 8):
     dPhi_Bins = [i*math.pi/N_dPhi_Bins for i in range(0,N_dPhi_Bins)]
@@ -79,7 +129,8 @@ if not(N_dPhi_Bins == 8):
     Integration_Width = math.pi/(len(delta_phi_centers)+1) * N_Phi_Integrate
     phi_width = math.pi/(N_dPhi_Bins)/2
 
-if (Shower == "LO"):
+#if (Shower == "LO"):
+if (False):
     pPb_File = '../InputData/pPb_SE_L0_Correlation_GMB_Ratio_Track.root'
     pp_File = '../InputData/pp_SE_L0_Correlation_GMB_Ratio_Track.root'
 
@@ -89,15 +140,6 @@ if (Shower == "LO"):
         #purity_Uncertainty = np.asarray([0.0273652,0.0305499,0.0358471,0.036])
     else:
         purity = [0.35]
-        
-    if (pT_Rebin):
-        pPb_File = '../InputData/pPb_SE_L0_Correlation_GMB_Ratio_pTRebin.root'
-        pp_File = '../InputData/pp_SE_L0_Correlation_GMB_Ratio_pTRebin.root'
-        
-        purity = np.asarray([0.260799,0.511580])
-        purity_Uncertainty = np.asarray([0.0287628,0.0362961])
-        pTbins = [12,21,40]
-        N_pT_Bins = len(pTbins)-1
         
         Files = [pp_File,pPb_File]
 

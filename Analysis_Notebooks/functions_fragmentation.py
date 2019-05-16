@@ -50,13 +50,13 @@ def Overlay_pT_FF(FF_Dict):
         for ipt in range (N_pT_Bins):
             if(ipt>2):
                 #plt.errorbar(zT_centers[:5], pPb_FF[ipt][:5],xerr=zT_widths[:5],yerr=pPb_FF_Errors[ipt][:5],linewidth=1, fmt='o',capsize=1,label=r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]))
-                plt.errorbar(zT_centers[1:5], FF_Dict["%s_FF"%(SYS)][ipt][1:5],xerr=zT_widths[1:5],yerr=FF_Dict["%s_FF_Errors"%(SYS)][ipt][1:5],linewidth=1, fmt='o',capsize=1,label=r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]))
+                plt.errorbar(zT_centers[ZT_OFF_PLOT:5], FF_Dict["%s_FF"%(SYS)][ipt][ZT_OFF_PLOT:5],xerr=zT_widths[ZT_OFF_PLOT:5],yerr=FF_Dict["%s_FF_Errors"%(SYS)][ipt][ZT_OFF_PLOT:5],linewidth=1, fmt='o',capsize=1,label=r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]))
 
             #elif(ipt<2):
             #    plt.errorbar(zT_centers[1:], pPb_FF[ipt][1:],xerr=zT_widths[1:],yerr=pPb_FF_Errors[ipt][1:],linewidth=1, fmt='o',capsize=1,label=r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]))
             else:
-                plt.errorbar(zT_centers[1:], FF_Dict["%s_FF"%(SYS)][ipt][1:],xerr=zT_widths[1:],yerr=FF_Dict["%s_FF_Errors"%(SYS)][ipt][1:],linewidth=1, fmt='o',capsize=1,label=r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]))
-                #plt.errorbar(zT_centers, pPb_FF[ipt],xerr=zT_widths,yerr=pPb_FF_Errors[ipt],linewidth=1, fmt='o',capsize=1,label=r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]))
+                plt.errorbar(zT_centers[ZT_OFF_PLOT:], FF_Dict["%s_FF"%(SYS)][ipt][ZT_OFF_PLOT:],xerr=zT_widths[ZT_OFF_PLOT:],yerr=FF_Dict["%s_FF_Errors"%(SYS)][ipt][ZT_OFF_PLOT:],linewidth=1, fmt='o',capsize=1,label=r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]))
+                #plt.errorbar(zT_centers, pPb_FF[ipt],xerr=zT_widths,yerr=pPb_FF_Errors[ipt],linewidth=1, fmt='o',capsize=1,label=r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1 
             #plt.errorbar(zT_centers, pPb_FF[ipt],xerr=zT_widths,yerr=pPb_FF_Errors[ipt],linewidth=1, fmt='o',capsize=1,label=r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]))
 
             plt.yscale('log')                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
@@ -97,32 +97,30 @@ def Weighted_Average(FF,FF_Errors,purity_FF_Errors):
     Rel_Stat_Erorr = FF_Errors/FF
     Rel_Purity_Error = purity_FF_Errors/FF
     
-    for izt in range (NzT):
+    for izt in range (0,NzT):
         weight_sum = 0
 
         for ipt in range(0,N_pT_Bins):
 
             if (ipt>2 and izt>4): continue #Tracking efficiency limit
+
+            if (description_string == "05zT" or description_string == "05zT_working_old"): #Cut low pT Crap
+                if (ipt<1 and izt < 2): continue
+                if(ipt<2 and izt<1): continue
             
-            if (description_string == "05zT"): #Cut low pT Crap
-                if(ipt<1 and izt <2): continue
-                if (ipt<2 and ipt <1): continue #ERROR HERE ERROR HERE!! THIS GETS TO ALICE-USA
-            #if (izt<1):
-            #    continue
-            #if(ipt<2 and izt<1): continue
-            
+            if (math.isnan(Rel_Stat_Erorr[ipt][izt]) or math.isnan(Rel_Purity_Error[ipt][izt]) or math.isnan(FF[ipt][izt])): continue
             Combined[izt] += 1/((Rel_Stat_Erorr[ipt][izt]**2) + (Rel_Purity_Error[ipt][izt]**2)) * FF[ipt][izt] 
             weight_sum += 1/((Rel_Stat_Erorr[ipt][izt]**2) + (Rel_Purity_Error[ipt][izt]**2))
-            
-            #OLD METHOD: INVERSE VARIANCE WEIGHTING with ABSOLUTE UNCERTAINTIES
-            #Combined[izt]+= 1/((FF_Errors[ipt][izt])**2 + (purity_FF_Errors[ipt][izt]**2)) * FF[ipt][izt] #Weighting by stat. error**2 = sqrt(N)**2
-            #weight_sum += 1/((FF_Errors[ipt][izt]**2) + (purity_FF_Errors[ipt][izt]**2))
 
+            
         Combined[izt] = Combined[izt]/weight_sum
 
-    for ipt in range (N_pT_Bins):
-        Combined_Errors += FF_Errors[ipt]**2
-        purity_Combined_Errors += purity_FF_Errors[ipt]**2
+#PUT A LOOP OF ZT on the OUTSIDE
+    for izt in range(0,NzT):
+        for ipt in range (N_pT_Bins):
+            if (math.isnan(FF_Errors[ipt][izt]) or math.isnan(purity_FF_Errors[ipt][izt])): continue
+            Combined_Errors[izt] += FF_Errors[ipt][izt]**2
+            purity_Combined_Errors[izt] += purity_FF_Errors[ipt][izt]**2
 
     Combined_Errors = np.sqrt(Combined_Errors)/N_pT_Bins
     purity_Combined_Errors = np.sqrt(purity_Combined_Errors)/N_pT_Bins
@@ -184,13 +182,13 @@ def Plot_pp_pPb_Avg_FF(Comb_Dict):
             label=r' %s %1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(SYS,pTbins[0],pTbins[N_pT_Bins]))
 
         Sys_Plot_pp = plt.bar(zT_centers[ZT_OFF_PLOT:], Sys_Uncertainty[ZT_OFF_PLOT:]+Sys_Uncertainty[ZT_OFF_PLOT:], 
-            bottom=Comb_Dict["%s_Combined_FF"%(SYS)][ZT_OFF_PLOT:]-Sys_Uncertainty[ZT_OFF_PLOT:],width=zt_box[ZT_OFF_PLOT:], align='center',color='white',)
+            bottom=Comb_Dict["%s_Combined_FF"%(SYS)][ZT_OFF_PLOT:]-Sys_Uncertainty[ZT_OFF_PLOT:],width=zt_box[ZT_OFF_PLOT:], align='center',color='white',edgecolor="black")
 
         plt.yscale('log')                                                                                                                                                                                                                                                              
         plt.ylabel(r"$\frac{1}{N_{\mathrm{\gamma}}}\frac{\mathrm{d}N}{\mathrm{d}z_{\mathrm{T}} \mathrm{d}\Delta\eta}$",fontsize=20)
         plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^\mathrm{h}/p_\mathrm{T}^\mathrm{\gamma}$",fontsize=20)
         #plt.xlim(xmin = 0.1,xmax=0.7)
-        plt.ylim(ymin = 0.001,ymax=20)
+        #plt.ylim(ymin = 0.001,ymax=20)
 
     leg = plt.legend(numpoints=1,frameon=False)
     leg.set_title("ALICE Work in Progress\n  $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV")
@@ -280,7 +278,7 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
 
     plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^{\mathrm{h}}/p_\mathrm{T}^\gamma$",fontsize=20)
     plt.ylabel(r"$\frac{\mathrm{p-Pb}}{\mathrm{pp}}$",fontsize=20)
-    plt.ylim((-1.5, 2))
+    plt.ylim((0, 2))
     plt.yticks(np.arange(-0, 2, step=0.2))
     
     if(NzT == 6):
@@ -292,6 +290,7 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
     ### ROOT LINEAR and CONSTANT FITS ###
     Ratio_TGraph = TGraphErrors()
     for izt in range (ZT_OFF_PLOT,len(Ratio)):
+    #for izt in range (2,len(Ratio)-1):
         Ratio_TGraph.SetPoint(izt,zT_centers[izt],Ratio[izt])
         Ratio_TGraph.SetPointError(izt,0,Ratio_Error[izt])
 
@@ -302,11 +301,12 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
     p0 = f.GetParameter(0)
     p0e = f.GetParError(0)
     p0col = "blue"
-    plt.text(0.75,1.8,"Constant Fit",color=p0col,fontsize=20,alpha=.7)
-    plt.text(0.75,1.68,r"$p0 = {0:.2f} \pm {1:.2f}$".format(p0,p0e),color=p0col,fontsize=18,alpha=.7)
-    plt.text(0.75,1.54,r"$\chi^2_{red} = %1.2f$"%(chi2_red),color=p0col,fontsize=18,alpha=.7)
-    plt.text(0.75,1.42,r"$p_{val} = %1.2f$"%(pval),color=p0col,fontsize=18,alpha=.7)
-    plt.fill_between(np.arange(0,1.1,0.1), p0+p0e, p0-p0e,color=p0col,alpha=.3)
+    if (Show_Fits):
+        plt.text(0.75,1.8,"Constant Fit",color=p0col,fontsize=20,alpha=.7)
+        plt.text(0.75,1.68,r"$p0 = {0:.2f} \pm {1:.2f}$".format(p0,p0e),color=p0col,fontsize=18,alpha=.7)
+        plt.text(0.75,1.54,r"$\chi^2_{red} = %1.2f$"%(chi2_red),color=p0col,fontsize=18,alpha=.7)
+        plt.text(0.75,1.42,r"$p_{val} = %1.2f$"%(pval),color=p0col,fontsize=18,alpha=.7)
+        plt.fill_between(np.arange(0,1.1,0.1), p0+p0e, p0-p0e,color=p0col,alpha=.3)
 
     Ratio_TGraph.Fit("pol1","S")
     f2 = Ratio_TGraph.GetFunction("pol1")
@@ -317,14 +317,15 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
     p1 = f2.GetParameter(1)
     p1e = f2.GetParError(1)
     p1col = "cyan"
-    plt.text(0.01,0.32,"Linear Fit",color=p1col,fontsize=20,alpha=.7)
-    plt.text(0.01,0.20,r"$p1 = {0:.2f} \pm {1:.2f}$".format(p1,p1e),color=p1col,fontsize=18,alpha=.7)
-    plt.text(0.01,0.08,r"$\chi^2_{red} = %1.2f$"%(chi2_red),color=p1col,fontsize=18,alpha=.7)
-    plt.text(0.01,-0.04,r"$p_{val} = %1.2f$"%(pval),color=p1col,fontsize=18,alpha=.7)
-    axes = plt.gca()
-    x_vals = np.array(axes.get_xlim())
-    y_vals = p0 + p1 * x_vals
-    plt.plot(x_vals, y_vals, '--',color=p1col,linewidth=2)
+    if (Show_Fits):
+        plt.text(0.01,0.32,"Linear Fit",color=p1col,fontsize=20,alpha=.7)
+        plt.text(0.01,0.20,r"$p1 = {0:.2f} \pm {1:.2f}$".format(p1,p1e),color=p1col,fontsize=18,alpha=.7)
+        plt.text(0.01,0.08,r"$\chi^2_{red} = %1.2f$"%(chi2_red),color=p1col,fontsize=18,alpha=.7)
+        plt.text(0.01,-0.04,r"$p_{val} = %1.2f$"%(pval),color=p1col,fontsize=18,alpha=.7)
+        axes = plt.gca()
+        x_vals = np.array(axes.get_xlim())
+        y_vals = p0 + p1 * x_vals
+        plt.plot(x_vals, y_vals, '--',color=p1col,linewidth=2)
 
     ### ROOT DONE ###
 
@@ -392,3 +393,42 @@ def Compare_pp_pPB_Avg_Ratio(Ratio,Ratio_Error,string_descr,Ratio2,Ratio_Error2,
     print("                Central Values:")
     print(Ratio[ZT_OFF_PLOT:])
 
+
+    
+    
+    
+def Compare_pp_pPB_Avg_Ratio_lists(strings,string_descrp_list,colors):
+        
+    plt.figure(figsize=(10,7)) 
+
+    
+    for (string,string_descr,colr) in zip(strings,string_descrp_list,colors):
+        
+        Ratio = np.load("npy_files/LO_Averaged_FF_Ratio_%s.npy"%(string))
+        Ratio_Error = np.load("npy_files/LO_Averaged_FF_Ratio_Errors_%s.npy"%(string))
+        
+        plt.errorbar(zT_centers[ZT_OFF_PLOT:], Ratio[ZT_OFF_PLOT:], yerr=Ratio_Error[ZT_OFF_PLOT:],xerr=zT_widths[ZT_OFF_PLOT:],capsize=3, fmt ="o",color=colr,alpha=1,ms=6,lw=1,label=string_descr)
+
+    empt4, = plt.plot([], [],' ',label=r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[0],pTbins[N_pT_Bins]))
+    
+    plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^{\mathrm{h}}/p_\mathrm{T}^\gamma$",fontsize=20)
+    plt.ylabel(r"$\frac{\mathrm{p-Pb}}{\mathrm{pp}}$",fontsize=20)
+    #plt.ylim((-1.5, 2))
+    #plt.yticks(np.arange(-0, 2, step=0.2))
+    
+    if(NzT == 6):
+        plt.xlim(xmin = 0.0,xmax=0.7)
+    elif(NzT==7):
+        plt.xlim(xmin = 0.0,xmax=1.0)
+    plt.axhline(y=1, color='r', linestyle='--')
+
+    leg = plt.legend(frameon=False,numpoints=1,loc="best",title=' ',prop={'size':18})
+    leg.set_title("ALICE Work in Progress\n  $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV")
+    plt.setp(leg.get_title(),fontsize=20)
+
+    plt.gcf()
+    #plt.savefig("pics/Comprison_Averaged_pT_FFunction_ratio_%s_%s_and_%s.pdf"%(Shower,string_descr,string_descr2), bbox_inches='tight')
+    plt.show()
+
+    print("                Central Values:")
+    print(Ratio[ZT_OFF_PLOT:])
