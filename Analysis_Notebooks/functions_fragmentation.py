@@ -5,17 +5,19 @@ from ROOT import TGraphErrors
 
 def FF_Ratio(FF_Dict):
     
-    fig = plt.figure(figsize=(17,13/(4-N_pT_Bins+1)))
+    fig = plt.figure(figsize=(17,13))
     
     for ipt in range (N_pT_Bins):
-        #if (ipt > 0): continue
 
         Ratio = FF_Dict["p-Pb_FF"][ipt]/FF_Dict["pp_FF"][ipt]
 
         #Stat. Error in ratio
         Ratio_Error = np.sqrt((FF_Dict["p-Pb_FF_Errors"][ipt]/FF_Dict["p-Pb_FF"][ipt])**2 + (FF_Dict["pp_FF_Errors"][ipt]/FF_Dict["pp_FF"][ipt])**2)*Ratio
         
-        ax = fig.add_subplot((N_pT_Bins/2),2,ipt+1)
+        if (N_pT_Bins < 5):
+            ax = fig.add_subplot(2,2,ipt+1)
+        elif (N_pT_Bins >=5):
+            ax = fig.add_subplot(3,2,ipt+1)
 
         #Sys_Plot = plt.bar(zT_centers, Ratio_Systematic+Ratio_Systematic, bottom=Ratio-Ratio_Systematic, width=zt_box, align='center',edgecolor="black",color='white',)
 
@@ -25,17 +27,15 @@ def FF_Ratio(FF_Dict):
         plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^{\mathrm{h}}/p_\mathrm{T}^\gamma$",fontsize=20)
         plt.ylabel(r"$\frac{\mathrm{p-Pb}}{\mathrm{pp}}$",fontsize=20)
         
+        plt.xlim(xmin = 0.0,xmax=1.0)
+        plt.ylim(ymin = -2, ymax=4)
+        
         leg = plt.legend([Ratio_Plot,empt4],["Statistical Error",r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],frameon=False,numpoints=1,title=' ',prop={'size':18})
         leg.set_title("ALICE Work in Progress\n ")
         plt.setp(leg.get_title(),fontsize=20)
         
-        #plt.xlim(xmin = 0.0,xmax=0.7)
-        #plt.ylim(ymin = 0.0, ymax=2)
         plt.axhline(y=1, color='r', linestyle='--')
-
-        plt.gcf()
-        plt.savefig("pics/%s_pp_FFunction_%i.pdf"%(Shower,ipt), bbox_inches='tight')
-
+    
     plt.gcf()
     plt.savefig("pics/%s_pp_FFunction.pdf"%(Shower), bbox_inches='tight')
     plt.show()
@@ -103,10 +103,6 @@ def Weighted_Average(FF,FF_Errors,purity_FF_Errors):
         for ipt in range(0,N_pT_Bins):
 
             if (ipt>2 and izt>4): continue #Tracking efficiency limit
-
-            #if (description_string == "05zT" or description_string == "05zT_working_old"): #Cut low pT Crap
-            #    if (ipt<1 and izt < 2): continue
-            #    if(ipt<2 and izt<1): continue
                     
             if (description_string == "05zT_2bins"):
                 if (ipt <2 and izt <1): continue
@@ -114,6 +110,7 @@ def Weighted_Average(FF,FF_Errors,purity_FF_Errors):
                 if (ipt <1 and izt <1): continue
             
             if (math.isnan(Rel_Stat_Erorr[ipt][izt]) or math.isnan(Rel_Purity_Error[ipt][izt]) or math.isnan(FF[ipt][izt])): continue
+            
             Combined[izt] += 1/((Rel_Stat_Erorr[ipt][izt]**2) + (Rel_Purity_Error[ipt][izt]**2)) * FF[ipt][izt] 
             weight_sum += 1/((Rel_Stat_Erorr[ipt][izt]**2) + (Rel_Purity_Error[ipt][izt]**2))
     
@@ -121,7 +118,9 @@ def Weighted_Average(FF,FF_Errors,purity_FF_Errors):
 
     for izt in range(0,NzT):
         for ipt in range (N_pT_Bins):
+            
             if (math.isnan(FF_Errors[ipt][izt]) or math.isnan(purity_FF_Errors[ipt][izt])): continue
+                
             Combined_Errors[izt] += FF_Errors[ipt][izt]**2
             purity_Combined_Errors[izt] += purity_FF_Errors[ipt][izt]**2
 

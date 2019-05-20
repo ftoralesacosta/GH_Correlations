@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
     // if (pos != std::string::npos)
     //   basic_name = basic_name.substr(0, pos);
 
-    int n = 3; //Number of "_" to skip
+    int n = 4; //Number of "_" to skip
     int i;
     for (i = 0; i < basic_name.length(); i++)
       {
@@ -224,8 +224,8 @@ TH2F* Same_Inclusive_Corr[nztbins*nptbins];
       	  Form("Inclusive_Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",
       	  ptbins[ipt],ptbins[ipt+1],100*ztbins[izt],100*ztbins[izt+1]));
 
-      fprintf(stderr,Form("Inclusive_Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",
-      			  ptbins[ipt],ptbins[ipt+1],100*ztbins[izt],100*ztbins[izt+1]));
+      //fprintf(stderr,Form("Inclusive_Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",
+      //ptbins[ipt],ptbins[ipt+1],100*ztbins[izt],100*ztbins[izt+1]));
 
       if (Same_Inclusive_Corr[izt+ipt*nztbins] == NULL) {
       	std::cout << "Same Incl TH2D fail" << std::endl;
@@ -246,7 +246,7 @@ TH2F* Same_Inclusive_Corr[nztbins*nptbins];
 	  1,ptbins[ipt],ptbins[ipt+1],100*ztbins[izt],100*ztbins[izt+1]));
 
       DNN1_entries = Same_DNN1_Corr[izt+ipt*nztbins]->GetEntries();
-      fprintf(stderr, "%s:%d: Number of Entries in Same DNN1 %lld \n",__FILE__,__LINE__,DNN1_entries);
+      //fprintf(stderr, "%s:%d: Number of Entries in Same DNN1 %lld \n",__FILE__,__LINE__,DNN1_entries);
       
       if (Same_DNN1_Corr[izt+ipt*nztbins] == NULL) {
 	std::cout << "Same 1 TH2D fail" << std::endl;
@@ -272,7 +272,7 @@ TH2F* Same_Inclusive_Corr[nztbins*nptbins];
 
       //Implement due to Track pT Skimming min bias
       for (int iSkim = 0; iSkim < nTrackSkims; iSkim ++){
-	fprintf(stderr,"%s%d: iSkim = %i \n",__FILE__,__LINE__,iSkim);
+	//fprintf(stderr,"%s%d: iSkim = %i \n",__FILE__,__LINE__,iSkim);
 
 
 	//SELECT WHICH MB CORRELATION TO USE
@@ -280,8 +280,8 @@ TH2F* Same_Inclusive_Corr[nztbins*nptbins];
 	if ((ptbins[ipt]*ztbins[izt] >= trackPtSkims[iSkim]) && ((ptbins[ipt]*ztbins[izt]) < trackPtSkims[iSkim+1]+0.5)){
 	  //a bit hacky, since ptbin*ztbin do not always correspond to integers...
 
-	  fprintf(stderr,"pt min max: %1.2f %1.2f, zt min max %1.2f %1.2f\n",ptbins[ipt],ptbins[ipt+1],ztbins[izt],ztbins[izt+1]);
-	  fprintf(stderr,"Track pT between %1.2f and %1.2f\n",ptbins[ipt]*ztbins[izt],ptbins[ipt+1]*ztbins[izt+1]);
+	  //fprintf(stderr,"pt min max: %1.2f %1.2f, zt min max %1.2f %1.2f\n",ptbins[ipt],ptbins[ipt+1],ztbins[izt],ztbins[izt+1]);
+	  //fprintf(stderr,"Track pT between %1.2f and %1.2f\n",ptbins[ipt]*ztbins[izt],ptbins[ipt+1]*ztbins[izt+1]);
 	  
 
 	  // Mix_Inclusive_Corr[izt+ipt*nztbins] = (TH2F*)MixFile[iSkim]->Get(
@@ -297,11 +297,11 @@ TH2F* Same_Inclusive_Corr[nztbins*nptbins];
 	      Form("Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",
 	      ptbins[ipt],ptbins[ipt+1],100*ztbins[izt],100*ztbins[izt+1]));
 
-	  fprintf(stderr,"Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",
-		  ptbins[ipt],ptbins[ipt+1],100*ztbins[izt],100*ztbins[izt+1]);
+	  //fprintf(stderr,"Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",
+	  //ptbins[ipt],ptbins[ipt+1],100*ztbins[izt],100*ztbins[izt+1]);
 
 	  DNN1_entries = Mix_Isolated_Corr[izt+ipt*nztbins]->GetEntries();
-	  fprintf(stderr, "%s:%d: Number of Entries in Mix Isolated %lld \n",__FILE__,__LINE__,DNN1_entries);
+	  //fprintf(stderr, "%s:%d: Number of Entries in Mix Isolated %lld \n",__FILE__,__LINE__,DNN1_entries);
       
 	  if (Mix_Isolated_Corr[izt+ipt*nztbins] == NULL) {
 	    std::cout << "Mix Iso TH2D fail" << std::endl;
@@ -316,7 +316,7 @@ TH2F* Same_Inclusive_Corr[nztbins*nptbins];
 	    exit(EXIT_FAILURE);}
 
 	  DNN1_entries = Mix_DNN1_Corr[izt+ipt*nztbins]->GetEntries();
-	  fprintf(stderr, "%s:%d: Number of Entries in Mix DNN1 %lu \n",__FILE__,__LINE__,DNN1_entries);
+	  //fprintf(stderr, "%s:%d: Number of Entries in Mix DNN1 %lu \n",__FILE__,__LINE__,DNN1_entries);
 
 	  Mix_DNN2_Corr[izt+ipt*nztbins] = (TH2F*)MixFile[iSkim]->Get(
           Form("DNN%i_Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",
@@ -341,7 +341,7 @@ TH2F* Same_Inclusive_Corr[nztbins*nptbins];
     Mix_DNN1_Corr[izt+ipt*nztbins]->Scale(1.0/mix_DNN1_intgrl);
     Mix_DNN2_Corr[izt+ipt*nztbins]->Scale(1.0/mix_DNN2_intgrl);
 
-    fprintf(stderr, "%s: %d: scaled Mixed Events by max ME value: %f\n",__FILE__,__LINE__,mix_Isolated_intgrl);
+    //fprintf(stderr, "%s: %d: scaled Mixed Events by max ME value: %f\n",__FILE__,__LINE__,mix_Isolated_intgrl);
 
     //DIVIDE MIXING (by ISOLATED, NO SHOWERSHAP for better statistics. Less than 2.0% deviation from region division)
     //Same_Inclusive_Corr[izt+ipt*nztbins]->Divide(Mix_Inclusive_Corr[izt+ipt*nztbins]);
@@ -350,26 +350,27 @@ TH2F* Same_Inclusive_Corr[nztbins*nptbins];
     Same_DNN2_Corr[izt+ipt*nztbins]->Divide(Mix_Isolated_Corr[izt+ipt*nztbins]);
     Same_DNN2_Corr_UnWeight[izt+ipt*nztbins]->Divide(Mix_Isolated_Corr[izt+ipt*nztbins]);
 
-    fprintf(stderr, "%s: %d: Division OK\n",__FILE__,__LINE__);
+    //fprintf(stderr, "%s: %d: Division OK\n",__FILE__,__LINE__);
 
     Same_DNN1_Corr[izt+ipt*nztbins]->Write();
-    fprintf(stderr, "%s: %d: Write DNN1 OK\n",__FILE__,__LINE__);
+    //fprintf(stderr, "%s: %d: Write DNN1 OK\n",__FILE__,__LINE__);
     }//zt bin
     
     for (int izt = 0; izt < nztbins; izt++){
       Same_DNN2_Corr[izt+ipt*nztbins]->Write();
-    fprintf(stderr, "%s: %d: Write DNN2 OK\n",__FILE__,__LINE__);
+      //fprintf(stderr, "%s: %d: Write DNN2 OK\n",__FILE__,__LINE__);
     }
 
     for (int izt = 0; izt < nztbins; izt++){
       Same_DNN2_Corr_UnWeight[izt+ipt*nztbins]->Write();
-      fprintf(stderr, "%s: %d: Write DNN2 UW OK\n",__FILE__,__LINE__);
+      //fprintf(stderr, "%s: %d: Write DNN2 UW OK\n",__FILE__,__LINE__);
     }
 
     for (int izt = 0; izt < nztbins; izt++){
       Same_Isolated_Corr[izt+ipt*nztbins]->Write();
-      fprintf(stderr, "%s: %d: Write Isolated OK\n",__FILE__,__LINE__);
+      //fprintf(stderr, "%s: %d: Write Isolated OK\n",__FILE__,__LINE__);
     }
+    fprintf(stderr, "%s: %d: Writes OK\n",__FILE__,__LINE__);
 
     // for (int izt = 0; izt < nztbins; izt++){
     //   Same_Inclusive_Corr[izt+ipt*nztbins]->Write();
@@ -386,18 +387,17 @@ TH2F* Same_Inclusive_Corr[nztbins*nptbins];
     H_purity[ipt] = (TH1D*)corr->Get(Form("H_Purities_pT%1.0f_%1.0f",ptbins[ipt],ptbins[ipt+1]));
     H_purity_Uncertainty[ipt] = (TH1D*)corr->Get(Form("H_Purity_Uncertanty_pT%1.0f_%1.0f",ptbins[ipt],ptbins[ipt+1]));
 
-    fprintf(stderr, "%s: %d: Write Trigger Get OK",__FILE__,__LINE__);
-
     //N_Incl_Triggers[ipt]->Write();
     N_Isolated_Triggers[ipt]->Write();
     N_Sig_Triggers[ipt]->Write();
     N_BKGD_Triggers[ipt]->Write();
     N_Signal_Overlap_Triggers[ipt]->Write();
     N_BKGD_Overlap_Triggers[ipt]->Write();
-    std::cout<<N_Sig_Triggers[ipt]->GetEntries()<<std::endl;
 
     H_purity[ipt]->Write();
     H_purity_Uncertainty[ipt]->Write();
+
+    fprintf(stderr," \n");
 
   }//ipt
 

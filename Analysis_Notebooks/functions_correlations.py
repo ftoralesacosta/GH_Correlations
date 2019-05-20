@@ -354,9 +354,9 @@ def Integrate_Away_Side(Phi_array,Phi_Errors,LE_Error):
             ztb = izt
             zT_width = zTbins[izt+1]-zTbins[izt]
 
-            temp_phi = Phi_array[ipt][ztb][(len(Phi_Errors[ipt][ztb])-N_Phi_Integrate):len(Phi_array[ipt][ztb])]
+            temp_phi = Phi_array[ipt][ztb][(len(Phi_Errors[ipt][ztb])-N_Phi_Integrate):]
             FF_zt[ipt][ztb] = temp_phi.sum()/zT_width
-            temp_error = (Phi_Errors[ipt][ztb][(len(Phi_Errors[ipt][ztb])-N_Phi_Integrate):len(Phi_Errors[ipt][ztb])])**2
+            temp_error = (Phi_Errors[ipt][ztb][(len(Phi_Errors[ipt][ztb])-N_Phi_Integrate):])**2
             if (Use_Uncorr_Error):
                 FF_zt_Errors[ipt][ztb] = (math.sqrt(temp_error.sum() + (LE_Error[ipt][izt][0])**2))/zT_width
             else:
@@ -399,7 +399,7 @@ def Get_Fragmentation(Dict):
     return FF_Dict
 
 def Plot_FF(FF_Dict):
-    fig = plt.figure(figsize=(17,13/(4-N_pT_Bins+1)))
+    fig = plt.figure(figsize=(17,13))
     for ipt in range(N_pT_Bins):
 
         zt_box = np.ones(NzT) * 0.03
@@ -412,10 +412,14 @@ def Plot_FF(FF_Dict):
                 zT_max = zTbins[izt]
                 break
         
-        ax = fig.add_subplot((N_pT_Bins/2),2,ipt+1)
-        if (ipt>0):
-            ax = fig.add_subplot((N_pT_Bins/2),2,ipt+1)
+        if (N_pT_Bins < 5):
+            ax = fig.add_subplot(2,2,ipt+1)
+        elif (N_pT_Bins >=5):
+            ax = fig.add_subplot(3,2,ipt+1)
             
+        
+        #fig = plt.figure(figsize=(10,7))
+        
         pPb_plot = plt.errorbar(zT_centers, FF_Dict["p-Pb_FF"][ipt],xerr=zT_widths,yerr=FF_Dict["p-Pb_FF_Errors"][ipt],linewidth=1, fmt='bo',capsize=1,label='p-Pb')
         pp_plot = plt.errorbar(zT_centers, FF_Dict["pp_FF"][ipt],xerr=zT_widths,yerr=FF_Dict["pp_FF_Errors"][ipt],linewidth=1,fmt='ro',capsize=1,label='pp')
 
@@ -423,7 +427,7 @@ def Plot_FF(FF_Dict):
             plt.errorbar(zT_centers, FF_Dict["MC_FF"][ipt],xerr=zT_widths,yerr=FF_Dict["MC_FF_Errors"][ipt],linewidth=1, fmt='go',capsize=1,label='MC')
             MC_plot = plt.fill_between(zT_centers, FF_Dict["MC_FF"][ipt]-FF_Dict["MC_FF_Errors"][ipt], FF_Dict["MC_FF"][ipt]+FF_Dict["MC_FF_Errors"][ipt],color='green',alpha=0.6)
 
-        empt, = ax.plot([], [],' ')
+        empt, = plt.plot([], [],' ')
 
         plt.yscale('log')                                                                                                                                                                                                                                                                                                                                          
         plt.ylabel(r"$\frac{1}{N_{\mathrm{\gamma}}}\frac{\mathrm{d}N}{\mathrm{d}z_{\mathrm{T}} \mathrm{d}\Delta\eta}$",fontsize=20)
@@ -445,7 +449,8 @@ def Plot_FF(FF_Dict):
 
         Title = plt.title(r'Integrated $\mathrm{\gamma}$-Hadron Correlation: $2\pi/3 < \Delta\varphi < \pi, |\Delta\eta| < %1.1f$ '%(eta_max),fontsize=15)
         plt.gcf()
-        plt.savefig("pics/Systems_FFunction_%i.pdf"%(ipt), bbox_inches='tight')
+        plt.savefig("pics/%s_Systems_FFunction_%i.pdf"%(description_string,ipt), bbox_inches='tight')
+        #plt.show()
 
     plt.gcf()
     plt.savefig("pics/Systems_FFunction_All.pdf", bbox_inches='tight')

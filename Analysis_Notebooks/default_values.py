@@ -2,6 +2,8 @@ import numpy as np
 import math
 import ROOT
 
+from variations import *
+
 
                  #####CASE SWITCHING#####
 
@@ -20,19 +22,22 @@ Show_Fits = False
 
 Shower = "LO"
 
-
-
-#description_string="05zT"
+description_string="05zT"
 #description_string="05zT_3bins"
 #description_string="05zT_2bins"
 
-description_string="05zT_working_old"
+#description_string="05zT_working_old"
 #description_string="1zT"
 #description_string="15zT"
 #description_string="2zT"
 
 #description_string="pT_Rebin_3"
 #description_string="pT_Rebin_5"
+
+
+#description_string="pT_Rebin_3_Cut"
+#description_string="pT_Rebin_4_Cut"
+#description_string="pT_Rebin_5_Cut"
 
 #description_string = "zT_Rebin_5"
 #description_string = "zT_Rebin_6"
@@ -41,6 +46,7 @@ description_string="05zT_working_old"
 #description_string = "zT_Rebin_15"
 
 #description_string = "dPhi_Rebin_16"
+
 
 
 pPb_File = '../InputData/%s/pPb_SE_L0_Correlation_GMB_Ratio.root'%(description_string)
@@ -104,9 +110,9 @@ if (description_string == "zT_Rebin_9"):
 if (description_string == "zT_Rebin_15"):
     zTbins = np.asarray([0.05, 0.06, 0.08, 0.10, 0.12, 0.15, 0.18, 0.22, 0.28, 0.34, 0.42, 0.53, 0.65, 0.81, 1.00])
     
-if (description_string == "pT_Rebin_3"):
+if (description_string == "pT_Rebin_3" or description_string == "pT_Rebin_3_Cut"):
     pTbins = [12.00, 21.33, 30.67, 40.00]
-if (description_string == "pT_Rebin_5"):    
+if (description_string == "pT_Rebin_5" or description_string == "pT_Rebin_5_Cut"):    
     pTbins = [12.00, 15.27, 19.42, 24.71, 31.44, 40.00]
 
 N_pT_Bins = len(pTbins)-1
@@ -142,10 +148,14 @@ zt_box = np.ones(NzT) * 0.03 #plotting Uncert. Boxes
 
 if (N_dPhi_Bins == 16):
     dPhi_Bins = [i*math.pi/N_dPhi_Bins for i in range(0,N_dPhi_Bins)]
-    delta_phi_centers = [i*math.pi/N_dPhi_Bins+math.pi/N_dPhi_Bins/2 for i in range(1,N_dPhi_Bins)]
-    N_Phi_Integrate = 6
+    delta_phi_centers = [i*math.pi/N_dPhi_Bins+math.pi/N_dPhi_Bins/2 for i in range(1,N_dPhi_Bins)] #skip first dPhi bin to avoid Isolation
+    N_Phi_Integrate = 6 #Number of dPhi Bins for away-side integration. 3 Corresponds to dphi > 2.1
     Integration_Width = math.pi/(len(delta_phi_centers)+1) * N_Phi_Integrate
     phi_width = math.pi/(N_dPhi_Bins)/2
+
+
+    
+print(dPhi_Bins)
 
 #if (Shower == "LO"):
 if (False):

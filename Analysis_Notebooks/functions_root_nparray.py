@@ -204,16 +204,20 @@ def GetPhiProj(filename,prfx,ipt, izt, Signal_DNN=True):
     
     #per trigger yield
     ntriggers = Get_NTriggers(filename,ipt, Signal_DNN)
-    if not(ntriggers == None):
+    if not(ntriggers == None or ntriggers == 0):
         PhiProjection.Scale(1.0/ntriggers)
     
     file.Close()
     
     Phi_Array = np.zeros(len(delta_phi_centers))
     Phi_Error_Array = np.zeros(len(delta_phi_centers))
-    for bin in range(2,N_dPhi_Bins+1):
-        Phi_Array[bin-2] = PhiProjection.GetBinContent(bin)
-        Phi_Error_Array[bin-2] = PhiProjection.GetBinError(bin)
+    if (N_dPhi_Bins == 8):
+        n_bins_to_kill_iso = 2
+    if (N_dPhi_Bins == 16):
+        n_bins_to_kill_iso = 3
+    for bin in range(n_bins_to_kill_iso,N_dPhi_Bins+1):
+        Phi_Array[bin-n_bins_to_kill_iso] = PhiProjection.GetBinContent(bin)
+        Phi_Error_Array[bin-n_bins_to_kill_iso] = PhiProjection.GetBinError(bin)
     
     return Phi_Array, Phi_Error_Array
 
@@ -357,7 +361,7 @@ def ROOT_to_nparray():
                 BR_UB = 0
                 BR_UB_Error = 0
 
-                UB_Error = 0 #Only UB stored in Dict
+                UB_Error = 0 
 
                 Sig_Phi_Array, Sig_Phi_Error_Array = GetPhiProj(ifile,SYS,ipt,izt,True)
                 Bkg_Phi_Array, Bkg_Phi_Error_Array = GetPhiProj(ifile,SYS,ipt,izt,False)
