@@ -436,7 +436,7 @@ def Compare_pp_pPB_Avg_Ratio_lists(strings,string_descrp_list,colors,Show_Fits):
     
     plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^{\mathrm{h}}/p_\mathrm{T}^\gamma$",fontsize=20)
     plt.ylabel(r"$\frac{\mathrm{p-Pb}}{\mathrm{pp}}$",fontsize=20)
-    #plt.ylim((-1.5, 2))
+    plt.ylim((-0, 3))
     #plt.yticks(np.arange(-0, 2, step=0.2))
     
     #if(NzT == 6):

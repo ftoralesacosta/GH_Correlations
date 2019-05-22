@@ -16,13 +16,15 @@ pT_Rebin = False
 N_dPhi_Bins = 8
 Ped_Sub_First = False
 Average_UE = False
-Show_Fits = False
+Show_Fits = True
 
         #DEFAULTS:
 
 Shower = "LO"
 
-description_string="05zT"
+#description_string="05zT"
+#description_string="05zT_Remake"
+#description_string="05zT_AliUSA"
 #description_string="05zT_3bins"
 #description_string="05zT_2bins"
 
@@ -32,6 +34,8 @@ description_string="05zT"
 #description_string="2zT"
 
 #description_string="pT_Rebin_3"
+description_string="pT_Rebin_4"
+#description_string="pT_Rebin_4_05zT"
 #description_string="pT_Rebin_5"
 
 

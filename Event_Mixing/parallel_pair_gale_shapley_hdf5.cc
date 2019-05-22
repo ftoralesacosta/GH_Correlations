@@ -158,11 +158,11 @@ namespace {
 		UInt_t NEvent_Vars = eventdims[1];
 
 		//Define array hyperslab will be read into 
-		//const hsize_t block_size = eventdims[0];
-		hsize_t block_size = event_end-event_start;
+		const hsize_t block_size = eventdims[0];
+		//hsize_t block_size = event_end-event_start;
 		float event_data_out[block_size][NEvent_Vars];
 
-		hsize_t event_offset[2] = {event_start,0};
+		hsize_t event_offset[2] = {0,0};
 		hsize_t event_count[2] = {block_size, NEvent_Vars};
 
 		event_dataspace.selectHyperslab( H5S_SELECT_SET, event_count, event_offset );
@@ -175,12 +175,13 @@ namespace {
 		event_memspace.selectHyperslab( H5S_SELECT_SET, event_count_out, event_offset_out );
 		event_dataset.read( event_data_out, H5::PredType::NATIVE_FLOAT, event_memspace, event_dataspace);
 		fprintf(stderr, "%s:%d: %s\n", __FILE__, __LINE__, "event dataset read into array: OK");
-
+		//fprintf(stderr,"%s: %d:",__FILE__,__LINE__ );
 
 		std::vector<float> ret;
 
 		for (size_t i = event_start; i < event_end; i++) {
 		  float v2 = event_data_out[i][0];
+		  fprintf(stderr,"%s: %d: Event %ui v2 = %f \n",__FILE__,__LINE__,i,v2);
 		  ret.push_back(v2);
 			if (nfeature >= 2) {
 			  float multp = event_data_out[i][1];
@@ -434,6 +435,8 @@ std::map<size_t,std::vector<Long64_t> > mix_gale_shapley(const char *filename_0,
 
 
 	//for(size_t h = 0; h < nblocks_0; h++){
+
+	std::vector<float> a = feature_extract_hdf5(filename_1, 1, 10,nfeature);
 	for(size_t h = 0; h < 10; h++){
 
 	  size_t event_start_0 = h * block_size;
@@ -453,7 +456,7 @@ std::map<size_t,std::vector<Long64_t> > mix_gale_shapley(const char *filename_0,
 	  size_t event_end_1 = event_start_1 + block_size;
 	
 	  //feature_1_vec.push_back(feature_extract_hdf5(filename_1, event_start_1, event_end_1,nfeature));
-	  std::vector<float> a = feature_extract_hdf5(filename_1, event_start_1, event_end_1,nfeature);
+
 	  fprintf(stderr,"\n %d: MB EVENT START=%u || EVENT END=%u",
 		  __LINE__,event_start_1,event_end_1);
 	    
