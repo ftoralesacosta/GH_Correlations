@@ -102,7 +102,8 @@ def Weighted_Average(FF,FF_Errors,purity_FF_Errors):
         
         for ipt in range(0,N_pT_Bins):
 
-            if (ipt>2 and izt>4): continue #Tracking efficiency limit
+            #if (ipt>2 and izt>4): continue #Tracking efficiency limit
+            #now done at correlation level
                     
             if (description_string == "05zT_2bins"):
                 if (ipt <2 and izt <1): continue
