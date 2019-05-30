@@ -3,6 +3,7 @@
 import ROOT
 from default_values import *
 import matplotlib.pyplot as plt
+import pandas as pd
 
 def Get_NTriggers(filename,ipt, Signal_DNN=True): 
     file = ROOT.TFile(filename)
@@ -403,3 +404,9 @@ def ROOT_to_nparray():
                     Dict["%s_Uncorr_Error"%(SYS)][ipt][izt] = UB_Error #constant in for zT bins
 
     return Dict
+
+
+def print_from_Dict(Dict):
+
+    test = pd.DataFrame.from_dict(Dict)
+    print(test)

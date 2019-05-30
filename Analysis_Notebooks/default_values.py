@@ -33,15 +33,24 @@ Shower = "LO"
 #description_string="15zT"
 #description_string="2zT"
 
-description_string="pT_Rebin_3"
-#description_string="pT_Rebin_4"
-#description_string="pT_Rebin_4_05zT"
-#description_string="pT_Rebin_5"
-
-
+description_string="pT_Rebin_1"
+#description_string="pT_Rebin_3"
+#description_string="pT_Rebin_3_Lambda"
+#description_string="pT_Rebin_3_Weights"
 #description_string="pT_Rebin_3_Cut"
-#description_string="pT_Rebin_4_Cut"
+
+#description_string="pT_Rebin_4"
+#description_string="pT_Rebin_4_Lambda"
+#description_string="pT_Rebin_4_Weights"
+#description_string="pT_Rebin_4_05zT"
+#description_string="pT_Rebin_4_Cut" #15-40eV
+#description_string= "pT_Rebin_4_ErrWeights"
+
+#description_string="pT_Rebin_5_Lambda"
+#description_string="pT_Rebin_5_Weights"
+#description_string="pT_Rebin_5"
 #description_string="pT_Rebin_5_Cut"
+
 
 #description_string = "zT_Rebin_5"
 #description_string = "zT_Rebin_6"
@@ -83,7 +92,6 @@ ZT_OFF_PLOT = 0 #Offset for FF plotting
 eta_max = 1.2 #Range of Signal Correlations
 
 #dPhi
-N_dPhi_Bins = 8
 dPhi_Bins = [i*math.pi/N_dPhi_Bins for i in range(0,N_dPhi_Bins)]
 delta_phi_centers = [i*math.pi/N_dPhi_Bins+math.pi/N_dPhi_Bins/2 for i in range(1,N_dPhi_Bins)] #skip first dPhi bin to avoid Isolation
 
@@ -113,10 +121,14 @@ if (description_string == "zT_Rebin_9"):
     
 if (description_string == "zT_Rebin_15"):
     zTbins = np.asarray([0.05, 0.06, 0.08, 0.10, 0.12, 0.15, 0.18, 0.22, 0.28, 0.34, 0.42, 0.53, 0.65, 0.81, 1.00])
+
+if ("pT_Rebin_1" in description_string):
+    pTbins = [12.0,40.0]
     
-if (description_string == "pT_Rebin_3" or description_string == "pT_Rebin_3_Cut"):
+if ("pT_Rebin_3" in description_string):
     pTbins = [12.00, 21.33, 30.67, 40.00]
-if (description_string == "pT_Rebin_5" or description_string == "pT_Rebin_5_Cut"):    
+    
+if ("pT_Rebin_5" in description_string):
     pTbins = [12.00, 15.27, 19.42, 24.71, 31.44, 40.00]
 
 N_pT_Bins = len(pTbins)-1
@@ -140,9 +152,9 @@ def Get_Purity(filename):
 if not(description_string == "05zT_working_old"):
     purity,purity_Uncertainty = Get_Purity(Files[1])
     
-print("purities:")
-print(purity)
-print(purity_Uncertainty)
+#print("purities:")
+#print(purity)
+#print(purity_Uncertainty)
     
 zT_widths = [(j-i)/2 for i, j in zip(zTbins[zT_offset:-1], zTbins[zT_offset+1:])]
 zT_centers = (zTbins[1+zT_offset:] + zTbins[zT_offset:-1]) / 2
@@ -159,7 +171,7 @@ if (N_dPhi_Bins == 16):
 
 
     
-print(dPhi_Bins)
+#print(dPhi_Bins)
 
 #if (Shower == "LO"):
 if (False):
@@ -192,3 +204,4 @@ if(Use_MC):
     Files = [pp_File,pPb_File,MC_File]
     
 print Files
+print pTbins

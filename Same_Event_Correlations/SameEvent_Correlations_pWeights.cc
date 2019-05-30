@@ -42,6 +42,29 @@ Float_t Get_Purity(Float_t pT_GeV)
 
 }
 
+
+Float_t Get_Purity_ErrFunction(Float_t pT_GeV)
+
+{
+
+  Float_t purity_val = 0;
+
+  Float_t par[3] = {0.548247710,
+                    8.794543375,
+                    12.7423900};
+
+  // for (int i; i < sizeof(par)/sizeof(Float_t); i++)
+  //   fprintf(stderr,"\n%d: Fit_parameter = %1.12f",__LINE__,par[i]);
+
+  purity_val = par[0]*TMath::Erf((pT_GeV-par[1])/par[2]);
+
+  //fprintf(stderr,"\n\n");                                                                                                                                                \
+                                                                                                                                                                            
+  return purity_val;
+
+}
+
+
 int main(int argc, char *argv[])
 {
   if (argc < 2) {
@@ -615,7 +638,6 @@ int main(int argc, char *argv[])
 	if( not(cluster_ncell[n]>Cluster_min)) continue;                    //removes clusters with 1 or 2 cells
 	if( not(cluster_e_cross[n]/cluster_e[n]>EcrossoverE_min)) continue; //removes "spiky" clusters
 	if( not(cluster_distance_to_bad_channel[n]>=Cluster_DtoBad)) continue; //removes clusters near bad channels
-	//	if( not(cluster_nlocal_maxima[n] < Cluster_NLocal_Max)) continue; //require to have at most 2 local maxima.
 	if( not(cluster_nlocal_maxima[n] < 3)) continue; //require to have at most 2 local maxima.
 
 	float isolation;
@@ -774,7 +796,7 @@ int main(int argc, char *argv[])
 
 	if(Background and Isolated){
 	  bkg_weight = hweight.GetBinContent(hweight.FindBin(cluster_pt[n]));
-	  BR_purity_weight = (1.0/Get_Purity(cluster_pt[n]) - 1);
+	  BR_purity_weight = (1.0/Get_Purity_ErrFunction(cluster_pt[n]) - 1);
 	  for (int ipt = 0; ipt < nptbins; ipt++){
 	    if (cluster_pt[n] >= ptbins[ipt] && cluster_pt[n] < ptbins[ipt+1]){
 	      Weights_Sum->Fill((ipt+1),bkg_weight); //Integrate histo for pTbin for sum of weights
@@ -789,13 +811,13 @@ int main(int argc, char *argv[])
 	  }
 
 	if (Signal and Isolated){
-	  purity_weight = 1.0/Get_Purity(cluster_pt[n]);
+	  purity_weight = 1.0/Get_Purity_ErrFunction(cluster_pt[n]);
 	  for (int ipt = 0; ipt < nptbins; ipt++){
 	    if (cluster_pt[n] >= ptbins[ipt] && cluster_pt[n] < ptbins[ipt+1]){
 	    purity_weight_sum[ipt] += purity_weight;
 	    }
 	  }
-	  fprintf(stderr,"%d: Purity From Fit = %f\n",__LINE__,purity_weight);
+	  //fprintf(stderr,"%d: Purity From Fit = %f\n",__LINE__,Get_Purity_ErrFunction(cluster_pt[n]));
 	}
 
 	//Track Loop

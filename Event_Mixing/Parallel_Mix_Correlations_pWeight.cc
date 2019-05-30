@@ -57,6 +57,27 @@ Float_t Get_Purity(Float_t pT_GeV)
 
 }
 
+Float_t Get_Purity_ErrFunction(Float_t pT_GeV)
+
+{
+
+  Float_t purity_val = 0;
+
+  Float_t par[3] = {5.48248e-01,
+		    8.79454,
+		    12.7424};
+  
+  for (int i; i < sizeof(par)/sizeof(Float_t); i++)
+    fprintf(stderr,"\n%d: Fit_parameter = %1.12f",__LINE__,par[i]);                                                                                            
+
+  purity_val = par[0]*TMath::Erf((pT_GeV-par[1])/par[2]);
+
+  //fprintf(stderr,"\n\n");                                                                                                                                                 
+  return purity_val;
+
+}
+
+
 
 int main(int argc, char *argv[])
 {

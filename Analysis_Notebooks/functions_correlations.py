@@ -2,6 +2,7 @@
 
 import matplotlib.pyplot as plt
 import matplotlib
+import math
 from default_values import *
 from functions_root_nparray import ZYAM_Line
 
@@ -261,6 +262,19 @@ def Correlated_Subtraction(Dict):
             
             #if not(Ped_Sub_First):
             #    Ped_Sub_After_Cs(Dict)
+            
+def Correlated_Subtraction_Weights(Dict):   
+    for SYS in Systems:
+        for ipt in range (N_pT_Bins):
+            #if (ipt > 0): continue
+            
+            Dict["%s_CSR"%(SYS)][ipt] = (Dict["%s_CSR"%(SYS)][ipt] - Dict["%s_CBR"%(SYS)][ipt])
+            Dict["%s_CSR_Errors"%(SYS)][ipt] = np.sqrt((Dict["%s_CSR_Errors"%(SYS)][ipt])**2 + (Dict["%s_CBR_Errors"%(SYS)][ipt])**2)
+            Dict["%s_Uncorr_Error"%(SYS)][ipt] = Dict["%s_Uncorr_Error"%(SYS)][ipt]
+            
+            
+            #if not(Ped_Sub_First):
+            #    Ped_Sub_After_Cs(Dict)
 
 
 
@@ -278,6 +292,32 @@ def Ped_Sub_After_Cs(Dict):
                 Dict["%s_Uncorr_Error"%(SYS)][ipt][izt] = ZYAM_Cs_Error
                                                   
 
+def Get_pp_pPb_List_Chi2(array1,array1_E,array2,array2_E):
+    
+    hist1 = ROOT.TH1F("hist1","histo1",N_dPhi_Bins, 0, 1)
+    for i in range(len(array1)-1):
+        hist1.SetBinContent(i+1,array1[i])
+        hist1.SetBinError(i+1,array1_E[i])
+        
+    hist2 = ROOT.TH1F("hist2","histo2",N_dPhi_Bins, 0, 1)
+    for i in range(len(array2)-1):
+        hist2.SetBinContent(i+1,array2[i])
+        hist2.SetBinError(i+1,array2_E[i])
+
+    chi2 = ROOT.Double(0.0)
+    ndf = ROOT.Long(0.0)
+    igood = ROOT.Long(0.0)
+    pval = hist1.Chi2TestX(hist2,chi2,ndf,igood,"WW")
+
+    return pval,chi2,ndf,igood
+
+def getfitvals(Dict):
+    for ipt in range(N_pT_Bins):
+        for ztb in range(NzT):
+            pval,chi2,ndf,igood = Get_pp_pPb_List_Chi2(Dict["p-Pb_CSR"][ipt][ztb],Dict["p-Pb_CSR_Errors"][ipt][ztb],Dict["pp_CSR"][ipt][ztb],Dict["pp_CSR_Errors"][ipt][ztb])
+            print("zT %i: pval = %f, chi2 = %f, ndf = %f"%(ztb+1,pval,chi2,ndf))
+                    
+                    
 def Plot_pp_pPb_Cs(Dict):
     
     for ipt in range (N_pT_Bins):
@@ -318,18 +358,24 @@ def Plot_pp_pPb_Cs(Dict):
 
             empt, = ax.plot([], [],' ')
             empt2, = ax.plot([],[],' ')
+            
+            empt3, = ax.plot([],[],' ')
+            pval,chi2,ndf,igood = Get_pp_pPb_List_Chi2(Dict["p-Pb_CSR"][ipt][ztb],Dict["p-Pb_CSR_Errors"][ipt][ztb],Dict["pp_CSR"][ipt][ztb],Dict["pp_CSR_Errors"][ipt][ztb])
+            fit_string = "pval = %1.2f, chi2 = %1.1f, ndf = %i"%(pval,chi2,ndf)
 
             if(Use_MC):
-                leg = plt.legend([pp,pPb,MC,pp_UE,pPb_UE,MC_UE,empt,empt2],['pp $\sqrt{s}= 5$ TeV (stat. error)',
+                leg = plt.legend([pp,pPb,MC,pp_UE,pPb_UE,MC_UE,empt,empt2,empt3],['pp $\sqrt{s}= 5$ TeV (stat. error)',
                     'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)','pythia GJ $\sqrt{s}=5$ TeV (stat. error)', 
                     'pp UE Error', 'p-Pb UE Error','pythia UE Error', r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]),
-                    r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],loc = "upper left",fontsize=16,frameon=False,numpoints=1)
+                    r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]),fit_string],loc = "upper left",fontsize=16,frameon=False,numpoints=1)
             else:    
-                leg = plt.legend([pp,pPb,pp_UE,pPb_UE,empt,empt2],['pp $\sqrt{s}= 5$ TeV (stat. error)',
+                leg = plt.legend([pp,pPb,pp_UE,pPb_UE,empt,empt2,empt3],['pp $\sqrt{s}= 5$ TeV (stat. error)',
                     'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)', 'pp UB Error', 'p-Pb UB Error',
                     r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]),
-                    r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],loc = "upper left",fontsize=16,frameon=False,numpoints=1)
+                    r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]),fit_string],loc = "upper left",fontsize=16,frameon=False,numpoints=1)
 
+            
+            
             leg.set_title("ALICE Work in Progress")
             leg._legend_box.align = "left"
             plt.setp(leg.get_title(),fontsize=22)

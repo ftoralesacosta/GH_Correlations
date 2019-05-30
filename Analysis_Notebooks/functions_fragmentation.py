@@ -101,9 +101,6 @@ def Weighted_Average(FF,FF_Errors,purity_FF_Errors):
         weight_sum = 0
         
         for ipt in range(0,N_pT_Bins):
-
-            #if (ipt>2 and izt>4): continue #Tracking efficiency limit
-            #now done at correlation level
                     
             if (description_string == "05zT_2bins"):
                 if (ipt <2 and izt <1): continue
@@ -305,10 +302,10 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
     p0e = f.GetParError(0)
     p0col = "blue"
     if (Show_Fits):
-        plt.text(0.75,1.8,"Constant Fit",color=p0col,fontsize=20,alpha=.7)
-        plt.text(0.75,1.68,r"$p0 = {0:.2f} \pm {1:.2f}$".format(p0,p0e),color=p0col,fontsize=18,alpha=.7)
-        plt.text(0.75,1.54,r"$\chi^2_{red} = %1.2f$"%(chi2_red),color=p0col,fontsize=18,alpha=.7)
-        plt.text(0.75,1.42,r"$p_{val} = %1.2f$"%(pval),color=p0col,fontsize=18,alpha=.7)
+        plt.text(0.68,1.84,"Constant Fit",color=p0col,fontsize=20,alpha=.7)
+        plt.text(0.68,1.72,r"$p0 = {0:.2f} \pm {1:.2f}$".format(p0,p0e),color=p0col,fontsize=18,alpha=.7)
+        plt.text(0.68,1.58,r"$\chi^2_{red} = %1.2f$"%(chi2_red),color=p0col,fontsize=18,alpha=.7)
+        plt.text(0.68,1.46,r"$p_{val} = %1.2f$"%(pval),color=p0col,fontsize=18,alpha=.7)
         plt.fill_between(np.arange(0,1.1,0.1), p0+p0e, p0-p0e,color=p0col,alpha=.3)
 
     Ratio_TGraph.Fit("pol1","S")
@@ -319,12 +316,13 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
     p0e = f2.GetParError(0)
     p1 = f2.GetParameter(1)
     p1e = f2.GetParError(1)
-    p1col = "cyan"
+    p1col = "Green"
     if (Show_Fits):
-        plt.text(0.01,0.32,"Linear Fit",color=p1col,fontsize=20,alpha=.7)
-        plt.text(0.01,0.20,r"$p1 = {0:.2f} \pm {1:.2f}$".format(p1,p1e),color=p1col,fontsize=18,alpha=.7)
-        plt.text(0.01,0.08,r"$\chi^2_{red} = %1.2f$"%(chi2_red),color=p1col,fontsize=18,alpha=.7)
-        plt.text(0.01,-0.04,r"$p_{val} = %1.2f$"%(pval),color=p1col,fontsize=18,alpha=.7)
+        plt.text(0.68,0.54,"Linear Fit",color=p1col,fontsize=20,alpha=.7)
+        plt.text(0.68,0.42,r"$p0 = {0:.2f} \pm {1:.2f}$".format(p0,p0e),color=p1col,fontsize=18,alpha=.7)
+        plt.text(0.68,0.30,r"$p1 = {0:.2f} \pm {1:.2f}$".format(p1,p1e),color=p1col,fontsize=18,alpha=.7)
+        plt.text(0.68,0.18,r"$\chi^2_{red} = %1.2f$"%(chi2_red),color=p1col,fontsize=18,alpha=.7)
+        plt.text(0.68,0.06,r"$p_{val} = %1.2f$"%(pval),color=p1col,fontsize=18,alpha=.7)
         axes = plt.gca()
         x_vals = np.array(axes.get_xlim())
         y_vals = p0 + p1 * x_vals
@@ -335,11 +333,8 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
 
     leg = plt.legend([Ratio_Plot,empt4],["Statistical Error",r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[pT_Start],pTbins[N_pT_Bins])],frameon=False,numpoints=1,loc="best",title=' ',prop={'size':18})
 
-
-    #leg = plt.legend(numpoints=1)
     leg.set_title("ALICE Work in Progress\n  $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV")
     plt.setp(leg.get_title(),fontsize=20)
-    #plt.figtext(0.39,0.85,"ALICE Work in Progress\n  $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV",color='Black', fontsize=20)
 
     plt.gcf()
     plt.savefig("pics/Averaged_pT_FFunction_ratio_%s.pdf"%(Shower), bbox_inches='tight')
@@ -358,47 +353,31 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
     print("\n                Full Systematic Uncertainty:")
 
     print(Ratio_Systematic[ZT_OFF_PLOT:])
-
     
-def Compare_pp_pPB_Avg_Ratio(Ratio,Ratio_Error,string_descr,Ratio2,Ratio_Error2,string_descr2):
-        
-    plt.figure(figsize=(10,7)) 
 
-    empt4, = plt.plot([], [],' ')
-
-    Ratio_Plot = plt.errorbar(zT_centers[ZT_OFF_PLOT:], Ratio[ZT_OFF_PLOT:], yerr=Ratio_Error[ZT_OFF_PLOT:],xerr=zT_widths[ZT_OFF_PLOT:], fmt='mo',capsize=3, ms=6,lw=1)
-    Ratio_Plot2 = plt.errorbar(zT_centers[ZT_OFF_PLOT:], Ratio2[ZT_OFF_PLOT:], yerr=Ratio_Error2[ZT_OFF_PLOT:],xerr=zT_widths[ZT_OFF_PLOT:], fmt='co',capsize=3, ms=6,lw=1)
-
-    plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^{\mathrm{h}}/p_\mathrm{T}^\gamma$",fontsize=20)
-    plt.ylabel(r"$\frac{\mathrm{p-Pb}}{\mathrm{pp}}$",fontsize=20)
-    #plt.ylim((-1.5, 2))
-    #plt.yticks(np.arange(-0, 2, step=0.2))
+def Get_pp_pPb_FF_Chi2(string_descrp):
     
-    if(NzT == 6):
-        plt.xlim(xmin = 0.0,xmax=0.7)
-    elif(NzT==7):
-        plt.xlim(xmin = 0.0,xmax=1.0)
-    plt.axhline(y=1, color='r', linestyle='--')
-
-
-    leg = plt.legend([Ratio_Plot,Ratio_Plot2,empt4],[string_descr,string_descr2,r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[0],pTbins[N_pT_Bins])],frameon=False,numpoints=1,loc="best",title=' ',prop={'size':18})
-
-
-    #leg = plt.legend(numpoints=1)
-    leg.set_title("ALICE Work in Progress\n  $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV")
-    plt.setp(leg.get_title(),fontsize=20)
-    #plt.figtext(0.39,0.85,"ALICE Work in Progress\n  $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV",color='Black', fontsize=20)
-
-    plt.gcf()
-    plt.savefig("pics/Comprison_Averaged_pT_FFunction_ratio_%s_%s_and_%s.pdf"%(Shower,string_descr,string_descr2), bbox_inches='tight')
-    plt.show()
-
-    print("                Central Values:")
-    print(Ratio[ZT_OFF_PLOT:])
-
-
+    plt.figure(figsize=(15,10.5))
     
+    histo_array = [] #pp,pPb, potentially PbPb
     
+    for SYS in Systems:
+        FF = np.load("npy_files/%s_%s_Averaged_Fragmentation_Functions_%s.npy"%(Shower,SYS,string_descrp))
+        FF_Errors = np.load("npy_files/%s_%s_Averaged_Fragmentation_Functions_Errors_%s.npy"%(Shower,SYS,string_descrp))
+        hist = ROOT.TH1F("hist","histo",7, 0, 1)
+        for i in range(len(FF)):
+            hist.SetBinContent(i+1,FF[i])
+            hist.SetBinError(i+1,FF_Errors[i])
+        histo_array.append(hist)
+    chi2_test = ROOT.Double(0.0)
+    ndf = ROOT.Long(0.0)
+    igood = ROOT.Long(0.0)
+    print(chi2_test,ndf,igood)
+    pval = histo_array[0].Chi2TestX(histo_array[1],chi2_test,ndf,igood)
+    print(chi2_test,ndf,igood)
+    print(pval)
+    return pval
+
     
 def Compare_pp_pPB_Avg_Ratio_lists(strings,string_descrp_list,colors,Show_Fits):
         
@@ -416,7 +395,7 @@ def Compare_pp_pPB_Avg_Ratio_lists(strings,string_descrp_list,colors,Show_Fits):
         
         ### ROOT LINEAR and CONSTANT FITS ###
         Ratio_TGraph = TGraphErrors()
-        for izt in range (ZT_OFF_PLOT,len(Ratio)):
+        for izt in range (ZT_OFF_PLOT,len(Ratio)-1):
         #for izt in range (2,len(Ratio)-1):
             Ratio_TGraph.SetPoint(izt,zT_centers[izt],Ratio[izt])
             Ratio_TGraph.SetPointError(izt,0,Ratio_Error[izt])
