@@ -29,12 +29,8 @@ def Get_NTriggers(filename,ipt, Signal_DNN=True):
 
 def ZYAM_Line(Phi_Array, Phi_Error_Array):
     
-    z_temp = Phi_Array[2:3]
-    z_temp_error = Phi_Error_Array[2:3]**2
-
-    if (N_dPhi_Bins == 16):
-        z_temp = Phi_Array[4:6]
-        z_temp_error = Phi_Error_Array[4:6]**2
+    z_temp = Phi_Array[ZYAM_Min_i:ZYAM_Max_i]
+    z_temp_error = Phi_Error_Array[ZYAM_Min_i:ZYAM_Max_i]**2
 
     Z_Value = z_temp.mean()
 
@@ -212,13 +208,10 @@ def GetPhiProj(filename,prfx,ipt, izt, Signal_DNN=True):
     
     Phi_Array = np.zeros(len(delta_phi_centers))
     Phi_Error_Array = np.zeros(len(delta_phi_centers))
-    if (N_dPhi_Bins == 8):
-        n_bins_to_kill_iso = 2
-    if (N_dPhi_Bins == 16):
-        n_bins_to_kill_iso = 3
-    for bin in range(n_bins_to_kill_iso,N_dPhi_Bins+1):
-        Phi_Array[bin-n_bins_to_kill_iso] = PhiProjection.GetBinContent(bin)
-        Phi_Error_Array[bin-n_bins_to_kill_iso] = PhiProjection.GetBinError(bin)
+
+    for bin in range(N_dPhi_Bins):
+        Phi_Array[bin] = PhiProjection.GetBinContent(bin+1)
+        Phi_Error_Array[bin] = PhiProjection.GetBinError(bin+1)
     
     return Phi_Array, Phi_Error_Array
 
@@ -346,7 +339,7 @@ def ROOT_to_nparray():
         Keys.append("%s_CBR_Errors"%(SYS))
         Keys.append("%s_Uncorr_Error"%(SYS))
 
-    Corr_Arrays = np.zeros((len(Keys),N_pT_Bins,NzT,N_dPhi_Bins-1))
+    Corr_Arrays = np.zeros((len(Keys),N_pT_Bins,NzT,N_dPhi_Bins))
 
     Dict = dict(zip(Keys, Corr_Arrays))
 

@@ -34,6 +34,8 @@ Shower = "LO"
 #description_string="2zT"
 
 description_string="pT_Rebin_1"
+description_string="pT_Rebin_1_15pT"
+#description_string= "pT_Rebin_1_16dPhi"
 #description_string="pT_Rebin_3"
 #description_string="pT_Rebin_3_Lambda"
 #description_string="pT_Rebin_3_Weights"
@@ -92,19 +94,48 @@ ZT_OFF_PLOT = 0 #Offset for FF plotting
 eta_max = 1.2 #Range of Signal Correlations
 
 #dPhi
-dPhi_Bins = [i*math.pi/N_dPhi_Bins for i in range(0,N_dPhi_Bins)]
-delta_phi_centers = [i*math.pi/N_dPhi_Bins+math.pi/N_dPhi_Bins/2 for i in range(1,N_dPhi_Bins)] #skip first dPhi bin to avoid Isolation
+if (description_string == "pT_Rebin_1_16dPhi"):
+    N_dPhi_Bins = 16
+dPhi_Bins = [i*math.pi/N_dPhi_Bins for i in range(0,N_dPhi_Bins+1)]
+delta_phi_centers = [i*math.pi/N_dPhi_Bins+math.pi/N_dPhi_Bins/2 for i in range(0,N_dPhi_Bins)] #skip first dPhi bin to avoid Isolation
 
-N_Phi_Integrate = 3 #Number of dPhi Bins for away-side integration. 3 Corresponds to dphi > 2.1
-Integration_Width = math.pi/(len(delta_phi_centers)+1) * N_Phi_Integrate
-phi_width = math.pi/(N_dPhi_Bins)/2
+#N_Phi_Integrate = 3 #Number of dPhi Bins for away-side integration. 3 Corresponds to dphi > 2.1
+#Integration_Width = math.pi/(len(delta_phi_centers)+1) * N_Phi_Integrate
+#phi_width = math.pi/(N_dPhi_Bins)/2
 
 #UE
 Uncorr_Estimate = "ZYAM"
 ue_error_bar = [dPhi_Bins[1],dPhi_Bins[2]] #Horiz. width of UE at first plotted dphi point
 
 
+for i,dphi in enumerate(dPhi_Bins):
+    if (dphi > 0.39):
+        ue_error_bar = [dPhi_Bins[i],dPhi_Bins[i+1]]
+    break;
 
+ZYAM_Min_i = 0
+for i,dphi in enumerate(dPhi_Bins):
+    if (dphi > 1.17):
+        ZYAM_Min_i = i
+        break
+
+ZYAM_Max_i = 0       
+for i,dphi in enumerate(dPhi_Bins):
+    if (dphi > 1.5):
+        ZYAM_Max_i = i
+        break
+print("ZYAM: %i to %i"%(ZYAM_Min_i,ZYAM_Max_i))
+
+dphi_start_integral = 0
+for i,dphi in enumerate(dPhi_Bins):
+    if (dphi > 2.1):
+        dphi_start_integral = i
+        break
+
+N_Phi_Integrate = len(dPhi_Bins)-dphi_start_integral
+print(N_Phi_Integrate)
+Integration_Width = math.pi/(len(delta_phi_centers)+1) * N_Phi_Integrate
+phi_width = math.pi/(N_dPhi_Bins)/2
 
                  #####CASE SWITCHING#####
 if (description_string == "zT_Rebin_5"):
@@ -162,7 +193,7 @@ NzT = len(zTbins)-zT_offset-1
 zt_box = np.ones(NzT) * 0.03 #plotting Uncert. Boxes
 
 
-if (N_dPhi_Bins == 16):
+if (N_dPhi_Bins == 14642):
     dPhi_Bins = [i*math.pi/N_dPhi_Bins for i in range(0,N_dPhi_Bins)]
     delta_phi_centers = [i*math.pi/N_dPhi_Bins+math.pi/N_dPhi_Bins/2 for i in range(1,N_dPhi_Bins)] #skip first dPhi bin to avoid Isolation
     N_Phi_Integrate = 6 #Number of dPhi Bins for away-side integration. 3 Corresponds to dphi > 2.1
