@@ -103,7 +103,7 @@ def Plot_UB_Subtraction(Dict):
                 fig = plt.figure(figsize=(18,12))
             #if (ipt > 0): continue
             #ipt = ipt+2
-            for izt in range (0,NzT):
+            for izt in range (0,NzT-ZT_OFF_PLOT):
                 ztb = izt-zT_offset
 
                 UE_Band = "None"
@@ -294,12 +294,12 @@ def Ped_Sub_After_Cs(Dict):
 
 def Get_pp_pPb_List_Chi2(array1,array1_E,array2,array2_E):
     
-    hist1 = ROOT.TH1F("hist1","histo1",N_dPhi_Bins, 0, 1)
+    hist1 = ROOT.TH1F("hist1","histo1",N_dPhi_Bins, 0, 3.14159)
     for i in range(len(array1)-1):
         hist1.SetBinContent(i+1,array1[i])
         hist1.SetBinError(i+1,array1_E[i])
         
-    hist2 = ROOT.TH1F("hist2","histo2",N_dPhi_Bins, 0, 1)
+    hist2 = ROOT.TH1F("hist2","histo2",N_dPhi_Bins, 0, 3.14159)
     for i in range(len(array2)-1):
         hist2.SetBinContent(i+1,array2[i])
         hist2.SetBinError(i+1,array2_E[i])
@@ -307,7 +307,7 @@ def Get_pp_pPb_List_Chi2(array1,array1_E,array2,array2_E):
     chi2 = ROOT.Double(0.0)
     ndf = ROOT.Long(0.0)
     igood = ROOT.Long(0.0)
-    pval = hist1.Chi2TestX(hist2,chi2,ndf,igood,"WW")
+    pval = hist1.Chi2TestX(hist2,chi2,ndf,igood,"WW");
 
     return pval,chi2,ndf,igood
 
@@ -326,8 +326,8 @@ def Plot_pp_pPb_Cs(Dict):
         #plt.figure(figsize=(10,7))
         fig = plt.figure(figsize=(24,12))
         if (NzT==7):
-            fig = plt.figure(figsize=(24,18))
-        for izt in range (zT_offset,NzT+zT_offset):
+            fig = plt.figure(figsize=(22,18))
+        for izt in range (NzT-ZT_OFF_PLOT):
             ztb = izt-zT_offset
 
             if (NzT ==4):
@@ -360,7 +360,14 @@ def Plot_pp_pPb_Cs(Dict):
             empt2, = ax.plot([],[],' ')
             
             empt3, = ax.plot([],[],' ')
-            pval,chi2,ndf,igood = Get_pp_pPb_List_Chi2(Dict["p-Pb_CSR"][ipt][ztb],Dict["p-Pb_CSR_Errors"][ipt][ztb],Dict["pp_CSR"][ipt][ztb],Dict["pp_CSR_Errors"][ipt][ztb])
+            pval,chi2,ndf,igood = Get_pp_pPb_List_Chi2(Dict["p-Pb_CSR"][ipt][ztb],Dict["p-Pb_CSR_Errors"][ipt][ztb],
+                                                        Dict["pp_CSR"][ipt][ztb],Dict["pp_CSR_Errors"][ipt][ztb])
+            
+            #plt.figtext(0.115,0.71,"pval = %1.2f, chi2 = %1.1f, ndf = %i"%(pval,chi2,ndf),fontsize=18,alpha=.7)
+            #plt.figtext(0.455,0.71,"pval = %1.2f, chi2 = %1.1f, ndf = %i"%(pval,chi2,ndf),fontsize=18,alpha=.7)
+            plt.figtext(0.125+0.335*(izt%3),0.71-0.35*(izt%2),"pval = %1.2f, chi2 = %1.1f, ndf = %i"%(pval,chi2,ndf),fontsize=18,alpha=.7)
+            #plt.figtext(0.120+0.335*(izt%3),0.36,"pval = %1.2f, chi2 = %1.1f, ndf = %i"%(pval,chi2,ndf),fontsize=18,alpha=.7)
+
             fit_string = "pval = %1.2f, chi2 = %1.1f, ndf = %i"%(pval,chi2,ndf)
 
             if(Use_MC):
@@ -369,10 +376,10 @@ def Plot_pp_pPb_Cs(Dict):
                     'pp UE Error', 'p-Pb UE Error','pythia UE Error', r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]),
                     r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]),fit_string],loc = "upper left",fontsize=16,frameon=False,numpoints=1)
             else:    
-                leg = plt.legend([pp,pPb,pp_UE,pPb_UE,empt,empt2,empt3],['pp $\sqrt{s}= 5$ TeV (stat. error)',
+                leg = plt.legend([pp,pPb,pp_UE,pPb_UE,empt,empt2],['pp $\sqrt{s}= 5$ TeV (stat. error)',
                     'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)', 'pp UB Error', 'p-Pb UB Error',
                     r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]),
-                    r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]),fit_string],loc = "upper left",fontsize=16,frameon=False,numpoints=1)
+                    r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],loc = "upper left",fontsize=16,frameon=False,numpoints=1)
 
             
             
