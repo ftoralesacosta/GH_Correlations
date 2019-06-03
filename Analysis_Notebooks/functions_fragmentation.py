@@ -395,7 +395,7 @@ def Compare_pp_pPB_Avg_Ratio_lists(strings,string_descrp_list,colors,Show_Fits):
         
         ### ROOT LINEAR and CONSTANT FITS ###
         Ratio_TGraph = TGraphErrors()
-        for izt in range (ZT_OFF_PLOT,len(Ratio)-1):
+        for izt in range (ZT_OFF_PLOT,len(Ratio)):
         #for izt in range (2,len(Ratio)-1):
             Ratio_TGraph.SetPoint(izt,zT_centers[izt],Ratio[izt])
             Ratio_TGraph.SetPointError(izt,0,Ratio_Error[izt])

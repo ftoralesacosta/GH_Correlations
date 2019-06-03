@@ -33,13 +33,17 @@ Shower = "LO"
 #description_string="15zT"
 #description_string="2zT"
 
-description_string="pT_Rebin_1"
-description_string="pT_Rebin_1_15pT"
-#description_string= "pT_Rebin_1_16dPhi"
+#description_string="pT_Rebin_1"
+#description_string="pT_Rebin_1_15pT"
+description_string= "pT_Rebin_1_16dPhi"
+
 #description_string="pT_Rebin_3"
 #description_string="pT_Rebin_3_Lambda"
 #description_string="pT_Rebin_3_Weights"
 #description_string="pT_Rebin_3_Cut"
+#description_string= "pT_Rebin_3_ErrWeights"
+
+
 
 #description_string="pT_Rebin_4"
 #description_string="pT_Rebin_4_Lambda"
@@ -52,6 +56,9 @@ description_string="pT_Rebin_1_15pT"
 #description_string="pT_Rebin_5_Weights"
 #description_string="pT_Rebin_5"
 #description_string="pT_Rebin_5_Cut"
+#description_string= "pT_Rebin_5_ErrWeights"
+
+
 
 
 #description_string = "zT_Rebin_5"
@@ -88,7 +95,7 @@ pTbins = [12,15,19,26,40]
 #zT
 zTbins = np.asarray([0.05, 0.07670637, 0.11767734, 0.18053204, 0.27695915, 0.42489062, 0.65183634,1])
 zT_offset = 0
-ZT_OFF_PLOT = 0 #Offset for FF plotting
+ZT_OFF_PLOT = 1 #Offset for FF plotting
 
 #deta
 eta_max = 1.2 #Range of Signal Correlations
@@ -96,6 +103,7 @@ eta_max = 1.2 #Range of Signal Correlations
 #dPhi
 if (description_string == "pT_Rebin_1_16dPhi"):
     N_dPhi_Bins = 16
+    
 dPhi_Bins = [i*math.pi/N_dPhi_Bins for i in range(0,N_dPhi_Bins+1)]
 delta_phi_centers = [i*math.pi/N_dPhi_Bins+math.pi/N_dPhi_Bins/2 for i in range(0,N_dPhi_Bins)] #skip first dPhi bin to avoid Isolation
 
@@ -105,13 +113,18 @@ delta_phi_centers = [i*math.pi/N_dPhi_Bins+math.pi/N_dPhi_Bins/2 for i in range(
 
 #UE
 Uncorr_Estimate = "ZYAM"
-ue_error_bar = [dPhi_Bins[1],dPhi_Bins[2]] #Horiz. width of UE at first plotted dphi point
 
+ue_error_bar = [] #Horiz. width of UE at first plotted dphi point
 
 for i,dphi in enumerate(dPhi_Bins):
     if (dphi > 0.39):
-        ue_error_bar = [dPhi_Bins[i],dPhi_Bins[i+1]]
-    break;
+        ue_error_bar.append(dPhi_Bins[i])
+        break;
+        
+for i,dphi in enumerate(dPhi_Bins):
+    if (dphi > 0.78):
+        ue_error_bar.append(dPhi_Bins[i])
+        break;
 
 ZYAM_Min_i = 0
 for i,dphi in enumerate(dPhi_Bins):
