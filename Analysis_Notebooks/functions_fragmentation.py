@@ -307,12 +307,19 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
         plt.text(0.68,1.46,r"$p_{val} = %1.2f$"%(pval),color=p0col,fontsize=18,alpha=.7)
         plt.fill_between(np.arange(0,1.1,0.1), p0+p0e, p0-p0e,color=p0col,alpha=.3)
 
+    
+    
     Ratio_TGraph.Fit("pol1","S")
     zT_Points = np.linspace(0.05,1,20)
     Fit_Band = ROOT.TGraphErrors(len(zT_Points));
     for i in range(len(zT_Points)):
         Fit_Band.SetPoint(i, zT_Points[i], 0)
     (ROOT.TVirtualFitter.GetFitter()).GetConfidenceIntervals(Fit_Band)
+    
+    band_errors = np.zeros(len(zT_Points))
+    for i in range (len(zT_Points)):
+        band_errors[i] = Fit_Band.GetErrorY(i)
+    print(band_errors)
 
 
     f2 = Ratio_TGraph.GetFunction("pol1")
@@ -330,9 +337,10 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
         plt.text(0.68,0.18,r"$\chi^2_{red} = %1.2f$"%(chi2_red),color=p1col,fontsize=18,alpha=.7)
         plt.text(0.68,0.06,r"$p_{val} = %1.2f$"%(pval),color=p1col,fontsize=18,alpha=.7)
         axes = plt.gca()
-        x_vals = np.array(axes.get_xlim())
-        y_vals = p0 + p1 * x_vals
-        plt.plot(x_vals, y_vals, '--',color=p1col,linewidth=2)
+        x_vals = np.array(zT_Points)
+        y_vals = p0 + p1 * zT_Points
+        plt.plot(zT_Points, y_vals, '--',color=p1col,linewidth=2)
+        plt.fill_between(zT_Points,y_vals+band_errors,y_vals-band_errors,color=p1col,alpha=0.3)
 
     ### ROOT DONE ###
 

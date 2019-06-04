@@ -95,7 +95,8 @@ pTbins = [12,15,19,26,40]
 #zT
 zTbins = np.asarray([0.05, 0.07670637, 0.11767734, 0.18053204, 0.27695915, 0.42489062, 0.65183634,1])
 zT_offset = 0
-ZT_OFF_PLOT = 1 #Offset for FF plotting
+if (len(zTbins)==8):
+    ZT_OFF_PLOT = 1 #Offset for FF plotting
 
 #deta
 eta_max = 1.2 #Range of Signal Correlations
@@ -137,7 +138,6 @@ for i,dphi in enumerate(dPhi_Bins):
     if (dphi > 1.5):
         ZYAM_Max_i = i
         break
-print("ZYAM: %i to %i"%(ZYAM_Min_i,ZYAM_Max_i))
 
 dphi_start_integral = 0
 for i,dphi in enumerate(dPhi_Bins):
@@ -146,7 +146,6 @@ for i,dphi in enumerate(dPhi_Bins):
         break
 
 N_Phi_Integrate = len(dPhi_Bins)-dphi_start_integral
-print(N_Phi_Integrate)
 Integration_Width = math.pi/(len(delta_phi_centers)+1) * N_Phi_Integrate
 phi_width = math.pi/(N_dPhi_Bins)/2
 
