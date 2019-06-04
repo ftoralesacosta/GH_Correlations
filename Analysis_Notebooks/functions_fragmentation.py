@@ -378,7 +378,7 @@ def Get_pp_pPb_FF_Chi2(string_descrp):
     for SYS in Systems:
         FF = np.load("npy_files/%s_%s_Averaged_Fragmentation_Functions_%s.npy"%(Shower,SYS,string_descrp))
         FF_Errors = np.load("npy_files/%s_%s_Averaged_Fragmentation_Functions_Errors_%s.npy"%(Shower,SYS,string_descrp))
-        hist = ROOT.TH1F("hist","histo",7, 0, 1)
+        hist = ROOT.TH1F("hist","histo",len(FF), 0, 1)
         for i in range(len(FF)):
             hist.SetBinContent(i+1,FF[i])
             hist.SetBinError(i+1,FF_Errors[i])

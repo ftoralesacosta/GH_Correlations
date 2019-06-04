@@ -294,13 +294,17 @@ def Ped_Sub_After_Cs(Dict):
 
 def Get_pp_pPb_List_Chi2(array1,array1_E,array2,array2_E):
     
-    hist1 = ROOT.TH1F("hist1","histo1",N_dPhi_Bins, 0, 3.14159)
-    for i in range(len(array1)-1):
+    hist1 = ROOT.TH1F("hist1","histo1",len(array1)+1, 0, 3.2)
+    hist1.SetBinContent(0,0)
+    for i in range(len(array1)):
         hist1.SetBinContent(i+1,array1[i])
         hist1.SetBinError(i+1,array1_E[i])
+#        print("Array Content || Bin Content --- %f || %f"%(array1[i],hist1.GetBinContent(i+1)))
+#    print("")
         
-    hist2 = ROOT.TH1F("hist2","histo2",N_dPhi_Bins, 0, 3.14159)
-    for i in range(len(array2)-1):
+    hist2 = ROOT.TH1F("hist2","histo2",len(array2)+1, 0, 3.2)
+    hist2.SetBinContent(0,0)
+    for i in range(len(array2)):
         hist2.SetBinContent(i+1,array2[i])
         hist2.SetBinError(i+1,array2_E[i])
 
@@ -309,14 +313,7 @@ def Get_pp_pPb_List_Chi2(array1,array1_E,array2,array2_E):
     igood = ROOT.Long(0.0)
     pval = hist1.Chi2TestX(hist2,chi2,ndf,igood,"WW");
 
-    return pval,chi2,ndf,igood
-
-def getfitvals(Dict):
-    for ipt in range(N_pT_Bins):
-        for ztb in range(NzT):
-            pval,chi2,ndf,igood = Get_pp_pPb_List_Chi2(Dict["p-Pb_CSR"][ipt][ztb],Dict["p-Pb_CSR_Errors"][ipt][ztb],Dict["pp_CSR"][ipt][ztb],Dict["pp_CSR_Errors"][ipt][ztb])
-            print("zT %i: pval = %f, chi2 = %f, ndf = %f"%(ztb+1,pval,chi2,ndf))
-                    
+    return pval,chi2,ndf,igood 
                     
 def Plot_pp_pPb_Cs(Dict):
     
