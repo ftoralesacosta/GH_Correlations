@@ -290,7 +290,6 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
     ### ROOT LINEAR and CONSTANT FITS ###
     Ratio_TGraph = TGraphErrors()
     for izt in range (ZT_OFF_PLOT,len(Ratio)):
-    #for izt in range (2,len(Ratio)-1):
         Ratio_TGraph.SetPoint(izt,zT_centers[izt],Ratio[izt])
         Ratio_TGraph.SetPointError(izt,0,Ratio_Error[izt])
 
@@ -309,6 +308,13 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
         plt.fill_between(np.arange(0,1.1,0.1), p0+p0e, p0-p0e,color=p0col,alpha=.3)
 
     Ratio_TGraph.Fit("pol1","S")
+    zT_Points = np.linspace(0.05,1,20)
+    Fit_Band = ROOT.TGraphErrors(len(zT_Points));
+    for i in range(len(zT_Points)):
+        Fit_Band.SetPoint(i, zT_Points[i], 0)
+    (ROOT.TVirtualFitter.GetFitter()).GetConfidenceIntervals(Fit_Band)
+
+
     f2 = Ratio_TGraph.GetFunction("pol1")
     chi2_red  = f2.GetChisquare()/f2.GetNDF()
     pval = f2.GetProb()

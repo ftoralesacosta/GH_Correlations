@@ -344,11 +344,12 @@ def Plot_pp_pPb_Cs(Dict):
                 MC = plt.errorbar(delta_phi_centers,["MC_CSR"][ipt][ztb],xerr=phi_width,yerr=["MC_CSR_Errors"][ipt][ztb],fmt='go',capsize=4,markersize=11)
 
 
-
-            plt.xlabel(r'|$\Delta \varphi$|',fontsize=28)
+            if (izt>2):
+                plt.xlabel(r'|$\Delta \varphi$|',fontsize=28)
             plt.xticks(fontsize=18)
             plt.xlim((0.39269908169872414,3.14159))
-            plt.ylabel(r'$1/N_{\gamma} \: \: \mathrm{d}N/\mathrm{d}\Delta \eta$',fontsize=28)
+            if (izt%3 == 0):
+                plt.ylabel(r'$1/N_{\gamma} \: \: \mathrm{d}N/\mathrm{d}\Delta \eta$',fontsize=28)
             plt.yticks(fontsize=18)
             plt.axhline(y=0,color='gray',linestyle='--',linewidth=1.3,alpha=0.8)        
 
@@ -363,10 +364,7 @@ def Plot_pp_pPb_Cs(Dict):
             pval,chi2,ndf,igood = Get_pp_pPb_List_Chi2(Dict["p-Pb_CSR"][ipt][ztb],Dict["p-Pb_CSR_Errors"][ipt][ztb],
                                                         Dict["pp_CSR"][ipt][ztb],Dict["pp_CSR_Errors"][ipt][ztb])
             
-            #plt.figtext(0.115,0.71,"pval = %1.2f, chi2 = %1.1f, ndf = %i"%(pval,chi2,ndf),fontsize=18,alpha=.7)
-            #plt.figtext(0.455,0.71,"pval = %1.2f, chi2 = %1.1f, ndf = %i"%(pval,chi2,ndf),fontsize=18,alpha=.7)
-            plt.figtext(0.125+0.335*(izt%3),0.71-0.35*(izt%2),"pval = %1.2f, chi2 = %1.1f, ndf = %i"%(pval,chi2,ndf),fontsize=18,alpha=.7)
-            #plt.figtext(0.120+0.335*(izt%3),0.36,"pval = %1.2f, chi2 = %1.1f, ndf = %i"%(pval,chi2,ndf),fontsize=18,alpha=.7)
+            plt.figtext(0.140+0.325*(izt%3),0.705-0.345*(izt%2),"pval = %1.2f, chi2 = %1.1f, ndf = %i"%(pval,chi2,ndf),fontsize=18,alpha=.7)
 
             fit_string = "pval = %1.2f, chi2 = %1.1f, ndf = %i"%(pval,chi2,ndf)
 
