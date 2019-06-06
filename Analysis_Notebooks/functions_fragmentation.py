@@ -119,11 +119,15 @@ def Weighted_Average(FF,FF_Errors,purity_FF_Errors):
             
             if (math.isnan(FF_Errors[ipt][izt]) or math.isnan(purity_FF_Errors[ipt][izt])): continue
                 
-            Combined_Errors[izt] += FF_Errors[ipt][izt]**2
-            purity_Combined_Errors[izt] += purity_FF_Errors[ipt][izt]**2
+            #Combined_Errors[izt] += FF_Errors[ipt][izt]**2
+            #purity_Combined_Errors[izt] += purity_FF_Errors[ipt][izt]**2
+            Combined_Errors[izt] += 1/FF_Errors[ipt][izt]**2
+            purity_Combined_Errors[izt] += 1/purity_FF_Errors[ipt][izt]**2
 
-    Combined_Errors = np.sqrt(Combined_Errors)/N_pT_Bins
-    purity_Combined_Errors = np.sqrt(purity_Combined_Errors)/N_pT_Bins
+    #Combined_Errors = np.sqrt(Combined_Errors)/N_pT_Bins
+    #purity_Combined_Errors = np.sqrt(purity_Combined_Errors)/N_pT_Bins
+    Combined_Errors = np.sqrt(1/Combined_Errors)
+    purity_Combined_Errors = np.sqrt(1/purity_Combined_Errors)
     
     return(Combined,Combined_Errors,purity_Combined_Errors)
 

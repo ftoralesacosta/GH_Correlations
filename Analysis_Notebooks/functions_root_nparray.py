@@ -398,8 +398,27 @@ def ROOT_to_nparray():
 
     return Dict
 
-
+#Each dictionary value is a numpy array of dimension 2 or 3. Want to print uncertainties.        
 def print_from_Dict(Dict):
-
-    test = pd.DataFrame.from_dict(Dict)
-    print(test)
+    
+    for key in Dict:    
+        if not("Error" in key):
+            continue
+        #if ("CBR" in key):
+        #    continue
+        
+        nparr = Dict[key]
+        print("%s:"%(key))
+        for sublist in nparr:
+            if (len(sublist.shape)) < 2:
+                for i in sublist:
+                    print(i),
+                print("")
+            else:
+                for subsublist in sublist:
+                    for i in subsublist:
+                        print("%1.4f"%(i)),
+                    print("")
+        print("")
+                        
+        

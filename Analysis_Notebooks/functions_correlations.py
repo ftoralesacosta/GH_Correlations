@@ -256,7 +256,7 @@ def Correlated_Subtraction(Dict):
             #if (ipt > 0): continue
             
             Dict["%s_CSR"%(SYS)][ipt] = (Dict["%s_CSR"%(SYS)][ipt] - (1-purity[ipt])*Dict["%s_CBR"%(SYS)][ipt])/purity[ipt]
-            Dict["%s_CSR_Errors"%(SYS)][ipt] = Dict["%s_CSR_Errors"%(SYS)][ipt]/purity[ipt]
+            Dict["%s_CSR_Errors"%(SYS)][ipt] = np.sqrt((Dict["%s_CSR_Errors"%(SYS)][ipt]/purity[ipt])**2 + (1-purity[ipt]*Dict["%s_CBR"%(SYS)][ipt]/purity[ipt]**2))
             Dict["%s_Uncorr_Error"%(SYS)][ipt] = Dict["%s_Uncorr_Error"%(SYS)][ipt]/purity[ipt]
             
             
@@ -285,6 +285,7 @@ def Ped_Sub_After_Cs(Dict):
             #if (ipt > 0): continue
 
             for izt in range (NzT):
+                #Recalculate ZYAM for decay-subtracted Correlations
                 ZYAM_Cs,ZYAM_Cs_Error = ZYAM_Line(Dict["%s_CSR"%(SYS)][ipt][izt],
                                                   Dict["%s_CSR_Errors"%(SYS)][ipt][izt])
 
@@ -399,16 +400,16 @@ def Integrate_Away_Side(Phi_array,Phi_Errors,LE_Error):
         LE_Error = LE_Error*Integration_Width
     for ipt in range(N_pT_Bins):
         for izt in range(0, NzT):
-            ztb = izt
             zT_width = zTbins[izt+1]-zTbins[izt]
 
-            temp_phi = Phi_array[ipt][ztb][(len(Phi_Errors[ipt][ztb])-N_Phi_Integrate):]
-            FF_zt[ipt][ztb] = temp_phi.sum()/zT_width
-            temp_error = (Phi_Errors[ipt][ztb][(len(Phi_Errors[ipt][ztb])-N_Phi_Integrate):])**2
+            temp_phi = Phi_array[ipt][izt][(len(Phi_Errors[ipt][izt])-N_Phi_Integrate):]
+            FF_zt[ipt][izt] = temp_phi.sum()/zT_width
+            
+            temp_error = (Phi_Errors[ipt][izt][(len(Phi_Errors[ipt][izt])-N_Phi_Integrate):])**2
             if (Use_Uncorr_Error):
-                FF_zt_Errors[ipt][ztb] = (math.sqrt(temp_error.sum() + (LE_Error[ipt][izt][0])**2))/zT_width
+                FF_zt_Errors[ipt][izt] = (math.sqrt(temp_error.sum() + (LE_Error[ipt][izt][0])**2))/zT_width
             else:
-                FF_zt_Errors[ipt][ztb] = math.sqrt(temp_error.sum())/zT_width
+                FF_zt_Errors[ipt][izt] = math.sqrt(temp_error.sum())/zT_width
             
     return FF_zt, FF_zt_Errors
 

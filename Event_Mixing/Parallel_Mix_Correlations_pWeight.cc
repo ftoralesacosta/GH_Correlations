@@ -57,9 +57,7 @@ Float_t Get_Purity(Float_t pT_GeV)
 
 }
 
-Float_t Get_Purity_ErrFunction(Float_t pT_GeV)
-
-{
+Float_t Get_Purity_ErrFunction(Float_t pT_GeV, std::string deviation) {
 
   Float_t purity_val = 0;
 
@@ -67,9 +65,20 @@ Float_t Get_Purity_ErrFunction(Float_t pT_GeV)
                     8.794543375,
                     12.7423900};
 
+  if (strcmp(deviation.data(),"Plus")==0){
+    par[0] = 0.60750016509;
+    par[1] = 7.05184155403;
+    par[2] = 13.6116163603;
+  }
+
+  if (strcmp(deviation.data(),"Minus")==0){
+    par[0] = 0.479958593235;
+    par[1] = 9.05392932723;
+    par[2] = 10.2061359452;
+  }
+
+
   purity_val = par[0]*TMath::Erf((pT_GeV-par[1])/par[2]);
-
-
   return purity_val;
 
 }
@@ -132,6 +141,7 @@ int main(int argc, char *argv[])
   int n_eta_bins = 0;
   int n_phi_bins = 0;
   std::string shower_shape = "DNN";
+  std::string purity_deviation = "None";
   // zT & pT bins
   int nztbins = 7;
   float* ztbins;
@@ -304,6 +314,10 @@ int main(int argc, char *argv[])
 	std::cout<<"Shower Shape: "<<shower_shape.data()<<std::endl;
       }
       
+      else if (strcmp(key, "Purity_Dev") == 0){
+        purity_deviation = value;
+	std::cout<<"Purity Deviation Change: "<<purity_deviation.data()<<std::endl;
+      }
 
       else std::cout << "WARNING: Unrecognized keyvariable " << key << std::endl;
   
@@ -693,7 +707,7 @@ int main(int argc, char *argv[])
 
 	Float_t BR_purity_weight;
 	if (Background and Isolated){
-	  BR_purity_weight = (1.0/Get_Purity_ErrFunction(cluster_pt[n]) - 1);
+	  BR_purity_weight = (1.0/Get_Purity_ErrFunction(cluster_pt[n],purity_deviation) - 1);
 	  for (int ipt = 0; ipt < nptbins; ipt++){
             if (cluster_pt[n] >= ptbins[ipt] && cluster_pt[n] < ptbins[ipt+1]){
 	      BR_purity_weight_sum[ipt] += BR_purity_weight;
@@ -703,13 +717,13 @@ int main(int argc, char *argv[])
 
 	Float_t purity_weight;
 	if (Signal and Isolated){
-          purity_weight = 1.0/Get_Purity_ErrFunction(cluster_pt[n]);
+          purity_weight = 1.0/Get_Purity_ErrFunction(cluster_pt[n],purity_deviation);
           for (int ipt = 0; ipt < nptbins; ipt++){
             if (cluster_pt[n] >= ptbins[ipt] && cluster_pt[n] < ptbins[ipt+1]){
 	      purity_weight_sum[ipt] += purity_weight;
             }
           }
-          fprintf(stderr,"%d: Purity From Fit = %f\n",__LINE__,purity_weight);
+          //fprintf(stderr,"%d: Purity From Fit = %f\n",__LINE__,purity_weight);
         }
 
 	if(first_cluster){

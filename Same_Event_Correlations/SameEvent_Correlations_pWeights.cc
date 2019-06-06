@@ -43,9 +43,7 @@ Float_t Get_Purity(Float_t pT_GeV)
 }
 
 
-Float_t Get_Purity_ErrFunction(Float_t pT_GeV)
-
-{
+Float_t Get_Purity_ErrFunction(Float_t pT_GeV, std::string deviation) {
 
   Float_t purity_val = 0;
 
@@ -53,13 +51,20 @@ Float_t Get_Purity_ErrFunction(Float_t pT_GeV)
                     8.794543375,
                     12.7423900};
 
-  // for (int i; i < sizeof(par)/sizeof(Float_t); i++)
-  //   fprintf(stderr,"\n%d: Fit_parameter = %1.12f",__LINE__,par[i]);
+  if (strcmp(deviation.data(),"Plus")==0){
+    par[0] = 0.60750016509;
+    par[1] = 7.05184155403;
+    par[2] = 13.6116163603;
+  }
+
+  if (strcmp(deviation.data(),"Minus")==0){
+    par[0] = 0.479958593235;
+    par[1] = 9.05392932723;
+    par[2] = 10.2061359452;
+  }
+
 
   purity_val = par[0]*TMath::Erf((pT_GeV-par[1])/par[2]);
-
-  //fprintf(stderr,"\n\n");                                                                                                                                                \
-                                                                                                                                                                            
   return purity_val;
 
 }
@@ -101,6 +106,7 @@ int main(int argc, char *argv[])
   int n_eta_bins = 0;
   int n_phi_bins = 0;  
   std::string shower_shape = "DNN";
+  std::string purity_deviation = "None";
 
   // Zt bins
   //FIXME: Will have to likely set nztbins first, then initialize array
@@ -286,6 +292,11 @@ int main(int argc, char *argv[])
 	  shower_shape = value;
 	  std::cout<<"Shower Shape: "<<shower_shape.data()<<std::endl;
 	  //if (strcmp(shower_shape.data(),"Lambda")== 0) std::cout<<"test worked"<<std::endl;
+      }
+
+      else if (strcmp(key, "Purity_Dev") == 0){
+	purity_deviation = value;
+	std::cout<<"Purity Deviation Change: "<<purity_deviation.data()<<std::endl;
       }
 
       else std::cout << "WARNING: Unrecognized keyvariable " << key << std::endl;
@@ -796,7 +807,10 @@ int main(int argc, char *argv[])
 
 	if(Background and Isolated){
 	  bkg_weight = hweight.GetBinContent(hweight.FindBin(cluster_pt[n]));
-	  BR_purity_weight = (1.0/Get_Purity_ErrFunction(cluster_pt[n]) - 1);
+	  if (strcmp(shower_shape.data(),"Lambda")!= 0)
+	    fprintf(stderr,"%s %f: WARNING \n \n WARNING: Using purity for LAMBDA");
+
+	  BR_purity_weight = (1.0/Get_Purity_ErrFunction(cluster_pt[n],purity_deviation) - 1);
 	  for (int ipt = 0; ipt < nptbins; ipt++){
 	    if (cluster_pt[n] >= ptbins[ipt] && cluster_pt[n] < ptbins[ipt+1]){
 	      Weights_Sum->Fill((ipt+1),bkg_weight); //Integrate histo for pTbin for sum of weights
@@ -811,13 +825,13 @@ int main(int argc, char *argv[])
 	  }
 
 	if (Signal and Isolated){
-	  purity_weight = 1.0/Get_Purity_ErrFunction(cluster_pt[n]);
+	  purity_weight = 1.0/Get_Purity_ErrFunction(cluster_pt[n],purity_deviation);
 	  for (int ipt = 0; ipt < nptbins; ipt++){
 	    if (cluster_pt[n] >= ptbins[ipt] && cluster_pt[n] < ptbins[ipt+1]){
 	    purity_weight_sum[ipt] += purity_weight;
 	    }
 	  }
-	  //fprintf(stderr,"%d: Purity From Fit = %f\n",__LINE__,Get_Purity_ErrFunction(cluster_pt[n]));
+	  //fprintf(stderr,"\n%d: Purity From Fit = %f\n",__LINE__,Get_Purity_ErrFunction(cluster_pt[n],purity_deviation));
 	}
 
 	//Track Loop
