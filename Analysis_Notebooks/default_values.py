@@ -15,7 +15,7 @@ CorrectedP = True  # FALSE FOR HARDPROBES
 Use_MC = False
 pT_Rebin = False
 N_dPhi_Bins = 8
-Ped_Sub_First = False
+Ped_Sub_First = False #Important after weight implementation
 Average_UE = False
 Show_Fits = True
 Uncorr_Estimate = "ZYAM"
@@ -35,10 +35,13 @@ Shower = "LO"
 #description_string="15zT"
 #description_string="2zT"
 
-description_string="pT_Rebin_1"
+#description_string="pT_Rebin_1"
 #description_string="pT_Rebin_1_15pT"
 #description_string="pT_Rebin_1_20pT"
-#description_string= "pT_Rebin_1_16dPhi"
+description_string= "pT_Rebin_1_16dPhi"
+#description_string = "pT_Rebin_1_pDevPlus"
+#description_string = "pT_Rebin_1_pDevMinus"
+
 
 #description_string="pT_Rebin_3"
 #description_string="pT_Rebin_3_Lambda"
@@ -171,9 +174,13 @@ if (description_string == "zT_Rebin_15"):
 
 if ("pT_Rebin_1" in description_string):
     pTbins = [12.0,40.0]
+    print(pTbins)
     
 if ("pT_Rebin_3" in description_string):
     pTbins = [12.00, 21.33, 30.67, 40.00]
+    
+if ("pT_Rebin_4" in description_string):
+    pTbins = [12.0, 15.0, 19.0, 26.0, 40.0]
     
 if ("pT_Rebin_5" in description_string):
     pTbins = [12.00, 15.27, 19.42, 24.71, 31.44, 40.00]
@@ -190,6 +197,7 @@ def Get_Purity(filename):
     
     for ipt in range(N_pT_Bins):
         purity_histo = file.Get('H_Purities_pT%1.0f_%1.0f' %(pTbins[ipt],pTbins[ipt+1]))
+        print('H_Purities_pT%1.0f_%1.0f' %(pTbins[ipt],pTbins[ipt+1]))
         purity_uncertainty_histo = file.Get('H_Purity_Uncertanty_pT%1.0f_%1.0f' %(pTbins[ipt],pTbins[ipt+1]))
         purities[ipt] = purity_histo.GetMean()
         p_uncertainties[ipt] = purity_uncertainty_histo.GetMean()

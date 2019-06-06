@@ -268,7 +268,7 @@ def Plot_UB():
                 plt.xticks(fontsize=(fsize))
                 plt.xlim((0.39269908169872414,3.14159))
                 plt.ylabel(r'$1/N_{\mathrm{trig}} \: \: \mathrm{d}N/\mathrm{d}\Delta\eta$',fontsize=fsize+2)
-                plt.ylim((-0.001,1.2*max(Sig_LE_Phi_Array)))
+                #plt.ylim((-0.001,1.2*max(Sig_LE_Phi_Array)))
                 empt, = ax.plot([], []," ")
                 empt2, = ax.plot([],[]," ")
                 plt.yticks(fontsize=fsize-5)
@@ -300,7 +300,7 @@ def Plot_UB():
                 plt.xticks(fontsize=(fsize))
                 plt.xlim((0.39269908169872414,3.14159))
                 plt.ylabel(r'$1/N_{\mathrm{trig}} \: \: \mathrm{d}N/\mathrm{d}\Delta\eta$',fontsize=fsize+2)
-                plt.ylim((-0.01,1.2*max(Bkg_LE_Phi_Array)))
+                #plt.ylim((-0.01,1.2*max(Bkg_LE_Phi_Array)))
                 plt.yticks(fontsize=fsize-5)
 
                 fill_x = [0,3.14149]
@@ -402,7 +402,9 @@ def ROOT_to_nparray():
 def print_from_Dict(Dict):
     
     for key in Dict:    
-        if not("Error" in key):
+        if ("Error" in key):
+            continue
+        if ("p-Pb" in key):
             continue
         #if ("CBR" in key):
         #    continue

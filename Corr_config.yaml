@@ -21,8 +21,9 @@ Track_pT_Min:		      0.5
 Track_pT_Max:		      15.0
 Track_Cut_Bit:                16
 
+Purity_Dev:		       None
 #Purity_Dev:		       Plus
-Purity_Dev:		       Minus
+#Purity_Dev:		       Minus
 
 #Zt_bins:		      [0.05, 0.091, 0.166, 0.302, 0.55,1.0] #5
 #Zt_bins:		      [0.05, 0.08, 0.14, 0.22, 0.37, 0.61, 1.00] #6

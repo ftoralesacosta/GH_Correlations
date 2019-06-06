@@ -21,35 +21,19 @@ const int MAX_INPUT_LENGTH = 200;
 
 enum isolationDet {CLUSTER_ISO_TPC_04, CLUSTER_ISO_ITS_04, CLUSTER_FRIXIONE_TPC_04_02, CLUSTER_FRIXIONE_ITS_04_02};
 
-Float_t Get_Purity(Float_t pT_GeV)
-
-{
-
-  Float_t purity_val = 0;
-
-  Float_t Fit_parameters[5] = {3.22749,
-			       -0.663308,
-			       0.0503776,
-			       -0.00153968,
-			       1.65376e-5};
-
-  for (int i; i < sizeof(Fit_parameters)/sizeof(Float_t); i++){
-    //fprintf(stderr,"\n%d: Fit_parameter = %1.12f",__LINE__,Fit_parameters[i]);
-    purity_val += Fit_parameters[i] * pow(pT_GeV,i);
-  }
-  //fprintf(stderr,"\n\n");
-  return purity_val;
-
-}
-
 
 Float_t Get_Purity_ErrFunction(Float_t pT_GeV, std::string deviation) {
 
   Float_t purity_val = 0;
 
-  Float_t par[3] = {0.548247710,
-                    8.794543375,
-                    12.7423900};
+  //Non-platue assumption
+  // Float_t par[3] = {0.548247710,
+  //                   8.794543375,
+  //                   12.7423900};
+
+  Float_t par[3] = {0.54225742923,
+                    8.09242373515,
+                    11.8085154181};
 
   if (strcmp(deviation.data(),"Plus")==0){
     par[0] = 0.60750016509;
@@ -638,7 +622,7 @@ int main(int argc, char *argv[])
 
     fprintf(stderr,"Looping to determine weights and pT spectra \n");
     for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
-    //for(Long64_t ievent = 0; ievent < 1000 ; ievent++){
+      //for(Long64_t ievent = 0; ievent < 1000 ; ievent++){
       _tree_event->GetEntry(ievent);
       fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, ievent, nentries);
 
@@ -760,7 +744,7 @@ int main(int argc, char *argv[])
 
     fprintf(stderr,"\n Looping for main correlation functions \n");
     for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
-      //for(Long64_t ievent = 0; ievent < 1000 ; ievent++){
+      
       _tree_event->GetEntry(ievent);
       fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, ievent, nentries);
 
@@ -810,7 +794,7 @@ int main(int argc, char *argv[])
 	  if (strcmp(shower_shape.data(),"Lambda")!= 0)
 	    fprintf(stderr,"%s %f: WARNING \n \n WARNING: Using purity for LAMBDA");
 
-	  BR_purity_weight = (1.0/Get_Purity_ErrFunction(cluster_pt[n],purity_deviation) - 1);
+	  BR_purity_weight = (1.0/Get_Purity_ErrFunction(cluster_pt[n],purity_deviation) - 1); //(1-p)/p = 1/p - 1
 	  for (int ipt = 0; ipt < nptbins; ipt++){
 	    if (cluster_pt[n] >= ptbins[ipt] && cluster_pt[n] < ptbins[ipt+1]){
 	      Weights_Sum->Fill((ipt+1),bkg_weight); //Integrate histo for pTbin for sum of weights
