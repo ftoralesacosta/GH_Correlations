@@ -281,6 +281,7 @@ def Correlated_Subtraction_Weights(Dict):
 def Ped_Sub_After_Cs(Dict):
 #This function calculates ZYAM after correlated subtraction (Cs)
     for SYS,ifile in zip(Systems,Files):
+        print(SYS)
         for ipt in range (N_pT_Bins):
             #if (ipt > 0): continue
 
@@ -291,23 +292,25 @@ def Ped_Sub_After_Cs(Dict):
 
                 Dict["%s_CSR"%(SYS)][ipt][izt] = Dict["%s_CSR"%(SYS)][ipt][izt] - ZYAM_Cs
                 Dict["%s_Uncorr_Error"%(SYS)][ipt][izt] = ZYAM_Cs_Error
+                
+                print(ZYAM_Cs)
                                                   
 
-def Get_pp_pPb_List_Chi2(array1,array1_E,array2,array2_E):
+def Get_pp_pPb_List_Chi2_old(array1,array1_E,array2,array2_E):
     
-    hist1 = ROOT.TH1F("hist1","histo1",len(array1)+1, 0, 3.2)
+    hist1 = ROOT.TH1F("hist1","histo1",len(array1), 0, 3.2)
     hist1.SetBinContent(0,0)
     for i in range(len(array1)):
-        hist1.SetBinContent(i+1,array1[i])
-        hist1.SetBinError(i+1,array1_E[i])
+        hist1.SetBinContent(i,array1[i])
+        hist1.SetBinError(i,array1_E[i])
 #        print("Array Content || Bin Content --- %f || %f"%(array1[i],hist1.GetBinContent(i+1)))
 #    print("")
         
-    hist2 = ROOT.TH1F("hist2","histo2",len(array2)+1, 0, 3.2)
+    hist2 = ROOT.TH1F("hist2","histo2",len(array2), 0, 3.2)
     hist2.SetBinContent(0,0)
     for i in range(len(array2)):
-        hist2.SetBinContent(i+1,array2[i])
-        hist2.SetBinError(i+1,array2_E[i])
+        hist2.SetBinContent(i,array2[i])
+        hist2.SetBinError(i,array2_E[i])
 
     chi2 = ROOT.Double(0.0)
     ndf = ROOT.Long(0.0)
@@ -315,8 +318,31 @@ def Get_pp_pPb_List_Chi2(array1,array1_E,array2,array2_E):
     pval = hist1.Chi2TestX(hist2,chi2,ndf,igood,"WW");
 
     return pval,chi2,ndf,igood 
+
+def Get_pp_pPb_List_Chi2(array1,array1_E,UE_1,array2,array2_E,UE_2):
+    
+    UE_1_array = np.full((len(array1),len(array1)),UE_1[0])  
+    UE_2_array = np.full((len(array2),len(array2)),UE_2[0])
+
+    Stat_1_array = np.diag(array1_E)
+    Stat_2_array = np.diag(array2_E)
+
+    Cov = Stat_1_array**2 + Stat_2_array**2 + UE_1_array**2 + UE_2_array**2
+    eig_val,eig_vec = np.linalg.eig(Cov)
+
+    Chi2 = 0
+    
+    for y1,y2,Err in zip(array1,array2,eig_val):
+        Chi2 += (y1-y2)**2 / Err
+    
+    print('$ \Chi ^2$ = %f'%(Chi2))
+    return Chi2
+    
+    
                     
 def Plot_pp_pPb_Cs(Dict):
+    
+    Quad_UE = True
     
     for ipt in range (N_pT_Bins):
         #if (ipt > 0): continue
@@ -326,20 +352,19 @@ def Plot_pp_pPb_Cs(Dict):
         if (NzT==7):
             fig = plt.figure(figsize=(22,18))
         for izt in range (NzT-ZT_OFF_PLOT):
-            ztb = izt-zT_offset
 
             if (NzT ==4):
-                ax = fig.add_subplot(2,2,ztb+1)
+                ax = fig.add_subplot(2,2,izt+1)
             elif (NzT ==6):
-                ax = fig.add_subplot(2,3,ztb+1)
+                ax = fig.add_subplot(2,3,izt+1)
             elif (NzT ==7):
-                ax = fig.add_subplot(3,3,ztb+1)
+                ax = fig.add_subplot(3,3,izt+1)
 
-            pPb = plt.errorbar(delta_phi_centers,Dict["p-Pb_CSR"][ipt][ztb],xerr=phi_width,yerr=Dict["p-Pb_CSR_Errors"][ipt][ztb],fmt='bo',capsize=4,markersize=11)
-            pp = plt.errorbar(delta_phi_centers,Dict["pp_CSR"][ipt][ztb],xerr=phi_width,yerr=Dict["pp_CSR_Errors"][ipt][ztb],fmt='ro',capsize=4,markersize=11)
+            pPb = plt.errorbar(delta_phi_centers,Dict["p-Pb_CSR"][ipt][izt],xerr=phi_width,yerr=Dict["p-Pb_CSR_Errors"][ipt][izt],fmt='bo',capsize=4,markersize=11)
+            pp = plt.errorbar(delta_phi_centers,Dict["pp_CSR"][ipt][izt],xerr=phi_width,yerr=Dict["pp_CSR_Errors"][ipt][izt],fmt='ro',capsize=4,markersize=11)
 
             if(Use_MC):
-                MC = plt.errorbar(delta_phi_centers,["MC_CSR"][ipt][ztb],xerr=phi_width,yerr=["MC_CSR_Errors"][ipt][ztb],fmt='go',capsize=4,markersize=11)
+                MC = plt.errorbar(delta_phi_centers,["MC_CSR"][ipt][izt],xerr=phi_width,yerr=["MC_CSR_Errors"][ipt][ztb],fmt='go',capsize=4,markersize=11)
 
 
             if (izt>2):
@@ -351,31 +376,56 @@ def Plot_pp_pPb_Cs(Dict):
             plt.yticks(fontsize=18)
             plt.axhline(y=0,color='gray',linestyle='--',linewidth=1.3,alpha=0.8)        
 
-            pp_UE = ax.fill_between(ue_error_bar,-Dict["pp_Uncorr_Error"][ipt][ztb][0],Dict['pp_Uncorr_Error'][ipt][ztb][0],facecolor='red',alpha=0.35) #Other for pp
-            pPb_UE = ax.fill_between(ue_error_bar,-Dict["p-Pb_Uncorr_Error"][ipt][ztb][0],Dict['p-Pb_Uncorr_Error'][ipt][ztb][0],facecolor='blue',alpha=0.35)#One for p-Pb
+            if not(Quad_UE):
+                pp_UE = ax.fill_between(ue_error_bar,-Dict["pp_Uncorr_Error"][ipt][izt][0],
+                Dict['pp_Uncorr_Error'][ipt][izt][0],facecolor='red',alpha=0.35) #Other for pp
+                
+                pPb_UE = ax.fill_between(ue_error_bar,-Dict["p-Pb_Uncorr_Error"][ipt][izt][0],
+                Dict['p-Pb_Uncorr_Error'][ipt][izt][0],facecolor='blue',alpha=0.35)#One for p-Pb
+            
+            else:
+                UE_Val = np.sqrt(Dict["pp_Uncorr_Error"][ipt][izt][0]**2 + Dict["p-Pb_Uncorr_Error"][ipt][izt][0]**2)
+                Combined_UE = ax.fill_between(ue_error_bar,-UE_Val,UE_Val,facecolor='purple',alpha=0.35)
+            
             #MC_UE = ax.fill_between(ue_error_bar,-Dict["MC_Uncorr_Error"][ipt][ztb][0],Dict["MC_Uncorr_Error"][ipt][ztb][0],facecolor='green',alpha=0.35)#One for p-Pb
 
             empt, = ax.plot([], [],' ')
             empt2, = ax.plot([],[],' ')
             
-            empt3, = ax.plot([],[],' ')
-            pval,chi2,ndf,igood = Get_pp_pPb_List_Chi2(Dict["p-Pb_CSR"][ipt][ztb],Dict["p-Pb_CSR_Errors"][ipt][ztb],
-                                                        Dict["pp_CSR"][ipt][ztb],Dict["pp_CSR_Errors"][ipt][ztb])
+            pval,chi2,ndf,igood = Get_pp_pPb_List_Chi2_old(Dict["p-Pb_CSR"][ipt][izt],Dict["p-Pb_CSR_Errors"][ipt][izt],
+                                                        Dict["pp_CSR"][ipt][izt],Dict["pp_CSR_Errors"][ipt][izt])
             
-            plt.figtext(0.140+0.325*(izt%3),0.705-0.345*(izt%2),"pval = %1.2f, chi2 = %1.1f, ndf = %i"%(pval,chi2,ndf),fontsize=18,alpha=.7)
-
-            fit_string = "pval = %1.2f, chi2 = %1.1f, ndf = %i"%(pval,chi2,ndf)
+            Chi2 = Get_pp_pPb_List_Chi2(Dict["p-Pb_CSR"][ipt][izt],Dict["p-Pb_CSR_Errors"][ipt][izt],Dict["p-Pb_Uncorr_Error"][ipt][izt],
+                                        Dict["pp_CSR"][ipt][izt],Dict["pp_CSR_Errors"][ipt][izt],Dict["pp_Uncorr_Error"][ipt][izt])
+            print("chi2 in plotter = %f"%(Chi2))
+            
+            
+            if (izt < 3):
+                #plt.figtext(0.140+0.325*(izt%3),0.705,"chi2 = %1.1f"%(Chi2),fontsize=18,alpha=.7)
+                plt.figtext(0.10+0.325*(izt%3),0.705,"ROOT: pval = %1.2f, chi2 = %1.1f, ndf = %i"%(pval,chi2,ndf),fontsize=18,alpha=.7)
+            else:
+                #plt.figtext(0.140+0.325*(izt%3),0.705-0.345,"chi2 = %1.1f"%(Chi2),fontsize=18,alpha=.7)
+                plt.figtext(0.10+0.325*(izt%3),0.705-0.345,"ROOT: pval = %1.2f, chi2 = %1.1f, ndf = %i"%(pval,chi2,ndf),fontsize=18,alpha=.7)
 
             if(Use_MC):
                 leg = plt.legend([pp,pPb,MC,pp_UE,pPb_UE,MC_UE,empt,empt2,empt3],['pp $\sqrt{s}= 5$ TeV (stat. error)',
                     'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)','pythia GJ $\sqrt{s}=5$ TeV (stat. error)', 
                     'pp UE Error', 'p-Pb UE Error','pythia UE Error', r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]),
-                    r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]),fit_string],loc = "upper left",fontsize=16,frameon=False,numpoints=1)
+                    r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]),fit_string],
+                    loc = "upper left",fontsize=16,frameon=False,numpoints=1)
             else:    
-                leg = plt.legend([pp,pPb,pp_UE,pPb_UE,empt,empt2],['pp $\sqrt{s}= 5$ TeV (stat. error)',
+                if not(Quad_UE):
+                    leg = plt.legend([pp,pPb,pp_UE,pPb_UE,empt,empt2],['pp $\sqrt{s}= 5$ TeV (stat. error)',
                     'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)', 'pp UB Error', 'p-Pb UB Error',
                     r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]),
-                    r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],loc = "upper left",fontsize=16,frameon=False,numpoints=1)
+                    r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],
+                    loc = "upper left",fontsize=16,frameon=False,numpoints=1)
+                else:
+                    leg = plt.legend([pp,pPb,Combined_UE,empt,empt2],['pp $\sqrt{s}= 5$ TeV (stat. error)',
+                    'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)', 'UB Error',
+                    r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]),
+                    r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],
+                    loc = "upper left",fontsize=16,frameon=False,numpoints=1)
 
             
             

@@ -348,7 +348,6 @@ def ROOT_to_nparray():
         for ipt in range (N_pT_Bins):
 
             for izt in range (0,NzT):
-                ztb = izt-zT_offset
 
                 SR_UB = 0
                 SR_UB_Error = 0

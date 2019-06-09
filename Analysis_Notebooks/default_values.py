@@ -41,6 +41,7 @@ Shower = "LO"
 description_string= "pT_Rebin_1_16dPhi"
 #description_string = "pT_Rebin_1_pDevPlus"
 #description_string = "pT_Rebin_1_pDevMinus"
+#description_string = "pT_Rebin_1_pDevNONE"
 
 
 #description_string="pT_Rebin_3"
@@ -102,7 +103,7 @@ pTbins = [12,15,19,26,40]
 zTbins = np.asarray([0.05, 0.07670637, 0.11767734, 0.18053204, 0.27695915, 0.42489062, 0.65183634,1])
 zT_offset = 0
 if (len(zTbins)==8):
-    ZT_OFF_PLOT = 0 #Offset for FF plotting
+    ZT_OFF_PLOT = 1 #Offset for FF plotting
 
 #deta
 eta_max = 1.2 #Range of Signal Correlations
@@ -153,6 +154,7 @@ for i,dphi in enumerate(dPhi_Bins):
 if (Uncorr_Estimate == "ZYAM"):
     print("ZYAM Index Range = %i to %i"%(ZYAM_Min_i,ZYAM_Max_i))
 N_Phi_Integrate = len(dPhi_Bins)-dphi_start_integral
+print(N_Phi_Integrate)
 Integration_Width = math.pi/(len(delta_phi_centers)+1) * N_Phi_Integrate
 phi_width = math.pi/(N_dPhi_Bins)/2
 
@@ -174,7 +176,6 @@ if (description_string == "zT_Rebin_15"):
 
 if ("pT_Rebin_1" in description_string):
     pTbins = [12.0,40.0]
-    print(pTbins)
     
 if ("pT_Rebin_3" in description_string):
     pTbins = [12.00, 21.33, 30.67, 40.00]
@@ -197,7 +198,7 @@ def Get_Purity(filename):
     
     for ipt in range(N_pT_Bins):
         purity_histo = file.Get('H_Purities_pT%1.0f_%1.0f' %(pTbins[ipt],pTbins[ipt+1]))
-        print('H_Purities_pT%1.0f_%1.0f' %(pTbins[ipt],pTbins[ipt+1]))
+        #print('H_Purities_pT%1.0f_%1.0f' %(pTbins[ipt],pTbins[ipt+1]))
         purity_uncertainty_histo = file.Get('H_Purity_Uncertanty_pT%1.0f_%1.0f' %(pTbins[ipt],pTbins[ipt+1]))
         purities[ipt] = purity_histo.GetMean()
         p_uncertainties[ipt] = purity_uncertainty_histo.GetMean()
@@ -245,4 +246,5 @@ if(Use_MC):
     Systems = ["pp","p-Pb","MC"]
     Files = [pp_File,pPb_File,MC_File]
     
-print Files
+for file,SYS in zip(Files,Systems):
+    print("%s File: %s"%(SYS,file))
