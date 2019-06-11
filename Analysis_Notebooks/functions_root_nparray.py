@@ -223,7 +223,7 @@ def Plot_UB():
             fig = plt.figure(figsize=(34,17))
             #if (ipt > 0): continue
             #ipt = ipt+2
-            for izt in range (zT_offset,NzT+zT_offset):
+            for izt in range (0,NzT):
 
                 ztb = izt-zT_offset
 
@@ -400,10 +400,10 @@ def ROOT_to_nparray():
 #Each dictionary value is a numpy array of dimension 2 or 3. Want to print uncertainties.        
 def print_from_Dict(Dict):
     
-    for key in Dict:    
-        if ("Error" in key):
+    for key in Dict:
+        if not("Error" in key):
             continue
-        if ("p-Pb" in key):
+        if not("pp" in key):
             continue
         #if ("CBR" in key):
         #    continue

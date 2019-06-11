@@ -109,8 +109,13 @@ def Weighted_Average(FF,FF_Errors,purity_FF_Errors):
             
             if (math.isnan(Rel_Stat_Erorr[ipt][izt]) or math.isnan(Rel_Purity_Error[ipt][izt]) or math.isnan(FF[ipt][izt])): continue
             
-            Combined[izt] += 1/((Rel_Stat_Erorr[ipt][izt]**2) + (Rel_Purity_Error[ipt][izt]**2)) * FF[ipt][izt] 
-            weight_sum += 1/((Rel_Stat_Erorr[ipt][izt]**2) + (Rel_Purity_Error[ipt][izt]**2))
+            Combined[izt] += (1/(FF_Errors[ipt][izt]**2)) * FF[ipt][izt]
+            weight_sum += 1/(FF_Errors[ipt][izt]**2)
+            #Combined[izt] += 1/((Rel_Stat_Erorr[ipt][izt]**2) + (Rel_Purity_Error[ipt][izt]**2)) * FF[ipt][izt] 
+            #weight_sum += 1/((Rel_Stat_Erorr[ipt][izt]**2) + (Rel_Purity_Error[ipt][izt]**2))            
+            
+
+
     
         Combined[izt] = Combined[izt]/weight_sum
 
@@ -470,7 +475,6 @@ def Compare_pp_pPB_Avg_lists(strings,string_descrp_list,colors):
             FF_Errors = np.load("npy_files/%s_%s_Averaged_Fragmentation_Functions_Errors_%s.npy"%(Shower,SYS,string))
             print("loading npy_files/%s_%s_Averaged_Fragmentation_Functions_Errors_%s.npy"%(Shower,SYS,string))
         
-            
             
             plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT]+0.2, FF[:NzT-ZT_OFF_PLOT],xerr=zT_widths[:NzT-ZT_OFF_PLOT],
                 yerr=FF_Errors[:NzT-ZT_OFF_PLOT],linewidth=1, fmt=shape,color=colr,capsize=1,label="%s (%s)"%(string_descr,SYS))

@@ -1,6 +1,7 @@
 ### Corr -> Frag ###
 
 import matplotlib.pyplot as plt
+import scipy
 import matplotlib
 import math
 from default_values import *
@@ -281,7 +282,6 @@ def Correlated_Subtraction_Weights(Dict):
 def Ped_Sub_After_Cs(Dict):
 #This function calculates ZYAM after correlated subtraction (Cs)
     for SYS,ifile in zip(Systems,Files):
-        print(SYS)
         for ipt in range (N_pT_Bins):
             #if (ipt > 0): continue
 
@@ -293,51 +293,31 @@ def Ped_Sub_After_Cs(Dict):
                 Dict["%s_CSR"%(SYS)][ipt][izt] = Dict["%s_CSR"%(SYS)][ipt][izt] - ZYAM_Cs
                 Dict["%s_Uncorr_Error"%(SYS)][ipt][izt] = ZYAM_Cs_Error
                 
-                print(ZYAM_Cs)
-                                                  
-
-def Get_pp_pPb_List_Chi2_old(array1,array1_E,array2,array2_E):
-    
-    hist1 = ROOT.TH1F("hist1","histo1",len(array1), 0, 3.2)
-    hist1.SetBinContent(0,0)
-    for i in range(len(array1)):
-        hist1.SetBinContent(i,array1[i])
-        hist1.SetBinError(i,array1_E[i])
-#        print("Array Content || Bin Content --- %f || %f"%(array1[i],hist1.GetBinContent(i+1)))
-#    print("")
-        
-    hist2 = ROOT.TH1F("hist2","histo2",len(array2), 0, 3.2)
-    hist2.SetBinContent(0,0)
-    for i in range(len(array2)):
-        hist2.SetBinContent(i,array2[i])
-        hist2.SetBinError(i,array2_E[i])
-
-    chi2 = ROOT.Double(0.0)
-    ndf = ROOT.Long(0.0)
-    igood = ROOT.Long(0.0)
-    pval = hist1.Chi2TestX(hist2,chi2,ndf,igood,"WW");
-
-    return pval,chi2,ndf,igood 
+        np.save("npy_files/%s_%s_%s_Cs"%(Shower,description_string,SYS),Dict["%s_CSR"%(SYS)])
+        np.save("npy_files/%s_%s_%s_Cs_Errors"%(Shower,description_string,SYS),Dict["%s_CSR_Errors"%(SYS)])
+        np.save("npy_files/%s_%s_%s_Cs_Uncorr_Error"%(Shower,description_string,SYS),Dict["%s_Uncorr_Error"%(SYS)])
+                                                                  
 
 def Get_pp_pPb_List_Chi2(array1,array1_E,UE_1,array2,array2_E,UE_2):
     
     UE_1_array = np.full((len(array1),len(array1)),UE_1[0])  
     UE_2_array = np.full((len(array2),len(array2)),UE_2[0])
-
     Stat_1_array = np.diag(array1_E)
     Stat_2_array = np.diag(array2_E)
 
     Cov = Stat_1_array**2 + Stat_2_array**2 + UE_1_array**2 + UE_2_array**2
-    eig_val,eig_vec = np.linalg.eig(Cov)
+    Cov_Inverse = np.linalg.inv(Cov)
 
-    Chi2 = 0
+    Delta = np.absolute(array1-array2)
+    Delta_T = np.transpose(Delta)
     
-    for y1,y2,Err in zip(array1,array2,eig_val):
-        Chi2 += (y1-y2)**2 / Err
+    Mult1 = np.matmul(Cov_Inverse,Delta)
     
-    print('$ \Chi ^2$ = %f'%(Chi2))
-    return Chi2
-    
+    Chi2 = np.matmul(Delta_T,Mult1)
+    NDF = len(array1) - 2
+    Pval = chisqprob(Chi2,NDF)
+    #Pval = scipy.stats.chi2.sf(Chi2,NDF)
+    return Chi2,NDF,Pval
     
                     
 def Plot_pp_pPb_Cs(Dict):
@@ -392,20 +372,11 @@ def Plot_pp_pPb_Cs(Dict):
             empt, = ax.plot([], [],' ')
             empt2, = ax.plot([],[],' ')
             
-            pval,chi2,ndf,igood = Get_pp_pPb_List_Chi2_old(Dict["p-Pb_CSR"][ipt][izt],Dict["p-Pb_CSR_Errors"][ipt][izt],
-                                                        Dict["pp_CSR"][ipt][izt],Dict["pp_CSR_Errors"][ipt][izt])
             
-            Chi2 = Get_pp_pPb_List_Chi2(Dict["p-Pb_CSR"][ipt][izt],Dict["p-Pb_CSR_Errors"][ipt][izt],Dict["p-Pb_Uncorr_Error"][ipt][izt],
+            Chi2,NDF,Pval = Get_pp_pPb_List_Chi2(Dict["p-Pb_CSR"][ipt][izt],Dict["p-Pb_CSR_Errors"][ipt][izt],Dict["p-Pb_Uncorr_Error"][ipt][izt],
                                         Dict["pp_CSR"][ipt][izt],Dict["pp_CSR_Errors"][ipt][izt],Dict["pp_Uncorr_Error"][ipt][izt])
-            print("chi2 in plotter = %f"%(Chi2))
-            
-            
-            if (izt < 3):
-                #plt.figtext(0.140+0.325*(izt%3),0.705,"chi2 = %1.1f"%(Chi2),fontsize=18,alpha=.7)
-                plt.figtext(0.10+0.325*(izt%3),0.705,"ROOT: pval = %1.2f, chi2 = %1.1f, ndf = %i"%(pval,chi2,ndf),fontsize=18,alpha=.7)
-            else:
-                #plt.figtext(0.140+0.325*(izt%3),0.705-0.345,"chi2 = %1.1f"%(Chi2),fontsize=18,alpha=.7)
-                plt.figtext(0.10+0.325*(izt%3),0.705-0.345,"ROOT: pval = %1.2f, chi2 = %1.1f, ndf = %i"%(pval,chi2,ndf),fontsize=18,alpha=.7)
+                        
+            plt.annotate("$\chi^2$ = %1.1f, ndf = %i, p = %1.2f"%(Chi2,NDF,Pval), xy=(0.99, 0.06), xycoords='axes fraction', ha='right', va='top', fontsize=16)
 
             if(Use_MC):
                 leg = plt.legend([pp,pPb,MC,pp_UE,pPb_UE,MC_UE,empt,empt2,empt3],['pp $\sqrt{s}= 5$ TeV (stat. error)',
@@ -441,9 +412,217 @@ def Plot_pp_pPb_Cs(Dict):
         
         #Above can be adapted for pp & PbPb comparisons
         
+def Cs_Weighted_Average(Dict):
+    
+    #Change this to empty dictionary with keys taking SYS. Then just loop over systems
+    
+    Averaged_pPb = np.zeros((NzT,N_dPhi_Bins))
+    Averaged_pPb_Error = np.zeros((NzT,N_dPhi_Bins))
+    Averaged_UB_pPb_Error = np.zeros((NzT,N_dPhi_Bins))
+    
+    Averaged_pp = np.zeros((NzT,N_dPhi_Bins))
+    Averaged_pp_Error = np.zeros((NzT,N_dPhi_Bins))
+    Averaged_UB_pp_Error = np.zeros((NzT,N_dPhi_Bins))
+    
+    
+    for izt in range (NzT):
+        for dphi in range(N_dPhi_Bins):
+            for ipt in range (N_pT_Bins):
+
+                pPb_Cs = Dict["p-Pb_CSR"][ipt][izt][dphi]
+                pPb_Cs_Error = Dict["p-Pb_CSR_Errors"][ipt][izt][dphi]
+                pp_Cs = Dict["pp_CSR"][ipt][izt][dphi]
+                pp_Cs_Error = Dict["pp_CSR_Errors"][ipt][izt][dphi]
+    
+                    
+                pPb_Cs_Weight = 1/(pPb_Cs_Error**2) #check if zero
+                pp_Cs_Weight = 1/(pp_Cs_Error**2)
+                
+                Averaged_pPb[izt][dphi] += pPb_Cs_Weight*pPb_Cs
+                Averaged_pp[izt][dphi] += pp_Cs_Weight*pp_Cs
+                
+                Averaged_pPb_Error[izt][dphi] += pPb_Cs_Weight
+                Averaged_pp_Error[izt][dphi] += pp_Cs_Weight
+                
+                Averaged_UB_pPb_Error[izt][dphi] += (Dict["p-Pb_Uncorr_Error"][ipt][izt][0])**2
+                Averaged_UB_pp_Error[izt][dphi] += (Dict["pp_Uncorr_Error"][ipt][izt][0])**2
+                
+        Averaged_pPb[izt] = Averaged_pPb[izt]/Averaged_pPb_Error[izt]
+        Averaged_pp[izt] = Averaged_pp[izt]/Averaged_pp_Error[izt]
+        
+        Averaged_pPb_Error[izt] = np.sqrt(1/Averaged_pPb_Error[izt])
+        Averaged_pp_Error[izt] = np.sqrt(1/Averaged_pp_Error[izt])
+        
+
+        Averaged_UB_pPb_Error[izt] = np.sqrt(Averaged_UB_pPb_Error[izt])/N_pT_Bins
+        Averaged_UB_pp_Error[izt] = np.sqrt(Averaged_UB_pp_Error[izt])/N_pT_Bins
+        
+    
+    #for izt in range(NzT):
+    #    for ipt in range(N_pT_Bins):
+    #        print Dict["p-Pb_Uncorr_Error"][ipt][izt][0]
+    #        #Averaged_UB_Error[izt] += np.sqrt(Dict["p-Pb_Uncorr_Error"][ipt][izt][0]**2 + Dict["pp_Uncorr_Error"][ipt][izt][0]**2)
+    #        Averaged_UB_pPb_Error[izt] += (Dict["p-Pb_Uncorr_Error"][ipt][izt][0])**2
+    #        Averaged_UB_pp_Error[izt] += (Dict["pp_Uncorr_Error"][ipt][izt][0])**2
+    #    
+    #    #Averaged_UB_Error[izt] = Averaged_UB_Error[izt]/N_pT_Bins
+    #    Averaged_UB_pPb_Error[izt] = np.sqrt(Averaged_UB_pPb_Error[izt])/N_pT_Bins
+    #    Averaged_UB_pp_Error[izt] = np.sqrt(Averaged_UB_pp_Error[izt])/N_pT_Bins
+
+        
+    Keys = []
+    Corr_Arrays = []
+    
+    Keys.append("Combined_p-Pb_Cs")
+    Keys.append("Combined_p-Pb_Cs_Errors")
+    Keys.append("Combined_p-Pb_Cs_Uncorr_Error")
+    
+    Keys.append("Combined_pp_Cs")
+    Keys.append("Combined_pp_Cs_Errors")
+    Keys.append("Combined_pp_Cs_Uncorr_Error")
+
+    Corr_Arrays.append(Averaged_pPb)
+    Corr_Arrays.append(Averaged_pPb_Error)
+    Corr_Arrays.append(Averaged_UB_pPb_Error)
+    
+    Corr_Arrays.append(Averaged_pp)
+    Corr_Arrays.append(Averaged_pp_Error)
+    Corr_Arrays.append(Averaged_UB_pp_Error)
+    
+    Weighted_Corr = dict(zip(Keys,Corr_Arrays))
+    
+    Save_Avg_Cs_npy(Weighted_Corr)
+    
+    return Weighted_Corr
+
+        
+def Save_Avg_Cs_npy(Corr):
+    for SYS in Systems:
+        np.save("npy_files/%s_%s_Combined_%s_Cs"%(Shower,description_string,SYS),Corr["Combined_%s_Cs"%(SYS)])
+        np.save("npy_files/%s_%s_Combined_%s_Cs_Errors"%(Shower,description_string,SYS),Corr["Combined_%s_Cs_Errors"%(SYS)])
+        np.save("npy_files/%s_%s_Combined_%s_Cs_Uncorr_Error"%(Shower,description_string,SYS),Corr["Combined_%s_Cs_Uncorr_Error"%(SYS)])
+                
+def Plot_pp_pPb_Averaged_Cs(Dict):
+
+        #Loops & Fig
+        fig = plt.figure(figsize=(24,12))
+        if (NzT==7):
+            fig = plt.figure(figsize=(22,18))
+        for izt in range (NzT-ZT_OFF_PLOT):
+
+            if (NzT ==4):
+                ax = fig.add_subplot(2,2,izt+1)
+            elif (NzT ==6):
+                ax = fig.add_subplot(2,3,izt+1)
+            elif (NzT ==7):
+                ax = fig.add_subplot(3,3,izt+1)
+            
+        #Plots
+            pPb = plt.errorbar(delta_phi_centers,Dict["Combined_p-Pb_Cs"][izt],xerr=phi_width,yerr=Dict["Combined_p-Pb_Cs_Errors"][izt],fmt='bo',capsize=4,markersize=11)
+            pp = plt.errorbar(delta_phi_centers,Dict["Combined_pp_Cs"][izt],xerr=phi_width,yerr=Dict["Combined_pp_Cs_Errors"][izt],fmt='ro',capsize=4,markersize=11)
+            
+            plt.axhline(y=0,color='gray',linestyle='--',linewidth=1.3,alpha=0.8)
+            
+            UE_Val = np.sqrt(Dict["Combined_pp_Cs_Uncorr_Error"][izt][0]**2 + Dict["Combined_p-Pb_Cs_Uncorr_Error"][izt][0]**2)
+            Combined_UE = ax.fill_between(ue_error_bar,-UE_Val,UE_Val,facecolor='purple',alpha=0.35)
+        
+            empt, = ax.plot([], [],' ')
+            empt2, = ax.plot([],[],' ')
+            
+        #Labels
+            if (izt>2):
+                plt.xlabel(r'|$\Delta \varphi$|',fontsize=28)
+            if (izt%3 == 0):
+                plt.ylabel(r'$1/N_{\gamma} \: \: \mathrm{d}N/\mathrm{d}\Delta \eta$',fontsize=28)
+                
+            Chi2,NDF,Pval = Get_pp_pPb_List_Chi2(Dict["Combined_p-Pb_Cs"][izt],Dict["Combined_p-Pb_Cs_Errors"][izt],Dict["Combined_p-Pb_Cs_Uncorr_Error"][izt],
+                                        Dict["Combined_pp_Cs"][izt],Dict["Combined_pp_Cs_Errors"][izt],Dict["Combined_pp_Cs_Uncorr_Error"][izt])
+            
+            plt.annotate("$\chi^2$ = %1.1f, ndf = %i, p = %1.2f"%(Chi2,NDF,Pval), xy=(0.99, 0.08), xycoords='axes fraction', ha='right', va='top', fontsize=16)
+            
+            plt.xlim((0.39269908169872414,3.14159))
+            
+            
+            leg = plt.legend([pp,pPb,Combined_UE,empt,empt2],['pp $\sqrt{s}= 5$ TeV (stat. error)',
+                    'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)', 'UB Error',
+                    r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]),
+                    r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[0],pTbins[N_pT_Bins])],
+                    loc = "upper left",fontsize=16,frameon=False,numpoints=1)
+                
+def Compare_Cs_Averages(strings,string_descrp_list,colors):
+    
+    #shapes = ["o","x","s"]
+    for SYS in Systems:
+        fig = plt.figure(figsize=(22,18))
+        
+        for (string,string_descr,colr) in zip(strings,string_descrp_list,colors):
+            print(string)
+            
+            CS_Avg = np.load("npy_files/%s_%s_Combined_%s_Cs.npy"%(Shower,string,SYS))
+            CS_Avg_Err = np.load("npy_files/%s_%s_Combined_%s_Cs_Errors.npy"%(Shower,string,SYS))
+            CS_Avg_Uncorr_Err = np.load("npy_files/%s_%s_Combined_%s_Cs_Uncorr_Error.npy"%(Shower,string,SYS))
+            
+            for izt in range(NzT-ZT_OFF_PLOT):
+                
+                if (NzT ==4):
+                    ax = fig.add_subplot(2,2,izt+1)
+                elif (NzT ==6):
+                    ax = fig.add_subplot(2,3,izt+1)
+                elif (NzT ==7):
+                    ax = fig.add_subplot(3,3,izt+1)
+   
+                plt.errorbar(delta_phi_centers,CS_Avg[izt],xerr=phi_width,yerr=CS_Avg_Err[izt],fmt='o',color = colr,capsize=4,markersize=11,
+                label = "average %s"%(string_descr))
+                
+                plt.xlim((0.39269908169872414,3.14159))
+                
+                leg = plt.legend(numpoints=1,frameon=False,loc="best")
+                leg.set_title("%s :%1.2f < $z_\mathrm{T}$ < %1.2f"%(SYS,zTbins[izt],zTbins[izt+1]))
+                plt.setp(leg.get_title(),fontsize=18)
+                    
+            
+def Compare_Cs_pTBins():
+    
+    #shapes = ["o","x","s"]
+    for SYS in Systems:
+        fig = plt.figure(figsize=(22,18))
+        
+        CS = np.load("npy_files/%s_%s_%s_Cs.npy"%(Shower,description_string,SYS))
+        CS_ERR = np.load("npy_files/%s_%s_%s_Cs_Errors.npy"%(Shower,description_string,SYS))
+        CS_Uncorr_ERR = np.load("npy_files/%s_%s_%s_Cs_Uncorr_Error.npy"%(Shower,description_string,SYS))    
+        
+        CS_Avg = np.load("npy_files/%s_%s_Combined_%s_Cs.npy"%(Shower,description_string,SYS))
+        CS_Avg_Err = np.load("npy_files/%s_%s_Combined_%s_Cs_Errors.npy"%(Shower,description_string,SYS))
+        CS_Avg_Uncorr_Err = np.load("npy_files/%s_%s_Combined_%s_Cs_Uncorr_Error.npy"%(Shower,description_string,SYS))
+            
+        for izt in range(NzT-ZT_OFF_PLOT):
+                
+            if (NzT ==4):
+                ax = fig.add_subplot(2,2,izt+1)
+            elif (NzT ==6):
+                ax = fig.add_subplot(2,3,izt+1)
+            elif (NzT ==7):
+                ax = fig.add_subplot(3,3,izt+1)
+                
+            plt.errorbar(delta_phi_centers,CS_Avg[izt],xerr=phi_width,yerr=CS_Avg_Err[izt],fmt='ko',capsize=4,markersize=11,
+            label = '%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[0],pTbins[N_pT_Bins]))
+                
+            for ipt in range(N_pT_Bins):
+                plt.errorbar(delta_phi_centers,CS[ipt][izt],xerr=phi_width,yerr=CS_ERR[ipt][izt],fmt='o',capsize=4,markersize=11,
+                label = '%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'
+                %(pTbins[ipt],pTbins[ipt+1]))
+                
+                plt.xlim((0.39269908169872414,3.14159))
+                
+                leg = plt.legend(numpoints=1,frameon=False,loc="best")
+                leg.set_title("%s :%1.2f < $z_\mathrm{T}$ < %1.2f"%(SYS,zTbins[izt],zTbins[izt+1]))
+                plt.setp(leg.get_title(),fontsize=18)           
+            
+                
+        
 def Integrate_Away_Side(Phi_array,Phi_Errors,LE_Error):
     
-    Use_Uncorr_Error = True
+    Use_Uncorr_Error = False
     FF_zt = np.zeros((N_pT_Bins, NzT))
     FF_zt_Errors = np.zeros((N_pT_Bins, NzT))
     if Use_Uncorr_Error:

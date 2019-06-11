@@ -35,13 +35,15 @@ Shower = "LO"
 #description_string="15zT"
 #description_string="2zT"
 
-#description_string="pT_Rebin_1"
+description_string="pT_Rebin_1"
 #description_string="pT_Rebin_1_15pT"
 #description_string="pT_Rebin_1_20pT"
-description_string= "pT_Rebin_1_16dPhi"
+#description_string= "pT_Rebin_1_16dPhi"
 #description_string = "pT_Rebin_1_pDevPlus"
 #description_string = "pT_Rebin_1_pDevMinus"
 #description_string = "pT_Rebin_1_pDevNONE"
+
+#description_string = "pT_Rebin_2_pDevNONE"
 
 
 #description_string="pT_Rebin_3"
@@ -58,6 +60,7 @@ description_string= "pT_Rebin_1_16dPhi"
 #description_string="pT_Rebin_4_05zT"
 #description_string="pT_Rebin_4_Cut" #15-40eV
 #description_string= "pT_Rebin_4_ErrWeights"
+#description_string= "pT_Rebin_4_ErrWeights_16dPhi"
 
 #description_string="pT_Rebin_5_Lambda"
 #description_string="pT_Rebin_5_Weights"
@@ -114,10 +117,6 @@ if ("16dPhi" in description_string):
     
 dPhi_Bins = [i*math.pi/N_dPhi_Bins for i in range(0,N_dPhi_Bins+1)]
 delta_phi_centers = [i*math.pi/N_dPhi_Bins+math.pi/N_dPhi_Bins/2 for i in range(0,N_dPhi_Bins)] #skip first dPhi bin to avoid Isolation
-
-#N_Phi_Integrate = 3 #Number of dPhi Bins for away-side integration. 3 Corresponds to dphi > 2.1
-#Integration_Width = math.pi/(len(delta_phi_centers)+1) * N_Phi_Integrate
-#phi_width = math.pi/(N_dPhi_Bins)/2
 
 #UE
 
@@ -176,6 +175,9 @@ if (description_string == "zT_Rebin_15"):
 
 if ("pT_Rebin_1" in description_string):
     pTbins = [12.0,40.0]
+    
+if ("pT_Rebin_2" in description_string):
+    pTbins = [12.0,15.0,40.0]
     
 if ("pT_Rebin_3" in description_string):
     pTbins = [12.00, 21.33, 30.67, 40.00]
