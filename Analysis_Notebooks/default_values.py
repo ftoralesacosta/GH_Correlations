@@ -1,6 +1,7 @@
 import numpy as np
 import math
 import ROOT
+import scipy.stats
 
 from variations import *
 
@@ -17,8 +18,9 @@ pT_Rebin = False
 N_dPhi_Bins = 8
 Ped_Sub_First = False #Important after weight implementation
 Average_UE = False
-Show_Fits = True
+Show_Fits = False
 Uncorr_Estimate = "ZYAM"
+#Use_Avg_Cs = True
 
         #DEFAULTS:
 
@@ -35,13 +37,13 @@ Shower = "LO"
 #description_string="15zT"
 #description_string="2zT"
 
-description_string="pT_Rebin_1"
+#description_string="pT_Rebin_1"
 #description_string="pT_Rebin_1_15pT"
 #description_string="pT_Rebin_1_20pT"
 #description_string= "pT_Rebin_1_16dPhi"
 #description_string = "pT_Rebin_1_pDevPlus"
 #description_string = "pT_Rebin_1_pDevMinus"
-#description_string = "pT_Rebin_1_pDevNONE"
+description_string = "pT_Rebin_1_pDevNONE"
 
 #description_string = "pT_Rebin_2_pDevNONE"
 
@@ -150,10 +152,11 @@ for i,dphi in enumerate(dPhi_Bins):
         dphi_start_integral = i
         break
     
-if (Uncorr_Estimate == "ZYAM"):
-    print("ZYAM Index Range = %i to %i"%(ZYAM_Min_i,ZYAM_Max_i))
+#if (Uncorr_Estimate == "ZYAM"):
+#    print("ZYAM Index Range = %i to %i"%(ZYAM_Min_i,ZYAM_Max_i))
+
 N_Phi_Integrate = len(dPhi_Bins)-dphi_start_integral
-print(N_Phi_Integrate)
+#print(N_Phi_Integrate)
 Integration_Width = math.pi/(len(delta_phi_centers)+1) * N_Phi_Integrate
 phi_width = math.pi/(N_dPhi_Bins)/2
 
@@ -209,6 +212,7 @@ def Get_Purity(filename):
 
 if not(description_string == "05zT_working_old"):
     purity,purity_Uncertainty = Get_Purity(Files[1])
+#print(purity)
     
 #print("purities:")
 #print(purity)
@@ -250,3 +254,32 @@ if(Use_MC):
     
 for file,SYS in zip(Files,Systems):
     print("%s File: %s"%(SYS,file))
+    
+    
+def Get_pp_pPb_List_Chi2(array1,array1_E,SYS_1,array2,array2_E,SYS_2,Sys_Type="Constant"):
+    
+    Sys_Error_array_1 = (np.full((len(array1),len(array1)),SYS_1[0]))**2
+    Sys_Error_array_2 = (np.full((len(array2),len(array2)),SYS_2[0]))**2
+
+    
+    Stat_1_array = np.diag(array1_E)
+    Stat_2_array = np.diag(array2_E)
+
+    #Common relative normalization Error
+    if (Sys_Type == "Constant_Rel_Norm"):
+        Sys_Error_array_1 = SYS_1[0]**2 * np.outer(array1,array2) 
+        Sys_Error_array_2 = SYS_2[0]**2 *np.outer(array2,array2)
+    
+    Cov = Stat_1_array**2 + Stat_2_array**2 + Sys_Error_array_1 + Sys_Error_array_2
+    Cov_Inverse = np.linalg.inv(Cov)
+
+    Delta = np.absolute(array1-array2)
+    Delta_T = np.transpose(Delta)
+    
+    Mult1 = np.matmul(Cov_Inverse,Delta)
+    
+    Chi2 = np.matmul(Delta_T,Mult1)
+    NDF = len(array1) - 2
+    #Pval = chisqprob(Chi2,NDF)
+    Pval = scipy.stats.chi2.sf(Chi2,NDF)
+    return Chi2,NDF,Pval

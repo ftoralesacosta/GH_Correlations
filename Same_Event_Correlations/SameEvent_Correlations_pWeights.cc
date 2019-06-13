@@ -50,7 +50,6 @@ Float_t Get_Purity_ErrFunction(Float_t pT_GeV, std::string deviation) {
 
   purity_val = par[0]*TMath::Erf((pT_GeV-par[1])/par[2]);
   return purity_val;
-
 }
 
 

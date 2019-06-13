@@ -7,10 +7,10 @@ def FF_Ratio(FF_Dict):
     
     fig = plt.figure(figsize=(17,13))
     
-    for ipt in range (N_pT_Bins):
+    for ipt in range (len(FF_Dict["p-Pb_FF"])):
 
         Ratio = FF_Dict["p-Pb_FF"][ipt]/FF_Dict["pp_FF"][ipt]
-
+        print(Ratio)
         #Stat. Error in ratio
         Ratio_Error = np.sqrt((FF_Dict["p-Pb_FF_Errors"][ipt]/FF_Dict["p-Pb_FF"][ipt])**2 + (FF_Dict["pp_FF_Errors"][ipt]/FF_Dict["pp_FF"][ipt])**2)*Ratio
         
@@ -27,8 +27,8 @@ def FF_Ratio(FF_Dict):
         plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^{\mathrm{h}}/p_\mathrm{T}^\gamma$",fontsize=20)
         plt.ylabel(r"$\frac{\mathrm{p-Pb}}{\mathrm{pp}}$",fontsize=20)
         
-        plt.xlim(xmin = 0.0,xmax=1.0)
-        plt.ylim(ymin = -2, ymax=4)
+        plt.xlim(xmin = 0.0,xmax=zT_centers[NzT-ZT_OFF_PLOT])
+        plt.ylim(ymin = -0.5, ymax=2.5)
         
         leg = plt.legend([Ratio_Plot,empt4],["Statistical Error",r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],frameon=False,numpoints=1,title=' ',prop={'size':18})
         leg.set_title("ALICE Work in Progress\n ")
@@ -40,7 +40,10 @@ def FF_Ratio(FF_Dict):
     plt.savefig("pics/%s_pp_FFunction.pdf"%(Shower), bbox_inches='tight')
     plt.show()
     
-
+    if (len(FF_Dict["p-Pb_FF"]) < 2): #Because Cs avge and FF avg methods the same for 1 pT bin 
+        Ratio = np.save("npy_files/LO_Cs_Avg_FF_Ratio_%s.npy"%(description_string),Ratio)
+        Ratio_Error = np.save("npy_files/LO_Cs_Avg_FF_Ratio_Errors_%s.npy"%(description_string),Ratio_Error)
+    
 def Overlay_pT_FF(FF_Dict):
     
     for SYS in Systems:
@@ -113,8 +116,6 @@ def Weighted_Average(FF,FF_Errors,purity_FF_Errors):
             weight_sum += 1/(FF_Errors[ipt][izt]**2)
             #Combined[izt] += 1/((Rel_Stat_Erorr[ipt][izt]**2) + (Rel_Purity_Error[ipt][izt]**2)) * FF[ipt][izt] 
             #weight_sum += 1/((Rel_Stat_Erorr[ipt][izt]**2) + (Rel_Purity_Error[ipt][izt]**2))            
-            
-
 
     
         Combined[izt] = Combined[izt]/weight_sum
@@ -157,7 +158,7 @@ def Average_FF(FF_Dict):
                 
         np.save("npy_files/%s_%s_Averaged_Fragmentation_Functions_%s.npy"%(Shower,SYS,description_string),Comb_Dict["%s_Combined_FF"%(SYS)])
         np.save("npy_files/%s_%s_Averaged_Fragmentation_Functions_Errors_%s.npy"%(Shower,SYS,description_string),Comb_Dict["%s_Combined_FF_Errors"%(SYS)])
-        print("saved to npy_files/%s_%s_Averaged_Fragmentation_Functions_%s.npy"%(Shower,SYS,description_string))
+        #print("saved to npy_files/%s_%s_Averaged_Fragmentation_Functions_%s.npy"%(Shower,SYS,description_string))
         
         Efficiency_Uncertainty = 0.05*Comb_Dict["%s_Combined_FF"%(SYS)]
         Sys_Uncertainty = np.sqrt(Efficiency_Uncertainty**2 + Comb_Dict["%s_purity_Uncertainty"%(SYS)]**2)
@@ -165,8 +166,6 @@ def Average_FF(FF_Dict):
         
     return Comb_Dict
         
-
-
 
 def Plot_pp_pPb_Avg_FF(Comb_Dict):
     
@@ -200,6 +199,14 @@ def Plot_pp_pPb_Avg_FF(Comb_Dict):
         #plt.xlim(xmin = 0.1,xmax=0.7)
         #plt.ylim(ymin = 0.001,ymax=20)
 
+    #purity_normalization = np.full(len(Comb_Dict["pp_Combined_FF"][:NzT-ZT_OFF_PLOT]),math.sqrt(0.15**2+0.05**2)) #estimate of constant normalization Error
+    purity_normalization = np.full(len(Comb_Dict["pp_Combined_FF"][:NzT-ZT_OFF_PLOT]),math.sqrt(0.25**2+0.05**2)) #estimate of constant normalization Error
+    
+    Chi2,NDF,Pval = Get_pp_pPb_List_Chi2(Comb_Dict["pp_Combined_FF"][:NzT-ZT_OFF_PLOT],Comb_Dict["pp_Combined_FF_Errors"][:NzT-ZT_OFF_PLOT],purity_normalization,
+                                         Comb_Dict["p-Pb_Combined_FF"][:NzT-ZT_OFF_PLOT],Comb_Dict["p-Pb_Combined_FF_Errors"][:NzT-ZT_OFF_PLOT],purity_normalization,"Constant_Rel_Norm")
+                        
+    plt.annotate("$\chi^2$ = %1.1f, ndf = %i, p = %f"%(Chi2,NDF,Pval), xy=(0.99, 0.06), xycoords='axes fraction', ha='right', va='top', fontsize=16)
+        
     leg = plt.legend(numpoints=1,frameon=False)
     leg.set_title("ALICE Work in Progress\n  $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV")
     plt.setp(leg.get_title(),fontsize=18)
@@ -216,6 +223,13 @@ def Plot_pp_pPb_Avg_FF(Comb_Dict):
         print("")
         print("                    %s Stat. Uncertainty:"%(SYS))
         print(Comb_Dict["%s_Combined_FF_Errors"%(SYS)][:NzT-ZT_OFF_PLOT])
+        print("")
+        
+        Efficiency_Uncertainty = 0.05*Comb_Dict["%s_Combined_FF"%(SYS)][:NzT-ZT_OFF_PLOT]
+        Sys_Uncertainty = np.sqrt(Efficiency_Uncertainty**2 + Comb_Dict["%s_purity_Uncertainty"%(SYS)][:NzT-ZT_OFF_PLOT]**2)
+        
+        print("              %s Systematic Uncertainty:"%(SYS))
+        print(Sys_Uncertainty)
         print("")
         
     print("                        LaTeX Table")
@@ -260,6 +274,7 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
     
     #Ratio
     Ratio = pPb_Combined/pp_Combined
+    print(Ratio)
     
     #Stat. Error in ratio
     Ratio_Error = np.sqrt((pPb_Combined_Errors/pPb_Combined)**2 + (pp_Combined_Errors/pp_Combined)**2)*Ratio
@@ -380,38 +395,20 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
     print(Ratio_Systematic[ZT_OFF_PLOT:])
     
 
-def Get_pp_pPb_FF_Chi2(string_descrp):
+    
+def Compare_pp_pPB_Avg_Ratio_lists(strings,string_descrp_list,colors,Show_Fits,Avg_Cs = False):
     
     plt.figure(figsize=(15,10.5))
     
-    histo_array = [] #pp,pPb, potentially PbPb
-    
-    for SYS in Systems:
-        FF = np.load("npy_files/%s_%s_Averaged_Fragmentation_Functions_%s.npy"%(Shower,SYS,string_descrp))
-        FF_Errors = np.load("npy_files/%s_%s_Averaged_Fragmentation_Functions_Errors_%s.npy"%(Shower,SYS,string_descrp))
-        hist = ROOT.TH1F("hist","histo",len(FF), 0, 1)
-        for i in range(len(FF)):
-            hist.SetBinContent(i+1,FF[i])
-            hist.SetBinError(i+1,FF_Errors[i])
-        histo_array.append(hist)
-    chi2_test = ROOT.Double(0.0)
-    ndf = ROOT.Long(0.0)
-    igood = ROOT.Long(0.0)
-    print(chi2_test,ndf,igood)
-    pval = histo_array[0].Chi2TestX(histo_array[1],chi2_test,ndf,igood)
-    print(chi2_test,ndf,igood)
-    print(pval)
-    return pval
-
-    
-def Compare_pp_pPB_Avg_Ratio_lists(strings,string_descrp_list,colors,Show_Fits):
-        
-    plt.figure(figsize=(15,10.5)) 
-    
     for (string,string_descr,colr) in zip(strings,string_descrp_list,colors):
         
-        Ratio = np.load("npy_files/LO_Averaged_FF_Ratio_%s.npy"%(string))
-        Ratio_Error = np.load("npy_files/LO_Averaged_FF_Ratio_Errors_%s.npy"%(string))
+        if not(Avg_Cs):
+            Ratio = np.load("npy_files/LO_Averaged_FF_Ratio_%s.npy"%(string))
+            Ratio_Error = np.load("npy_files/LO_Averaged_FF_Ratio_Errors_%s.npy"%(string))
+        
+        else:
+            Ratio = np.load("npy_files/LO_Cs_Avg_FF_Ratio_%s.npy"%(string))
+            Ratio_Error = np.load("npy_files/LO_Cs_Avg_FF_Ratio_Errors_%s.npy"%(string))
 
         Zbins = np.geomspace(0.05, 1.0, num=len(Ratio)+1)
         zT_centers = (Zbins[1:] + Zbins[:-1]) / 2

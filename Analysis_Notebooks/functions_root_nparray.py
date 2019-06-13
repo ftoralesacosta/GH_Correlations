@@ -401,25 +401,30 @@ def ROOT_to_nparray():
 def print_from_Dict(Dict):
     
     for key in Dict:
-        if not("Error" in key):
+        if ("Error" in key):
             continue
-        if not("pp" in key):
+        if ("pip" in key):
             continue
         #if ("CBR" in key):
         #    continue
         
         nparr = Dict[key]
         print("%s:"%(key))
-        for sublist in nparr:
-            if (len(sublist.shape)) < 2:
-                for i in sublist:
-                    print(i),
-                print("")
-            else:
-                for subsublist in sublist:
-                    for i in subsublist:
-                        print("%1.4f"%(i)),
+        if (len(nparr.shape) < 2):
+            for i in nparr:
+                print(i),
+            print("")
+        else:
+            for sublist in nparr:
+                if (len(sublist.shape)) < 2:
+                    for i in sublist:
+                        print(i),
                     print("")
+                else:
+                    for subsublist in sublist:
+                        for i in subsublist:
+                            print("%1.4f"%(i)),
+                        print("")
         print("")
                         
         
