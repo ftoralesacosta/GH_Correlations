@@ -579,7 +579,7 @@ def Compare_Cs_pTBins():
         
 def Integrate_Away_Side(Phi_array,Phi_Errors,LE_Error):
     
-    Use_Uncorr_Error = False
+    Use_Uncorr_Error = True
     FF_zt = np.zeros((len(Phi_array), NzT))
     FF_zt_Errors = np.zeros((len(Phi_array), NzT))
     

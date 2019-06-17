@@ -18,9 +18,12 @@ pT_Rebin = False
 N_dPhi_Bins = 8
 Ped_Sub_First = False #Important after weight implementation
 Average_UE = False
-Show_Fits = False
+Show_Fits = True
 Uncorr_Estimate = "ZYAM"
-#Use_Avg_Cs = True
+
+rad_start = 1.5
+#rad_start = 1.9
+#rad_start = 2.1
 
         #DEFAULTS:
 
@@ -44,6 +47,7 @@ Shower = "LO"
 #description_string = "pT_Rebin_1_pDevPlus"
 #description_string = "pT_Rebin_1_pDevMinus"
 description_string = "pT_Rebin_1_pDevNONE"
+#description_string = "pT_Rebin_1_90p"
 
 #description_string = "pT_Rebin_2_pDevNONE"
 
@@ -55,7 +59,6 @@ description_string = "pT_Rebin_1_pDevNONE"
 #description_string= "pT_Rebin_3_ErrWeights"
 
 
-
 #description_string="pT_Rebin_4"
 #description_string="pT_Rebin_4_Lambda"
 #description_string="pT_Rebin_4_Weights"
@@ -64,22 +67,11 @@ description_string = "pT_Rebin_1_pDevNONE"
 #description_string= "pT_Rebin_4_ErrWeights"
 #description_string= "pT_Rebin_4_ErrWeights_16dPhi"
 
-#description_string="pT_Rebin_5_Lambda"
-#description_string="pT_Rebin_5_Weights"
-#description_string="pT_Rebin_5"
-#description_string="pT_Rebin_5_Cut"
-#description_string= "pT_Rebin_5_ErrWeights"
 
-
-
-
-#description_string = "zT_Rebin_5"
 #description_string = "zT_Rebin_6"
 #description_string = "zT_Rebin_8"
 #description_string = "zT_Rebin_9"
-#description_string = "zT_Rebin_15"
 
-#description_string = "dPhi_Rebin_16"
 
 
 
@@ -101,7 +93,8 @@ purity_Uncertainty = np.asarray([0.0376517,0.0476880,0.0489686,0.0480000])
         # RANGE & BINNING:
 
 #pT
-pTbins = [12,15,19,26,40]
+#pTbins = [12,15,19,26,40]
+pTbins = [12,40]
 #N_pT_Bins = len(pTbins)-1
 
 #zT
@@ -148,7 +141,7 @@ for i,dphi in enumerate(dPhi_Bins):
 
 dphi_start_integral = 0
 for i,dphi in enumerate(dPhi_Bins):
-    if (dphi > 2.1):
+    if (dphi > rad_start):
         dphi_start_integral = i
         break
     
@@ -219,6 +212,7 @@ if not(description_string == "05zT_working_old"):
 #print(purity_Uncertainty)
     
 zT_widths = [(j-i)/2 for i, j in zip(zTbins[zT_offset:-1], zTbins[zT_offset+1:])]
+zT_widths = np.asarray(zT_widths)
 zT_centers = (zTbins[1+zT_offset:] + zTbins[zT_offset:-1]) / 2
 NzT = len(zTbins)-zT_offset-1
 zt_box = np.ones(NzT) * 0.03 #plotting Uncert. Boxes
@@ -267,8 +261,8 @@ def Get_pp_pPb_List_Chi2(array1,array1_E,SYS_1,array2,array2_E,SYS_2,Sys_Type="C
 
     #Common relative normalization Error
     if (Sys_Type == "Constant_Rel_Norm"):
-        Sys_Error_array_1 = SYS_1[0]**2 * np.outer(array1,array2) 
-        Sys_Error_array_2 = SYS_2[0]**2 *np.outer(array2,array2)
+        Sys_Error_array_1 = np.outer(SYS_1[0]*array1,SYS_1[0]*array1)
+        Sys_Error_array_2 = np.outer(SYS_2[0]*array2,SYS_2[0]*array2)
     
     Cov = Stat_1_array**2 + Stat_2_array**2 + Sys_Error_array_1 + Sys_Error_array_2
     Cov_Inverse = np.linalg.inv(Cov)
@@ -279,7 +273,8 @@ def Get_pp_pPb_List_Chi2(array1,array1_E,SYS_1,array2,array2_E,SYS_2,Sys_Type="C
     Mult1 = np.matmul(Cov_Inverse,Delta)
     
     Chi2 = np.matmul(Delta_T,Mult1)
-    NDF = len(array1) - 2
+    NDF = len(array1) - 1
     #Pval = chisqprob(Chi2,NDF)
     Pval = scipy.stats.chi2.sf(Chi2,NDF)
+    print(Chi2)
     return Chi2,NDF,Pval

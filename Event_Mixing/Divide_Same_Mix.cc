@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
     // if (pos != std::string::npos)
     //   basic_name = basic_name.substr(0, pos);
 
-    int n = 4; //Number of "_" to skip
+    int n = 3; //Number of "_" to skip
     int i;
     for (i = 0; i < basic_name.length(); i++)
       {
