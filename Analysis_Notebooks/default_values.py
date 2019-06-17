@@ -24,6 +24,7 @@ Uncorr_Estimate = "ZYAM"
 rad_start = 1.5
 #rad_start = 1.9
 #rad_start = 2.1
+#rad_start = 2.7
 
         #DEFAULTS:
 
@@ -49,15 +50,10 @@ Shower = "LO"
 description_string = "pT_Rebin_1_pDevNONE"
 #description_string = "pT_Rebin_1_90p"
 
-#description_string = "pT_Rebin_2_pDevNONE"
+#description_string = "pT_Rebin_2"
 
 
 #description_string="pT_Rebin_3"
-#description_string="pT_Rebin_3_Lambda"
-#description_string="pT_Rebin_3_Weights"
-#description_string="pT_Rebin_3_Cut"
-#description_string= "pT_Rebin_3_ErrWeights"
-
 
 #description_string="pT_Rebin_4"
 #description_string="pT_Rebin_4_Lambda"
@@ -141,7 +137,7 @@ for i,dphi in enumerate(dPhi_Bins):
 
 dphi_start_integral = 0
 for i,dphi in enumerate(dPhi_Bins):
-    if (dphi > rad_start):
+    if (dphi >= rad_start):
         dphi_start_integral = i
         break
     
@@ -173,10 +169,10 @@ if ("pT_Rebin_1" in description_string):
     pTbins = [12.0,40.0]
     
 if ("pT_Rebin_2" in description_string):
-    pTbins = [12.0,15.0,40.0]
+    pTbins = [12.0,22.0,40.0]
     
 if ("pT_Rebin_3" in description_string):
-    pTbins = [12.00, 21.33, 30.67, 40.00]
+    pTbins = [ 12.0, 17.93, 26.78, 40.0]
     
 if ("pT_Rebin_4" in description_string):
     pTbins = [12.0, 15.0, 19.0, 26.0, 40.0]

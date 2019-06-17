@@ -2,6 +2,7 @@ from default_values import *
 import matplotlib.pyplot as plt
 import matplotlib
 from ROOT import TGraphErrors
+#import iminuit
 
 def FF_Ratio(FF_Dict):
     
@@ -167,6 +168,75 @@ def Average_FF(FF_Dict):
     return Comb_Dict
         
 
+    
+def powerlawFunction(A, p):
+    def function(x):
+        return A * np.power(x, -p)
+    return function
+
+
+def getPowerlawParamsAndErrors(hist, histerr, binCenters):
+    def Chi2(A, p):
+        model = map(powerlawFunction(A, p), binCenters)
+        with np.errstate(divide='ignore', invalid='ignore'):
+            return np.sum(np.power(np.divide(np.subtract(hist, model), histerr, where=histerr != 0), 2.0))
+
+    initA = binCenters[0] * hist[0] * 100
+    mt = iminuit.Minuit(Chi2, A=initA, error_A=initA / 10.0, p=4.0, error_p=0.4, errordef=1, print_level=0)
+    mt.migrad()
+
+    if not mt.migrad_ok():
+        print 'Warning: power law fit did not converge'
+
+    mt.matrix(correlation=True)
+
+    fitParams = mt.values
+    fitErrors = mt.errors
+    chi2dof = Chi2(**fitParams) / (len(hist) - 2)
+
+    return fitParams, fitErrors, chi2dof
+
+def singleparameterPowerlawFunction(p, xmin, xmax, norm):
+    def function(x):
+        A = scipy.integrate.quad(lambda x: np.power(x, -p), xmin, xmax)[0]
+        return norm * np.power(x, -p) / A
+    return function
+
+# hist must be normalized within binCenters!
+def getSingleparameterPowerlawParamsAndErrors(hist, histerr, norm,binCenters, xmin, xmax):
+    def Chi2(p):
+        model = map(singleparameterPowerlawFunction(p, xmin, xmax, norm), binCenters)
+        # with np.errstate(divide='ignore', invalid='ignore'):
+        #     return np.sum(np.power(np.divide(np.subtract(hist, model), histerr, where=histerr != 0), 2.0))
+        return np.sum(np.power(np.divide(np.subtract(hist, model), histerr, where=histerr != 0), 2.0))
+
+    mt = iminuit.Minuit(Chi2, p=4.0, error_p=0.4, errordef=1, print_level=0)
+    mt.migrad()
+
+    if not mt.migrad_ok():
+        print 'Warning: single-parameter power law fit did not converge'
+
+    fitParams = {}
+    fitParams['p'] = mt.values['p']
+    fitParams['xmin'] = xmin
+    fitParams['xmax'] = xmax
+    fitErrors = mt.errors
+    chi2dof = Chi2(**mt.values) / (len(hist) - 1)
+
+    return fitParams, fitErrors, chi2dof, mt.migrad_ok()
+    
+    
+    
+    
+def Fit_FF_PowerLaw(Comb_Dict):
+    for SYS in Systems:
+        hist = Comb_Dict["%s_Combined_FF"%(SYS)][:NzT-ZT_OFF_PLOT]
+        histerr = Comb_Dict["%s_Combined_FF_Errors"%(SYS)][:NzT-ZT_OFF_PLOT]
+        norm = np.sum(hist)
+        Params, Fit_Error, Chi_Red, OKNess = getSingleparameterPowerlawParamsAndErrors(hist, histerr, norm,zT_centers, zTbins[0], zTbins[len(zTbins)-ZT_OFF_PLOT])
+    
+    
+    
 def Plot_pp_pPb_Avg_FF(Comb_Dict):
     
     Colors = ["red","blue","black"]
