@@ -2,7 +2,8 @@ from default_values import *
 import matplotlib.pyplot as plt
 import matplotlib
 from ROOT import TGraphErrors
-#import iminuit
+import scipy
+import iminuit
 
 def FF_Ratio(FF_Dict):
     
@@ -233,8 +234,9 @@ def Fit_FF_PowerLaw(Comb_Dict):
         hist = Comb_Dict["%s_Combined_FF"%(SYS)][:NzT-ZT_OFF_PLOT]
         histerr = Comb_Dict["%s_Combined_FF_Errors"%(SYS)][:NzT-ZT_OFF_PLOT]
         norm = np.sum(hist)
-        Params, Fit_Error, Chi_Red, OKNess = getSingleparameterPowerlawParamsAndErrors(hist, histerr, norm,zT_centers, zTbins[0], zTbins[len(zTbins)-ZT_OFF_PLOT])
-    
+        Params, Fit_Error, Chi_Red, OKNess = getSingleparameterPowerlawParamsAndErrors(hist, histerr, norm,zT_centers[:NzT-ZT_OFF_PLOT], zTbins[0], zTbins[NzT-ZT_OFF_PLOT])
+        print(Params)
+        print(Fit_Error)
     
     
 def Plot_pp_pPb_Avg_FF(Comb_Dict):
