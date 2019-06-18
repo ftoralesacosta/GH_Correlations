@@ -584,18 +584,20 @@ def Integrate_Away_Side(Phi_array,Phi_Errors,LE_Error):
     FF_zt_Errors = np.zeros((len(Phi_array), NzT))
     
     if Use_Uncorr_Error:
-        LE_Error = LE_Error*Integration_Width
+        LE_Error = LE_Error/dPhi_Width*(ZYAM_Max_i-ZYAM_Min_i)
     
     for ipt in range(len(Phi_array)):
         
         for izt in range(0, NzT):
             
             zT_width = zTbins[izt+1]-zTbins[izt]
+            #zT_width = 1
             
-            temp_phi = Phi_array[ipt][izt][(len(Phi_Errors[ipt][izt])-N_Phi_Integrate):]
+            temp_phi = Phi_array[ipt][izt][(len(Phi_Errors[ipt][izt])-N_Phi_Integrate):]/(dPhi_Width*N_Phi_Integrate)
+            print(temp_phi)
             
             FF_zt[ipt][izt] = temp_phi.sum()/zT_width
-            temp_error = (Phi_Errors[ipt][izt][(len(Phi_Errors[ipt][izt])-N_Phi_Integrate):])**2
+            temp_error = (Phi_Errors[ipt][izt][(len(Phi_Errors[ipt][izt])-N_Phi_Integrate):]/(dPhi_Width*N_Phi_Integrate))**2
             
             if (Use_Uncorr_Error):
                 FF_zt_Errors[ipt][izt] = (math.sqrt(temp_error.sum() + (LE_Error[ipt][izt][0])**2))/zT_width
@@ -630,8 +632,8 @@ def Get_Fragmentation(Dict,Use_Avg_Cs=False):
         temp_FF, temp_FF_Errors = Integrate_Away_Side(Dict["%s_CSR"%(SYS)],Dict["%s_CSR_Errors"%(SYS)],Dict["%s_Uncorr_Error"%(SYS)])
         temp_purity_Errors = []
         
-        for ipt in range(len(Dict["%s_CSR"%(SYS)])):
-            temp_purity_Errors.append(temp_FF[ipt]*(purity_Uncertainty[ipt]/purity[ipt])*Integration_Width)  # abs. FF purity uncertainty
+        for ipt in range(len(Dict["%s_CSR"%(SYS)])): 
+            temp_purity_Errors.append(temp_FF[ipt]*(purity_Uncertainty[ipt]/purity[ipt]))  # abs. FF purity uncertainty
         
         if (Use_Avg_Cs):
             temp_FF,temp_FF_Errors,temp_purity_Errors = temp_FF[0],temp_FF_Errors[0],temp_purity_Errors[0]

@@ -21,10 +21,14 @@ Average_UE = False
 Show_Fits = True
 Uncorr_Estimate = "ZYAM"
 
-rad_start = 1.5
-#rad_start = 1.9
+rad_start = 1.6
+Phi_String = "\pi/2"
+
 #rad_start = 2.1
-#rad_start = 2.7
+#Phi_String = "2\pi/3"
+
+#rad_start = 2.9
+#Phi_String = "7\pi/8"
 
         #DEFAULTS:
 
@@ -41,7 +45,7 @@ Shower = "LO"
 #description_string="15zT"
 #description_string="2zT"
 
-description_string="pT_Rebin_1"
+#description_string="pT_Rebin_1"
 #description_string="pT_Rebin_1_15pT"
 #description_string="pT_Rebin_1_20pT"
 #description_string= "pT_Rebin_1_16dPhi"
@@ -50,7 +54,7 @@ description_string="pT_Rebin_1"
 #description_string = "pT_Rebin_1_pDevNONE"
 #description_string = "pT_Rebin_1_90p"
 
-#description_string = "pT_Rebin_2"
+description_string = "pT_Rebin_2"
 
 
 #description_string="pT_Rebin_3"
@@ -107,6 +111,7 @@ if ("16dPhi" in description_string):
     N_dPhi_Bins = 16
     
 dPhi_Bins = [i*math.pi/N_dPhi_Bins for i in range(0,N_dPhi_Bins+1)]
+dPhi_Width = dPhi_Bins[1]-dPhi_Bins[0]
 delta_phi_centers = [i*math.pi/N_dPhi_Bins+math.pi/N_dPhi_Bins/2 for i in range(0,N_dPhi_Bins)] #skip first dPhi bin to avoid Isolation
 
 #UE
@@ -246,21 +251,15 @@ for file,SYS in zip(Files,Systems):
     print("%s File: %s"%(SYS,file))
     
     
-def Get_pp_pPb_List_Chi2(array1,array1_E,SYS_1,array2,array2_E,SYS_2,Sys_Type="Constant"):
-    
-    Sys_Error_array_1 = (np.full((len(array1),len(array1)),SYS_1[0]))**2
-    Sys_Error_array_2 = (np.full((len(array2),len(array2)),SYS_2[0]))**2
-
-    
+def Get_pp_pPb_List_Chi2(array1,array1_E,SYS_1,array2,array2_E,SYS_2):
+        
     Stat_1_array = np.diag(array1_E)
     Stat_2_array = np.diag(array2_E)
 
-    #Common relative normalization Error
-    if (Sys_Type == "Constant_Rel_Norm"):
-        Sys_Error_array_1 = np.outer(SYS_1[0]*array1,SYS_1[0]*array1)
-        Sys_Error_array_2 = np.outer(SYS_2[0]*array2,SYS_2[0]*array2)
+    Sys_Error_Matrix_1 = np.outer(SYS_1,SYS_1) #ABSOLUTE Errors
+    Sys_Error_Matrix_2 = np.outer(SYS_2,SYS_2)
     
-    Cov = Stat_1_array**2 + Stat_2_array**2 + Sys_Error_array_1 + Sys_Error_array_2
+    Cov = Stat_1_array**2 + Stat_2_array**2 + Sys_Error_Matrix_1 + Sys_Error_Matrix_2
     Cov_Inverse = np.linalg.inv(Cov)
 
     Delta = np.absolute(array1-array2)
@@ -272,5 +271,35 @@ def Get_pp_pPb_List_Chi2(array1,array1_E,SYS_1,array2,array2_E,SYS_2,Sys_Type="C
     NDF = len(array1) - 1
     #Pval = chisqprob(Chi2,NDF)
     Pval = scipy.stats.chi2.sf(Chi2,NDF)
-    print(Chi2)
     return Chi2,NDF,Pval
+
+#Each dictionary value is a numpy array of dimension 2 or 3. Want to print uncertainties.        
+def print_from_Dict(Dict):
+    
+    for key in Dict:
+        if ("iError" in key):
+            continue
+        if ("pip" in key):
+            continue
+        #if ("CBR" in key):
+        #    continue
+        
+        nparr = Dict[key]
+        print("%s:"%(key))
+        if (len(nparr.shape) < 2):
+            for i in nparr:
+                print("%1.4f,"%(i)),
+            print("")
+        else:
+            for sublist in nparr:
+                if (len(sublist.shape)) < 2:
+                    for i in sublist:
+                        print("%1.4f,"%(i)),
+                    print("")
+                else:
+                    for subsublist in sublist:
+                        for i in subsublist:
+                            print("%1.4f,"%(i)),
+                        print("")
+        print("")
+                    

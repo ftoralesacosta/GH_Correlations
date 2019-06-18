@@ -395,36 +395,5 @@ def ROOT_to_nparray():
                     Dict["%s_CBR_Errors"%(SYS)][ipt][izt] = Bkg_Phi_Error_Array
                     Dict["%s_Uncorr_Error"%(SYS)][ipt][izt] = UB_Error #constant in for zT bins
 
-    return Dict
-
-#Each dictionary value is a numpy array of dimension 2 or 3. Want to print uncertainties.        
-def print_from_Dict(Dict):
-    
-    for key in Dict:
-        if ("iError" in key):
-            continue
-        if ("pp" in key):
-            continue
-        #if ("CBR" in key):
-        #    continue
-        
-        nparr = Dict[key]
-        print("%s:"%(key))
-        if (len(nparr.shape) < 2):
-            for i in nparr:
-                print("%1.4f,"%(i)),
-            print("")
-        else:
-            for sublist in nparr:
-                if (len(sublist.shape)) < 2:
-                    for i in sublist:
-                        print("%1.4f,"%(i)),
-                    print("")
-                else:
-                    for subsublist in sublist:
-                        for i in subsublist:
-                            print("%1.4f,"%(i)),
-                        print("")
-        print("")
-                        
+    return Dict    
         

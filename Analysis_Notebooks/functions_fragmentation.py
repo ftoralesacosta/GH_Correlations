@@ -221,6 +221,7 @@ def getSingleparameterPowerlawParamsAndErrors(hist, histerr, norm,binCenters, xm
     fitParams['p'] = mt.values['p']
     fitParams['xmin'] = xmin
     fitParams['xmax'] = xmax
+    fitParams['norm'] = norm
     fitErrors = mt.errors
     chi2dof = Chi2(**mt.values) / (len(hist) - 1)
 
@@ -229,15 +230,22 @@ def getSingleparameterPowerlawParamsAndErrors(hist, histerr, norm,binCenters, xm
     
     
     
-def Fit_FF_PowerLaw(Comb_Dict):
+def Fit_FF_PowerLaw(FF_Dictionary):
     for SYS in Systems:
-        hist = Comb_Dict["%s_Combined_FF"%(SYS)][:NzT-ZT_OFF_PLOT]
-        histerr = Comb_Dict["%s_Combined_FF_Errors"%(SYS)][:NzT-ZT_OFF_PLOT]
+        hist = FF_Dictionary["%s_Combined_FF"%(SYS)][:NzT-ZT_OFF_PLOT]
+        histerr = FF_Dictionary["%s_Combined_FF_Errors"%(SYS)][:NzT-ZT_OFF_PLOT]
         norm = np.sum(hist)
-        Params, Fit_Error, Chi_Red, OKNess = getSingleparameterPowerlawParamsAndErrors(hist, histerr, norm,zT_centers[:NzT-ZT_OFF_PLOT], zTbins[0], zTbins[NzT-ZT_OFF_PLOT])
-        print(Params)
-        print(Fit_Error)
-    
+        Params, Fit_Error, Chi_Red, OKNess = getSingleparameterPowerlawParamsAndErrors(hist, histerr,norm,zT_centers[:NzT-ZT_OFF_PLOT], zTbins[0], zTbins[NzT-ZT_OFF_PLOT])
+        power = Params["p"]
+        Chi2 = Chi_Red
+        if (OKNess == False):
+            print("WARNING: POWER LAW FIT DID NOT CONVERGE")
+        print(SYS,power,Chi2,norm)
+        
+        model = map(singleparameterPowerlawFunction(**Params), zT_centers[:NzT-ZT_OFF_PLOT])
+        plt.plot(zT_centers[:NzT-ZT_OFF_PLOT], model, 'g:')
+        plt.plot(zT_centers[:NzT-ZT_OFF_PLOT],FF_Dictionary["%s_Combined_FF"%(SYS)][:NzT-ZT_OFF_PLOT])
+        break
     
 def Plot_pp_pPb_Avg_FF(Comb_Dict):
     
@@ -268,11 +276,17 @@ def Plot_pp_pPb_Avg_FF(Comb_Dict):
         
     #Chi2 and Labels
     #purity_normalization = np.full(len(Comb_Dict["pp_Combined_FF"][:NzT-ZT_OFF_PLOT]),math.sqrt(0.25**2+0.05**2)) #estimate of constant normalization Error
-    purity_normalization = np.full(len(Comb_Dict["pp_Combined_FF"][:NzT-ZT_OFF_PLOT]),math.sqrt(0.15**2+0.05**2)) #estimate of constant normalization Error
+    pp_sys_Error = (Comb_Dict["pp_Combined_FF"][:NzT-ZT_OFF_PLOT])*math.sqrt(0.15**2+0.05**2)
+    p_Pb_sys_Error = (Comb_Dict["p-Pb_Combined_FF"][:NzT-ZT_OFF_PLOT])*math.sqrt(0.15**2+0.05**2)
+    #pp_sys_Error = purity_normalization
+    #p-Pb_sys_Error = purity_normalization
     
-    Chi2,NDF,Pval = Get_pp_pPb_List_Chi2(Comb_Dict["pp_Combined_FF"][:NzT-ZT_OFF_PLOT],Comb_Dict["pp_Combined_FF_Errors"][:NzT-ZT_OFF_PLOT],purity_normalization,
-                                         Comb_Dict["p-Pb_Combined_FF"][:NzT-ZT_OFF_PLOT],Comb_Dict["p-Pb_Combined_FF_Errors"][:NzT-ZT_OFF_PLOT],purity_normalization,"Constant_Rel_Norm")
-                        
+    Chi2,NDF,Pval = Get_pp_pPb_List_Chi2(Comb_Dict["pp_Combined_FF"][:NzT-ZT_OFF_PLOT],
+                                         Comb_Dict["pp_Combined_FF_Errors"][:NzT-ZT_OFF_PLOT],
+                                         pp_sys_Error,
+                                         Comb_Dict["p-Pb_Combined_FF"][:NzT-ZT_OFF_PLOT],
+                                         Comb_Dict["p-Pb_Combined_FF_Errors"][:NzT-ZT_OFF_PLOT],
+                                         p_Pb_sys_Error)
     #Labels
     plt.annotate("$\chi^2$ = %1.1f, ndf = %i, p = %f"%(Chi2,NDF,Pval), xy=(0.99, 0.06), xycoords='axes fraction', ha='right', va='top', fontsize=16)
         
@@ -280,7 +294,7 @@ def Plot_pp_pPb_Avg_FF(Comb_Dict):
     leg.set_title("ALICE Work in Progress\n  $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV")
     plt.setp(leg.get_title(),fontsize=20)
 
-    plt.title(r'Integrated $\mathrm{\gamma}$-Hadron Correlation: $2\pi/3 < \Delta\varphi < \pi, |\Delta\eta| < %1.1f$ '%(eta_max),fontdict = {'fontsize' : 19})
+    plt.title(r'Integrated $\mathrm{\gamma}$-Hadron Correlation: $\pi/2< \Delta\varphi < \pi, |\Delta\eta| < %1.1f$ '%(eta_max),fontdict = {'fontsize' : 19})
     plt.gcf()
     plt.savefig("pics/%s/Averaged_pT_FFunction_%s.pdf"%(Shower,Shower), bbox='tight')
     plt.show()
@@ -290,7 +304,7 @@ def Plot_pp_pPb_Avg_FF(Comb_Dict):
 
     
     
-    Printing = False
+    Printing = True
     
     if (Printing):
         #Printing
@@ -386,14 +400,22 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
     plt.yscale('log')                             
     plt.ylabel(r"$\frac{1}{N_{\mathrm{\gamma}}}\frac{\mathrm{d}N}{\mathrm{d}z_{\mathrm{T}} \mathrm{d}\Delta\eta}$",fontsize=24)
     plt.yticks(fontsize=16)
-    plt.ylim(0.06,20)
+    plt.ylim(0.03,20)
 
         
     #Chi2 and Labels
-    purity_normalization = np.full(len(Comb_Dict["pp_Combined_FF"][:NzT-ZT_OFF_PLOT]),math.sqrt(0.15**2+0.05**2)) #estimate of constant normalization Error
+    #purity_normalization = np.full(len(Comb_Dict["pp_Combined_FF"][:NzT-ZT_OFF_PLOT]),math.sqrt(0.15**2+0.05**2)) #estimate of constant normalization Error
+    pp_sys_Error = (Comb_Dict["pp_Combined_FF"][:NzT-ZT_OFF_PLOT])*math.sqrt(0.15**2+0.05**2)
+    p_Pb_sys_Error = (Comb_Dict["p-Pb_Combined_FF"][:NzT-ZT_OFF_PLOT])*math.sqrt(0.15**2+0.05**2)
+    #pp_sys_Error = purity_normalization
+    #p-Pb_sys_Error = purity_normalization
     
-    Chi2,NDF,Pval = Get_pp_pPb_List_Chi2(Comb_Dict["pp_Combined_FF"][:NzT-ZT_OFF_PLOT],Comb_Dict["pp_Combined_FF_Errors"][:NzT-ZT_OFF_PLOT],purity_normalization,
-                                         Comb_Dict["p-Pb_Combined_FF"][:NzT-ZT_OFF_PLOT],Comb_Dict["p-Pb_Combined_FF_Errors"][:NzT-ZT_OFF_PLOT],purity_normalization,"Constant_Rel_Norm")
+    Chi2,NDF,Pval = Get_pp_pPb_List_Chi2(Comb_Dict["pp_Combined_FF"][:NzT-ZT_OFF_PLOT],
+                                         Comb_Dict["pp_Combined_FF_Errors"][:NzT-ZT_OFF_PLOT],
+                                         pp_sys_Error,
+                                         Comb_Dict["p-Pb_Combined_FF"][:NzT-ZT_OFF_PLOT],
+                                         Comb_Dict["p-Pb_Combined_FF_Errors"][:NzT-ZT_OFF_PLOT],
+                                         p_Pb_sys_Error)
 
     plt.annotate("$\chi^2$ = %1.1f, ndf = %i, p = %1.2f"%(Chi2,NDF,Pval), xy=(0.01, 0.06), xycoords='axes fraction', ha='left', va='top', fontsize=16)
     #plt.annotate("$\chi^2$ = %1.1f, ndf = %i, p = %f"%(Chi2,NDF,Pval), xy=(0.99, 0.06), xycoords='axes fraction', ha='right', va='top', fontsize=16)
@@ -412,7 +434,7 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
          {'color': 'black', 'fontsize': 16, 'ha': 'left', 'va': 'top',
           'bbox': dict(boxstyle="square", fc="blue",alpha=0.3, ec="None", pad=0.2)})
 
-    plt.title(r'Integrated $\mathrm{\gamma}$-Hadron Correlation: $\pi/2 < \Delta\varphi < \pi, |\Delta\eta| < %1.1f$ '%(eta_max),fontdict = {'fontsize' : 19})
+    plt.title(r'Integrated $\mathrm{\gamma}$-Hadron Correlation: $%s < \Delta\varphi < \pi, |\Delta\eta| < %1.1f$ '%(Phi_String,eta_max),fontdict = {'fontsize' : 19})
 
     fig.add_axes((0.1,0.1,0.88,0.2))
 
@@ -465,7 +487,6 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
     
     #Ratio
     Ratio = pPb_Combined/pp_Combined
-    print(Ratio)
     
     #Stat. Error in ratio
     Ratio_Error = np.sqrt((pPb_Combined_Errors/pPb_Combined)**2 + (pp_Combined_Errors/pp_Combined)**2)*Ratio
