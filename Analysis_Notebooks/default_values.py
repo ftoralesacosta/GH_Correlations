@@ -72,7 +72,10 @@ Shower = "LO"
 #description_string = "zT_Rebin_6"
 #description_string = "zT_Rebin_8"
 #description_string = "zT_Rebin_9"
-description_string = "zT_Rebin_14"
+description_string = "zT_Rebin_10"
+#description_string = "zT_Rebin_12"
+#description_string = "zT_Rebin_14"
+
 
 
 
@@ -102,7 +105,7 @@ pTbins = [12,40]
 zTbins = np.asarray([0.05, 0.07670637, 0.11767734, 0.18053204, 0.27695915, 0.42489062, 0.65183634,1])
 zT_offset = 0
 if (len(zTbins)==8):
-    ZT_OFF_PLOT = 0 #Offset for FF plotting
+    ZT_OFF_PLOT = 1 #Offset for FF plotting
 
 #deta
 eta_max = 1.2 #Range of Signal Correlations
@@ -173,9 +176,15 @@ if (description_string == "zT_Rebin_8"):
 if (description_string == "zT_Rebin_9"):
     zTbins = np.asarray([0.05, 0.07, 0.10, 0.14, 0.19, 0.26, 0.37, 0.51, 0.72, 1.00])
     
+if (description_string == "zT_Rebin_10"):
+    zTbins = np.asarray([0.05, 0.0675, 0.0910, 0.1228, 0.1657, 0.2236, 0.3017, 0.4071, 0.5493, 0.7411, 1.00])
+    
+if (description_string == "zT_Rebin_12"):
+    zTbins = np.asarray([0.05, 0.0642, 0.0824, 0.1057, 0.1357,0.1742, 0.2236 , 0.287, 0.368, 0.473 ,0.607, 0.78, 1.0])
+                        
 if (description_string == "zT_Rebin_14"):
     zTbins = np.asarray([0.05, 0.06, 0.08, 0.10, 0.12, 0.15, 0.18, 0.22, 0.28, 0.34, 0.42, 0.53, 0.65, 0.81, 1.00])
-
+    
 if ("pT_Rebin_1" in description_string):
     pTbins = [12.0,40.0]
     

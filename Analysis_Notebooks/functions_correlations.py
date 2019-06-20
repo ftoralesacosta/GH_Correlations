@@ -444,34 +444,14 @@ def Cs_Weighted_Average(Dict):
 
         Averaged_UB_pPb_Error[0][izt] = np.sqrt(Averaged_UB_pPb_Error[0][izt])/N_pT_Bins
         Averaged_UB_pp_Error[0][izt] = np.sqrt(Averaged_UB_pp_Error[0][izt])/N_pT_Bins
-        
-    
-    #for izt in range(NzT):
-    #    for ipt in range(N_pT_Bins):
-    #        print Dict["p-Pb_Uncorr_Error"][ipt][izt][0]
-    #        #Averaged_UB_Error[izt] += np.sqrt(Dict["p-Pb_Uncorr_Error"][ipt][izt][0]**2 + Dict["pp_Uncorr_Error"][ipt][izt][0]**2)
-    #        Averaged_UB_pPb_Error[izt] += (Dict["p-Pb_Uncorr_Error"][ipt][izt][0])**2
-    #        Averaged_UB_pp_Error[izt] += (Dict["pp_Uncorr_Error"][ipt][izt][0])**2
-    #    
-    #    #Averaged_UB_Error[izt] = Averaged_UB_Error[izt]/N_pT_Bins
-    #    Averaged_UB_pPb_Error[izt] = np.sqrt(Averaged_UB_pPb_Error[izt])/N_pT_Bins
-    #    Averaged_UB_pp_Error[izt] = np.sqrt(Averaged_UB_pp_Error[izt])/N_pT_Bins
 
         
     Keys = []
     Corr_Arrays = []
     
-    #Keys.append("Combined_p-Pb_Cs")
-    #Keys.append("Combined_p-Pb_Cs_Errors")
-    #Keys.append("Combined_p-Pb_Cs_Uncorr_Error")
-    
     Keys.append("p-Pb_CSR")
     Keys.append("p-Pb_CSR_Errors")
     Keys.append("p-Pb_Uncorr_Error")
-
-    #Keys.append("Combined_pp_Cs")
-    #Keys.append("Combined_pp_Cs_Errors")
-    #Keys.append("Combined_pp_Cs_Uncorr_Error")
     
     Keys.append("pp_CSR")
     Keys.append("pp_CSR_Errors")
@@ -533,10 +513,6 @@ def Compare_Cs_Averages(strings,string_descrp_list,colors):
                     plt.xlabel(r'|$\Delta \varphi$|',fontsize=28)
                 if (izt%3 == 0):
                     plt.ylabel(r'$1/N_{\gamma} \: \: \mathrm{d}N/\mathrm{d}\Delta \eta$',fontsize=28)
-                
-                #Chi2,NDF,Pval = Get_pp_pPb_List_Chi2(Dict["Combined_p-Pb_Cs"][izt],Dict["Combined_p-Pb_Cs_Errors"][izt],Dict["Combined_p-Pb_Cs_Uncorr_Error"][izt],
-                #                        Dict["Combined_pp_Cs"][izt],Dict["Combined_pp_Cs_Errors"][izt],Dict["Combined_pp_Cs_Uncorr_Error"][izt])
-            
                 
                 leg = plt.legend(numpoints=1,frameon=False,loc="best")
                 leg.set_title("%s :%1.2f < $z_\mathrm{T}$ < %1.2f"%(SYS,zTbins[izt],zTbins[izt+1]))
@@ -604,7 +580,6 @@ def Integrate_Away_Side(Phi_array,Phi_Errors,LE_Error):
             zT_width = zTbins[izt+1]-zTbins[izt]
             #zT_width = 1
             
-            #temp_phi = Phi_array[ipt][izt][(len(Phi_Errors[ipt][izt])-N_Phi_Integrate):]/(dPhi_Width*N_Phi_Integrate)
             temp_phi = Phi_array[ipt][izt][-N_Phi_Integrate:]/(dPhi_Width*N_Phi_Integrate)
             #print(temp_phi)
             
@@ -636,7 +611,6 @@ def Get_Fragmentation(Dict,Use_Avg_Cs=False):
             Keys.append("%s_purity_Uncertainty"%(SYS))
             
     
-    #FF_Vals = np.zeros((len(Keys),N_pT_Bins,NzT))
     FF_Vals = []
 
     for index,SYS in enumerate(Systems):
@@ -653,9 +627,6 @@ def Get_Fragmentation(Dict,Use_Avg_Cs=False):
         FF_Vals.append(temp_FF)
         FF_Vals.append(temp_FF_Errors)
         FF_Vals.append(np.asarray(temp_purity_Errors))
-        
-        #FF_Dict["%s_FF"%(SYS)], FF_Dict["%s_FF_Errors"%(SYS)] = temp_FF, temp_FF_Errors
-        #FF_Dict["%s_purity_FF_Errors"%(SYS)] = np.asarray(temp_purity_Errors)
     
     FF_Dict = dict(zip(Keys,FF_Vals))
     
