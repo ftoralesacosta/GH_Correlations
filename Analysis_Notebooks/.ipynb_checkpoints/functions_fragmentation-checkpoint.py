@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 from ROOT import TGraphErrors
 import scipy
-#import iminuit
+import iminuit
 
 def FF_Ratio(FF_Dict):
     
@@ -169,33 +169,6 @@ def Average_FF(FF_Dict):
     return Comb_Dict
         
 
-    
-def powerlawFunction(A, p):
-    def function(x):
-        return A * np.power(x, -p)
-    return function
-
-
-def getPowerlawParamsAndErrors(hist, histerr, binCenters):
-    def Chi2(A, p):
-        model = map(powerlawFunction(A, p), binCenters)
-        with np.errstate(divide='ignore', invalid='ignore'):
-            return np.sum(np.power(np.divide(np.subtract(hist, model), histerr, where=histerr != 0), 2.0))
-
-    initA = binCenters[0] * hist[0] * 100
-    mt = iminuit.Minuit(Chi2, A=initA, error_A=initA / 10.0, p=4.0, error_p=0.4, errordef=1, print_level=0)
-    mt.migrad()
-
-    if not mt.migrad_ok():
-        print 'Warning: power law fit did not converge'
-
-    mt.matrix(correlation=True)
-
-    fitParams = mt.values
-    fitErrors = mt.errors
-    chi2dof = Chi2(**fitParams) / (len(hist) - 2)
-
-    return fitParams, fitErrors, chi2dof
 
 def singleparameterPowerlawFunction(p, xmin, xmax, norm):
     def function(x):
@@ -204,11 +177,10 @@ def singleparameterPowerlawFunction(p, xmin, xmax, norm):
     return function
 
 # hist must be normalized within binCenters!
-def getSingleparameterPowerlawParamsAndErrors(hist, histerr, norm,binCenters, xmin, xmax):
+def getSingleparameterPowerlawParamsAndErrors(hist, histerr, binCenters, xmin, xmax,norm):
     def Chi2(p):
         model = map(singleparameterPowerlawFunction(p, xmin, xmax, norm), binCenters)
-        # with np.errstate(divide='ignore', invalid='ignore'):
-        #     return np.sum(np.power(np.divide(np.subtract(hist, model), histerr, where=histerr != 0), 2.0))
+
         return np.sum(np.power(np.divide(np.subtract(hist, model), histerr, where=histerr != 0), 2.0))
 
     mt = iminuit.Minuit(Chi2, p=4.0, error_p=0.4, errordef=1, print_level=0)
@@ -228,25 +200,49 @@ def getSingleparameterPowerlawParamsAndErrors(hist, histerr, norm,binCenters, xm
     return fitParams, fitErrors, chi2dof, mt.migrad_ok()
     
     
+def Fit_FF_PowerLaw(FF_Dictionary,SYS):
     
+    print("%s Integrating %s"%(description_string,Phi_String))
+
+    #fig = plt.figure(figsize=(12,6))
     
-def Fit_FF_PowerLaw(FF_Dictionary):
-    for SYS in Systems:
-        hist = FF_Dictionary["%s_Combined_FF"%(SYS)][:NzT-ZT_OFF_PLOT]
-        histerr = FF_Dictionary["%s_Combined_FF_Errors"%(SYS)][:NzT-ZT_OFF_PLOT]
-        norm = np.sum(hist)
-        Params, Fit_Error, Chi_Red, OKNess = getSingleparameterPowerlawParamsAndErrors(hist, histerr,norm,zT_centers[:NzT-ZT_OFF_PLOT], zTbins[0], zTbins[NzT-ZT_OFF_PLOT])
-        power = Params["p"]
-        Chi2 = Chi_Red
-        if (OKNess == False):
-            print("WARNING: POWER LAW FIT DID NOT CONVERGE")
-        print(SYS,power,Chi2,norm)
+    #for i,SYS in enumerate(Systems):
         
-        model = map(singleparameterPowerlawFunction(**Params), zT_centers[:NzT-ZT_OFF_PLOT])
-        plt.plot(zT_centers[:NzT-ZT_OFF_PLOT], model, 'g:')
-        plt.plot(zT_centers[:NzT-ZT_OFF_PLOT],FF_Dictionary["%s_Combined_FF"%(SYS)][:NzT-ZT_OFF_PLOT])
-        break
+    #ax = fig.add_subplot(1,2,(i+1))
+    hist = FF_Dictionary["%s_Combined_FF"%(SYS)][:NzT-ZT_OFF_PLOT]
+    histerr = FF_Dictionary["%s_Combined_FF_Errors"%(SYS)][:NzT-ZT_OFF_PLOT]
+    binwidths = zT_widths[:NzT-ZT_OFF_PLOT]
+    bincenters = zT_centers[:NzT-ZT_OFF_PLOT]
+    histnorm = sum(np.multiply(hist, binwidths*2))
+    Params, fiterrors, chi2dof, fitisok = getSingleparameterPowerlawParamsAndErrors(hist, histerr, bincenters, bincenters[0] - binwidths[0], bincenters[-1] - binwidths[-1], histnorm)
+        
+    power = Params["p"]
+
+    if (fitisok == False):
+        print("WARNING: POWER LAW FIT DID NOT CONVERGE")
+
+    print(r"%s: p = %1.2f, chi2/dof = %1.2f"%(SYS,power,chi2dof))
+    #print("fit Error"),
+    #print(fiterrors)
+        
+    model = map(singleparameterPowerlawFunction(**Params), zT_centers[:NzT-ZT_OFF_PLOT])
+    return model
+        
+        #plt.plot(zT_centers[:NzT-ZT_OFF_PLOT], model, 'g:')
+        #plt.yscale("log")
+        #plt.plot(zT_centers[:NzT-ZT_OFF_PLOT],FF_Dictionary["%s_Combined_FF"%(SYS)][:NzT-ZT_OFF_PLOT])
+
+    #pp_sys_Error = (FF_Dictionary["pp_Combined_FF"][:NzT-ZT_OFF_PLOT])*math.sqrt(0.15**2+0.05**2)
+    #p_Pb_sys_Error = (FF_Dictionary["p-Pb_Combined_FF"][:NzT-ZT_OFF_PLOT])*math.sqrt(0.15**2+0.05**2)
+    #Chi2,NDF,Pval = Get_pp_pPb_List_Chi2(FF_Dictionary["pp_Combined_FF"][:NzT-ZT_OFF_PLOT],
+    #                                     FF_Dictionary["pp_Combined_FF_Errors"][:NzT-ZT_OFF_PLOT],
+    #                                     pp_sys_Error,
+    #                                     FF_Dictionary["p-Pb_Combined_FF"][:NzT-ZT_OFF_PLOT],
+    #                                     FF_Dictionary["p-Pb_Combined_FF_Errors"][:NzT-ZT_OFF_PLOT],
+    #                                     p_Pb_sys_Error)
     
+    print("Chi/NDF = %1.2f, pvalue = %1.2f"%(Chi2/NDF,Pval))
+
 def Plot_pp_pPb_Avg_FF(Comb_Dict):
     
     Colors = ["red","blue","black"]
@@ -397,10 +393,11 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
         Sys_Plot_pp = plt.bar(zT_centers[:NzT-ZT_OFF_PLOT], Sys_Uncertainty[:NzT-ZT_OFF_PLOT]+Sys_Uncertainty[:NzT-ZT_OFF_PLOT], 
             bottom=Comb_Dict["%s_Combined_FF"%(SYS)][:NzT-ZT_OFF_PLOT]-Sys_Uncertainty[:NzT-ZT_OFF_PLOT],width=zt_box[:NzT-ZT_OFF_PLOT], align='center',color=sys_col,alpha=0.3)
 
-    plt.yscale('log')                             
+    #plt.yscale('log')                             
     plt.ylabel(r"$\frac{1}{N_{\mathrm{\gamma}}}\frac{\mathrm{d}N}{\mathrm{d}z_{\mathrm{T}}\mathrm{d}\Delta\phi\mathrm{d}\Delta\eta}$",fontsize=24)
     plt.yticks(fontsize=16)
-    plt.ylim(0.03,20)
+    #plt.ylim(0.03,20)
+    plt.xlim(0,0.3)
 
         
     #Chi2 and Labels
@@ -427,15 +424,19 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
     
     crap_boxes = True
     if crap_boxes:
-        plt.text(0.468, 3.45, '   ',
+        plt.text(0.468, 2.0, '   ',
          {'color': 'black', 'fontsize': 16, 'ha': 'left', 'va': 'top',
           'bbox': dict(boxstyle="square", fc='red',alpha=0.3, ec="None", pad=0.2)})
-        plt.text(0.468, 2.2, '   ',
+        plt.text(0.468, 1.5, '   ',
          {'color': 'black', 'fontsize': 16, 'ha': 'left', 'va': 'top',
           'bbox': dict(boxstyle="square", fc="blue",alpha=0.3, ec="None", pad=0.2)})
 
     plt.title(r'Integrated $\mathrm{\gamma}$-Hadron Correlation: $%s < \Delta\varphi < \pi, |\Delta\eta| < %1.1f$ '%(Phi_String,eta_max),fontdict = {'fontsize' : 19})
 
+    model_pp = Fit_FF_PowerLaw(Comb_Dict,"pp")
+    print(model_pp)
+    plt.plot(zT_centers[:NzT-ZT_OFF_PLOT], model_pp, 'g:')
+    
     fig.add_axes((0.1,0.1,0.88,0.2))
 
     pPb_Combined = Comb_Dict["p-Pb_Combined_FF"]
@@ -462,6 +463,7 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
     #Sys_Plot = plt.bar(zT_centers[:NzT-ZT_OFF_PLOT], 2*Ratio_Systematic[:NzT-ZT_OFF_PLOT], 
     #   bottom=1.0-Ratio_Systematic[:NzT-ZT_OFF_PLOT], width=2*zT_widths[:NzT-ZT_OFF_PLOT], align='center',color='black',alpha = 0.2)
     
+    
     plt.axhline(y=1, color='k', linestyle='--')
     
     plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^{\mathrm{h}}/p_\mathrm{T}^\gamma$",fontsize=20)
@@ -470,7 +472,12 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
     plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^\mathrm{h}/p_\mathrm{T}^\mathrm{\gamma}$",fontsize=20)
     plt.xticks(fontsize=16)
     plt.yticks(fontsize=16)
+    plt.xlim(0,0.3)
 
+    #model_p-Pb = Fit_FF_PowerLaw(Comb_Dict,"p-Pb")
+    #plt.plot(zT_centers[:NzT-ZT_OFF_PLOT], model_pp, 'g:')
+        #plt.yscale("log")
+    
     plt.gcf()
     plt.savefig("pics/%s/%s_Averaged_pT_FFunction_and_Ratio.pdf"%(Shower,description_string), bbox='tight')
     plt.show()

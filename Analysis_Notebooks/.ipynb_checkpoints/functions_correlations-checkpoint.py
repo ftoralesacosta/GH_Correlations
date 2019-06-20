@@ -317,8 +317,10 @@ def Plot_pp_pPb_Cs(Dict):
                 ax = fig.add_subplot(2,2,izt+1)
             elif (NzT ==6):
                 ax = fig.add_subplot(2,3,izt+1)
-            elif (NzT ==7):
+            elif (NzT >=7):
                 ax = fig.add_subplot(3,3,izt+1)
+            elif (NzT >=12):
+                ax = fig.add_subplot(3,5,izt+1)
 
             pPb = plt.errorbar(delta_phi_centers,Dict["p-Pb_CSR"][ipt][izt],xerr=phi_width,yerr=Dict["p-Pb_CSR_Errors"][ipt][izt],fmt='bo',capsize=4,markersize=11)
             pp = plt.errorbar(delta_phi_centers,Dict["pp_CSR"][ipt][izt],xerr=phi_width,yerr=Dict["pp_CSR_Errors"][ipt][izt],fmt='ro',capsize=4,markersize=11)

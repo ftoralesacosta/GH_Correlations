@@ -15,7 +15,7 @@ Use_P_Weights = True
 CorrectedP = True  # FALSE FOR HARDPROBES
 Use_MC = False
 pT_Rebin = False
-N_dPhi_Bins = 8
+N_dPhi_Bins = 16
 Ped_Sub_First = False #Important after weight implementation
 Average_UE = False
 Show_Fits = True
@@ -24,11 +24,10 @@ Uncorr_Estimate = "ZYAM"
 #rad_start = 1.6
 #Phi_String = "\pi/2"
 
-#rad_start = 1.9
 rad_start = 1.9
 Phi_String = "5\pi/8"
 
-#rad_start = 2.9
+#rad_start = 2.7
 #Phi_String = "7\pi/8"
 
         #DEFAULTS:
@@ -49,11 +48,12 @@ Shower = "LO"
 #description_string="pT_Rebin_1"
 #description_string="pT_Rebin_1_15pT"
 #description_string="pT_Rebin_1_20pT"
-description_string= "pT_Rebin_1_16dPhi"
 #description_string = "pT_Rebin_1_pDevPlus"
 #description_string = "pT_Rebin_1_pDevMinus"
 #description_string = "pT_Rebin_1_pDevNONE"
 #description_string = "pT_Rebin_1_90p"
+#description_string= "pT_Rebin_1_8dPhi"
+#description_string= "pT_Rebin_1_16dPhi"
 
 #description_string = "pT_Rebin_2"
 
@@ -72,13 +72,13 @@ description_string= "pT_Rebin_1_16dPhi"
 #description_string = "zT_Rebin_6"
 #description_string = "zT_Rebin_8"
 #description_string = "zT_Rebin_9"
-#description_string = "zT_Rebin_14"
+description_string = "zT_Rebin_14"
 
 
 
 pPb_File = '../InputData/%s/pPb_SE_L0_Correlation_GMB_Ratio.root'%(description_string)
 pp_File = '../InputData/%s/pp_SE_L0_Correlation_GMB_Ratio.root'%(description_string)
-
+print pp_File
 Systems = ["pp","p-Pb"]
 Files = [pp_File,pPb_File]
 
@@ -108,8 +108,8 @@ if (len(zTbins)==8):
 eta_max = 1.2 #Range of Signal Correlations
 
 #dPhi
-if ("16dPhi" in description_string):
-    N_dPhi_Bins = 16
+if ("8dPhi" in description_string):
+    N_dPhi_Bins = 8
     
 dPhi_Bins = [i*math.pi/N_dPhi_Bins for i in range(0,N_dPhi_Bins+1)]
 dPhi_Width = dPhi_Bins[1]-dPhi_Bins[0]
@@ -191,8 +191,8 @@ if ("pT_Rebin_5" in description_string):
 
 N_pT_Bins = len(pTbins)-1
 
-if (description_string == "dPhi_Rebin_16"):
-    N_dPhi_Bins = 16
+if (description_string == "dPhi_Rebin_8"):
+    N_dPhi_Bins = 8
 
 def Get_Purity(filename):
     file = ROOT.TFile(filename)
