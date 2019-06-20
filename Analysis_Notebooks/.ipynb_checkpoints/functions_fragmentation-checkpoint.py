@@ -397,7 +397,7 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
     plt.ylabel(r"$\frac{1}{N_{\mathrm{\gamma}}}\frac{\mathrm{d}N}{\mathrm{d}z_{\mathrm{T}}\mathrm{d}\Delta\phi\mathrm{d}\Delta\eta}$",fontsize=24)
     plt.yticks(fontsize=16)
     #plt.ylim(0.03,20)
-    plt.xlim(0,0.3)
+    #plt.xlim(0,0.3)
 
         
     #Chi2 and Labels
@@ -472,7 +472,7 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
     plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^\mathrm{h}/p_\mathrm{T}^\mathrm{\gamma}$",fontsize=20)
     plt.xticks(fontsize=16)
     plt.yticks(fontsize=16)
-    plt.xlim(0,0.3)
+    #plt.xlim(0,0.3)
 
     #model_p-Pb = Fit_FF_PowerLaw(Comb_Dict,"p-Pb")
     #plt.plot(zT_centers[:NzT-ZT_OFF_PLOT], model_pp, 'g:')
