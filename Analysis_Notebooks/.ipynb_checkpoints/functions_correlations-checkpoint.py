@@ -313,7 +313,7 @@ def Plot_pp_pPb_Cs(Dict):
             fig = plt.figure(figsize=(22,18))
             
         if (NzT >=12):
-            fig = plt.figure(figsize=(22,26))
+            fig = plt.figure(figsize=(22,30))
         
         for izt in range (NzT-ZT_OFF_PLOT):
 
@@ -380,7 +380,7 @@ def Plot_pp_pPb_Cs(Dict):
                     'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)', 'UB Error'],
                     loc = "upper left",fontsize=16,frameon=False,numpoints=1)
 
-            plt.annotate(r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]), xy=(0.05, 0.68), xycoords='axes fraction', ha='left', va='top', fontsize=16)
+            plt.annotate(r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]), xy=(0.05, 0.65), xycoords='axes fraction', ha='left', va='top', fontsize=16)
             
             if (len(Dict["p-Pb_CSR"]) > 2):
                 plt.annotate(r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]), xy=(0.05, 0.6), xycoords='axes fraction', ha='left', va='top', fontsize=16)

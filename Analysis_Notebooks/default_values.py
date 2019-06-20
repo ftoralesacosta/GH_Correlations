@@ -102,7 +102,7 @@ pTbins = [12,40]
 zTbins = np.asarray([0.05, 0.07670637, 0.11767734, 0.18053204, 0.27695915, 0.42489062, 0.65183634,1])
 zT_offset = 0
 if (len(zTbins)==8):
-    ZT_OFF_PLOT = 1 #Offset for FF plotting
+    ZT_OFF_PLOT = 0 #Offset for FF plotting
 
 #deta
 eta_max = 1.2 #Range of Signal Correlations
@@ -119,28 +119,30 @@ delta_phi_centers = [i*math.pi/N_dPhi_Bins+math.pi/N_dPhi_Bins/2 for i in range(
 
 ue_error_bar = [] #Horiz. width of UE at first plotted dphi point
 
-for i,dphi in enumerate(dPhi_Bins):
-    if (dphi > 0.39):
-        ue_error_bar.append(dPhi_Bins[i])
-        break;
+#for i,dphi in enumerate(dPhi_Bins):
+#    if (dphi > 0.39):
+#        ue_error_bar.append(dPhi_Bins[i])
+#        break;
         
-for i,dphi in enumerate(dPhi_Bins):
-    #if (dphi > 0.78):
-    if(dphi > 1.5):
-        ue_error_bar.append(dPhi_Bins[i+1])
-        break;
+#for i,dphi in enumerate(dPhi_Bins):
+#    #if (dphi > 0.78):
+#    if(dphi > 1.5):
+#        ue_error_bar.append(dPhi_Bins[i+1])
+#        break;
 
 ZYAM_Min_i = 0
 for i,dphi in enumerate(dPhi_Bins):
     #if (dphi > 1.17):
     if (dphi > 0.39):
         ZYAM_Min_i = i
+        ue_error_bar.append(dPhi_Bins[ZYAM_Min_i])
         break
 
 ZYAM_Max_i = 0       
 for i,dphi in enumerate(dPhi_Bins):
     if (dphi > 1.7):
         ZYAM_Max_i = i
+        ue_error_bar.append(dPhi_Bins[ZYAM_Max_i])
         break
 
 dphi_start_integral = 0
