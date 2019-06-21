@@ -226,7 +226,7 @@ def Fit_FF_PowerLaw(FF_Dictionary,SYS):
     #print(fiterrors)
         
     model = map(singleparameterPowerlawFunction(**Params), zT_centers[:NzT-ZT_OFF_PLOT])
-    return model
+    return model,power,chi2dof
         
         #plt.plot(zT_centers[:NzT-ZT_OFF_PLOT], model, 'g:')
         #plt.yscale("log")
@@ -374,6 +374,7 @@ def Average_FF(FF_Dict):
 
 def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
     
+    plot_power = False
     Colors = ["red","blue","black"]
     fig = plt.figure(figsize=(8,8))
     
@@ -392,12 +393,17 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
 
         Sys_Plot_pp = plt.bar(zT_centers[:NzT-ZT_OFF_PLOT], Sys_Uncertainty[:NzT-ZT_OFF_PLOT]+Sys_Uncertainty[:NzT-ZT_OFF_PLOT], 
             bottom=Comb_Dict["%s_Combined_FF"%(SYS)][:NzT-ZT_OFF_PLOT]-Sys_Uncertainty[:NzT-ZT_OFF_PLOT],width=zt_box[:NzT-ZT_OFF_PLOT], align='center',color=sys_col,alpha=0.3)
-
-    #plt.yscale('log')                             
+        
+        
+        if (plot_power):
+            model,p,chi2dof = Fit_FF_PowerLaw(Comb_Dict,SYS)
+            plt.plot(zT_centers[:NzT-ZT_OFF_PLOT], model, sys_col,label=r"%s $\alpha = %1.2f\ \chi^2/dof = %1.2f$"%(SYS,p,chi2dof))
+        
+    plt.yscale('log')                             
     plt.ylabel(r"$\frac{1}{N_{\mathrm{\gamma}}}\frac{\mathrm{d}N}{\mathrm{d}z_{\mathrm{T}}\mathrm{d}\Delta\phi\mathrm{d}\Delta\eta}$",fontsize=24)
     plt.yticks(fontsize=16)
     #plt.ylim(0.03,20)
-    #plt.xlim(0,0.3)
+    plt.xlim(0,0.65)
 
         
     #Chi2 and Labels
@@ -432,10 +438,6 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
           'bbox': dict(boxstyle="square", fc="blue",alpha=0.3, ec="None", pad=0.2)})
 
     plt.title(r'Integrated $\mathrm{\gamma}$-Hadron Correlation: $%s < \Delta\varphi < \pi, |\Delta\eta| < %1.1f$ '%(Phi_String,eta_max),fontdict = {'fontsize' : 19})
-
-    model_pp = Fit_FF_PowerLaw(Comb_Dict,"pp")
-    print(model_pp)
-    plt.plot(zT_centers[:NzT-ZT_OFF_PLOT], model_pp, 'g:')
     
     fig.add_axes((0.1,0.1,0.88,0.2))
 
@@ -472,7 +474,7 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
     plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^\mathrm{h}/p_\mathrm{T}^\mathrm{\gamma}$",fontsize=20)
     plt.xticks(fontsize=16)
     plt.yticks(fontsize=16)
-    #plt.xlim(0,0.3)
+    plt.xlim(0,0.65)
 
     #model_p-Pb = Fit_FF_PowerLaw(Comb_Dict,"p-Pb")
     #plt.plot(zT_centers[:NzT-ZT_OFF_PLOT], model_pp, 'g:')
@@ -531,7 +533,7 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
         plt.xlim(xmin = 0.0,xmax=0.7)
     elif(NzT==7):
         plt.xlim(xmin = 0.0,xmax=1.0)
-    plt.xlim(xmin = 0.0,xmax=zT_centers[NzT-ZT_OFF_PLOT])
+    plt.xlim(xmin = 0.0,xmax=zTbins[NzT-ZT_OFF_PLOT])
     plt.axhline(y=1, color='k', linestyle='--')
 
     ### ROOT LINEAR and CONSTANT FITS ###
@@ -564,7 +566,7 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
     Fit_Band = ROOT.TGraphErrors(len(zT_Points));
     for i in range(len(zT_Points)-ZT_OFF_PLOT):
         Fit_Band.SetPoint(i, zT_Points[i], 0)
-    (ROOT.TVirtualFitter.GetFitter()).GetConfidenceIntervals(Fit_Band)
+    (ROOT.TVirtualFitter.GetFitter()).GetConfidenceIntervals(Fit_Band,0.95)
     
     band_errors = np.zeros(len(zT_Points))
     for i in range (len(zT_Points)):
@@ -610,8 +612,11 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
     print("                Central Values:")
     print(Ratio[:NzT-ZT_OFF_PLOT])
 
-    print("\n                Satistical Uncertainty Values:")
+    print("\n                Satistical Uncertainty Absolute:")
     print(Ratio_Error[:NzT-ZT_OFF_PLOT])
+    
+    print("\n               Relative Satistical Uncertainty:")
+    print(Ratio_Error[:NzT-ZT_OFF_PLOT]/Ratio[:NzT-ZT_OFF_PLOT])
 
     print("\n                Ratio Uncertainty from Purity:")
     print(Purity_Uncertainty[:NzT-ZT_OFF_PLOT])

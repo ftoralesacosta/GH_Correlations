@@ -303,6 +303,7 @@ def Ped_Sub_After_Cs(Dict):
 def Plot_pp_pPb_Cs(Dict):
     
     Quad_UE = True
+    Sub_Plots = True
     
     for ipt in range (len(Dict["p-Pb_CSR"])):
         #if (ipt > 0): continue
@@ -311,19 +312,24 @@ def Plot_pp_pPb_Cs(Dict):
         fig = plt.figure(figsize=(24,12))
         if (NzT >=7 and NzT <=9):
             fig = plt.figure(figsize=(22,18))
-            
-        if (NzT >=12):
+        if (NzT >=10 and NzT<=12):
+            fig = plt.figure(figsize=(22,24))
+        if (NzT >12):
             fig = plt.figure(figsize=(22,30))
         
         for izt in range (NzT-ZT_OFF_PLOT):
 
+            n_rows = int(NzT/3)+1
             if (NzT ==4):
                 ax = fig.add_subplot(2,2,izt+1)
+                
             elif (NzT ==6):
                 ax = fig.add_subplot(2,3,izt+1)
             elif (NzT >=7 and NzT <=9):
                 ax = fig.add_subplot(3,3,izt+1)
-            elif (NzT >=12):
+            elif (NzT >9 and NzT <=12):
+                ax = fig.add_subplot(4,3,izt+1)
+            elif (NzT >12):
                 ax = fig.add_subplot(5,3,izt+1)
 
             pPb = plt.errorbar(delta_phi_centers,Dict["p-Pb_CSR"][ipt][izt],xerr=phi_width,yerr=Dict["p-Pb_CSR_Errors"][ipt][izt],fmt='bo',capsize=4,markersize=11)
@@ -355,7 +361,7 @@ def Plot_pp_pPb_Cs(Dict):
                 UE_Val =math.sqrt(pp_UE**2 + pPb_UE**2)
                 Combined_UE = ax.fill_between(ue_error_bar,-UE_Val,UE_Val,facecolor='purple',alpha=0.35)
                 
-            Int_Window = ax.axvline(x=dPhi_Bins[-N_Phi_Integrate-1],linestyle='--',color="lightgreen",alpha=1.0)
+            Int_Window = ax.axvline(x=dPhi_Bins[-N_Phi_Integrate-1],linestyle='--',color="green",alpha=1.0)
             
             #MC_UE = ax.fill_between(ue_error_bar,-Dict["MC_Uncorr_Error"][ipt][ztb][0],Dict["MC_Uncorr_Error"][ipt][ztb][0],facecolor='green',alpha=0.35)#One for p-Pb
             
@@ -611,7 +617,6 @@ def Get_Fragmentation(Dict,Use_Avg_Cs=False):
             Keys.append("%s_purity_Uncertainty"%(SYS))
             
     
-    #FF_Vals = np.zeros((len(Keys),N_pT_Bins,NzT))
     FF_Vals = []
 
     for index,SYS in enumerate(Systems):
@@ -628,9 +633,6 @@ def Get_Fragmentation(Dict,Use_Avg_Cs=False):
         FF_Vals.append(temp_FF)
         FF_Vals.append(temp_FF_Errors)
         FF_Vals.append(np.asarray(temp_purity_Errors))
-        
-        #FF_Dict["%s_FF"%(SYS)], FF_Dict["%s_FF_Errors"%(SYS)] = temp_FF, temp_FF_Errors
-        #FF_Dict["%s_purity_FF_Errors"%(SYS)] = np.asarray(temp_purity_Errors)
     
     FF_Dict = dict(zip(Keys,FF_Vals))
     
@@ -724,3 +726,87 @@ def Plot_FF(FF_Dict):
     plt.gcf()
     plt.savefig("pics/Systems_FFunction_All.pdf", bbox_inches='tight')
     plt.show()
+
+    
+def ProcessData(input_x, input_y, input_yerr,UE_binmin=2, UE_binmax=9,label='data',color='black'):
+
+    Printing = False
+    
+    x = input_x 
+    dphi = x[1]-x[0]
+    xerr = np.multiply(np.ones(len(x)),dphi/2.0)
+    
+    y = np.divide(input_y, dphi)
+    yerr = np.divide(input_yerr,dphi)
+    yerr_squared = np.power(yerr,2.0)
+    
+    plt.errorbar(x,y,yerr=yerr,xerr=xerr,label=label+" before subtraction",alpha=0.4,color=color, linestyle = 'None')
+    
+    UE_rate = np.sum(y[UE_binmin:UE_binmax])/len(y[UE_binmin:UE_binmax])
+
+    UE_error = np.sqrt(np.sum(yerr_squared[UE_binmin:UE_binmax]))/len(y[UE_binmin:UE_binmax])
+    
+    if (Printing):
+        print 'UE_rate=  {:2.3f} per unit dphi'.format(UE_rate)
+        print 'UE_error= {:2.3f} per unit dphi'.format(UE_error)
+    
+    
+    plt.fill_between(x[UE_binmin:UE_binmax], UE_rate - UE_error, UE_rate+UE_error, alpha=.5,color='grey')
+    y_sub = np.subtract(y,UE_rate)
+    plt.errorbar(x,y_sub,yerr=yerr,xerr=xerr,label=label+" after subtraction",alpha=0.9,color=color,marker='o', linestyle = 'None')
+    plt.fill_between(x[UE_binmin:UE_binmax], 0.0- UE_error, 0.0+UE_error, alpha=.5,color='grey')
+      
+    plt.ylabel('Rate per dphixdeta',fontsize=16)
+    plt.xlabel('dphi (rad)',fontsize=16)
+
+    #subtract UE
+    y = np.subtract(y, UE_rate)
+    binmax = 6
+    #for i in range(1,binmax+1):
+        #print 'Rate bin #', i
+        #print '{:2.3f}  +/- {:2.3f} (stat) +/- {:2.3f} (UE syst) tracks per unit dphi'.format(y[-i],yerr[-i],UE_error) 
+
+    for i in range(1,binmax+1):
+        if not i==binmax: continue
+        if (Printing):
+            print 'Combination of ', i, ' bins'
+
+        combination = np.sum(y[-i:])/len(y[-i:])
+        combination_error = np.sqrt(np.sum(yerr_squared[-i:]))/len(y[-i:])
+        total_error = np.sqrt(combination_error*combination_error + UE_error*UE_error)
+        if (Printing):
+            print '{:2.3f}  +/- {:2.3f} (stat) +/- {:2.3f} (UE syst) [+/- {:2.3f} (Total error) ={:2.1%} relative] tracks per unit dphi'.format(combination,combination_error,UE_error,total_error,total_error/combination)
+            print '{:2.1%} relative stat error'.format(combination_error/combination)
+            print ' ' 
+
+    plt.fill_between(x[UE_binmin:UE_binmax], 0.0- UE_error, 0.0+UE_error, alpha=.6,color='grey')
+    plt.fill_between(x[-binmax:], combination - total_error, combination+total_error, alpha=.6,color=color)
+    #plt.fill_between(x[-binmax:], combination - combination_error, combination+combination_error, alpha=.5)
+    
+
+    return combination, total_error
+
+def GetRatio(pp_y,pp_yerr,pPb_y,pPb_yerr,bincenters):
+    fig = plt.figure(figsize=(9,9))
+    pp_avg, pp_error = ProcessData(bincenters, pp_y,pp_yerr,label='pp',color='red')
+    pPb_avg, pPb_error = ProcessData(bincenters, pPb_y,pPb_yerr,label='pPb',color='blue')
+    ratio = pPb_avg/pp_avg
+    ratio_err = ratio*np.sqrt(np.power(pPb_error/pPb_avg,2.0) + np.power(pp_error/pp_avg,2.0))
+    plt.xticks(fontsize=16)
+    plt.yticks(fontsize=16)
+    plt.legend(fontsize=16,frameon=False)
+    plt.tight_layout() 
+    plt.savefig('test.pdf')
+    plt.xlim([0.4,np.pi])
+    
+    Printing = False
+    if (Printing):
+        print 'pp average = {:2.3f} +/- {:2.3f} (total UE and stat uncertainty)'.format(pp_avg,pp_error)
+        print '##############################'
+
+        print 'pPb average = {:2.3f} +/- {:2.3f} (total UE and stat uncertainty)'.format(pPb_avg, pPb_error)
+        print '##############################'
+
+        print 'Ratio = {:2.2f} +/- {:2.2f} (total UE and stat uncertainty)'.format(ratio, ratio_err)
+
+    return ratio, ratio_err

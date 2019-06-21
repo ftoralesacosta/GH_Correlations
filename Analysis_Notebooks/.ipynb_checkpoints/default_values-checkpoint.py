@@ -24,11 +24,14 @@ Uncorr_Estimate = "ZYAM"
 #rad_start = 1.6
 #Phi_String = "\pi/2"
 
-rad_start = 1.9
-Phi_String = "5\pi/8"
+#rad_start = 1.9
+#Phi_String = "5\pi/8"
 
-#rad_start = 2.7
-#Phi_String = "7\pi/8"
+#rad_start = 2.3
+#Phi_String = "3\pi/4"
+
+rad_start = 2.7
+Phi_String = "7\pi/8"
 
         #DEFAULTS:
 
@@ -53,7 +56,7 @@ Shower = "LO"
 #description_string = "pT_Rebin_1_pDevNONE"
 #description_string = "pT_Rebin_1_90p"
 #description_string= "pT_Rebin_1_8dPhi"
-#description_string= "pT_Rebin_1_16dPhi"
+description_string= "pT_Rebin_1_16dPhi"
 
 #description_string = "pT_Rebin_2"
 
@@ -72,8 +75,12 @@ Shower = "LO"
 #description_string = "zT_Rebin_6"
 #description_string = "zT_Rebin_8"
 #description_string = "zT_Rebin_9"
-description_string = "zT_Rebin_10"
+#description_string = "zT_Rebin_10"
 #description_string = "zT_Rebin_12"
+#description_string = "zT_Rebin_12pT150"
+#description_string = "zT_Rebin_12_06zT"
+description_string = "zT_Rebin_8_06zT"
+#description_string = "zT_Rebin_9_06zT"
 #description_string = "zT_Rebin_14"
 
 
@@ -104,8 +111,7 @@ pTbins = [12,40]
 #zT
 zTbins = np.asarray([0.05, 0.07670637, 0.11767734, 0.18053204, 0.27695915, 0.42489062, 0.65183634,1])
 zT_offset = 0
-if (len(zTbins)==8):
-    ZT_OFF_PLOT = 1 #Offset for FF plotting
+ZT_OFF_PLOT = 0 #Offset for FF plotting
 
 #deta
 eta_max = 1.2 #Range of Signal Correlations
@@ -172,15 +178,24 @@ if (description_string == "zT_Rebin_6"):
     
 if (description_string == "zT_Rebin_8"):
     zTbins = np.asarray([0.05, 0.07, 0.11, 0.15, 0.22, 0.33, 0.47, 0.69, 1.00])
+    
+if (description_string == "zT_Rebin_8_06zT"):
+    zTbins = np.asarray([0.050, 0.068, 0.093, 0.127, 0.173, 0.236, 0.322, 0.440, 0.600])
 
 if (description_string == "zT_Rebin_9"):
     zTbins = np.asarray([0.05, 0.07, 0.10, 0.14, 0.19, 0.26, 0.37, 0.51, 0.72, 1.00])
     
+if(description_string == "zT_Rebin_9_06zT"):
+    zTbins = np.asarray([0.050, 0.066, 0.087, 0.114, 0.151, 0.199, 0.262, 0.345, 0.455, 0.600])
+    
 if (description_string == "zT_Rebin_10"):
     zTbins = np.asarray([0.05, 0.0675, 0.0910, 0.1228, 0.1657, 0.2236, 0.3017, 0.4071, 0.5493, 0.7411, 1.00])
     
-if (description_string == "zT_Rebin_12"):
+if ("zT_Rebin_12" in description_string):
     zTbins = np.asarray([0.05, 0.0642, 0.0824, 0.1057, 0.1357,0.1742, 0.2236 , 0.287, 0.368, 0.473 ,0.607, 0.78, 1.0])
+    
+if ("zT_Rebin_12_06zT" in description_string):
+    zTbins = np.asarray([0.050, 0.062, 0.076, 0.093, 0.114, 0.141, 0.173, 0.213, 0.262, 0.322, 0.397, 0.488, 0.600])
                         
 if (description_string == "zT_Rebin_14"):
     zTbins = np.asarray([0.05, 0.06, 0.08, 0.10, 0.12, 0.15, 0.18, 0.22, 0.28, 0.34, 0.42, 0.53, 0.65, 0.81, 1.00])
