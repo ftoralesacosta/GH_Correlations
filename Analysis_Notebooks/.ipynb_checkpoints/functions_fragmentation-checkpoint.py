@@ -217,6 +217,7 @@ def Fit_FF_PowerLaw(FF_Dictionary,SYS):
     Params, fiterrors, chi2dof, fitisok = getSingleparameterPowerlawParamsAndErrors(hist, histerr, bincenters, bincenters[0] - binwidths[0], bincenters[-1] - binwidths[-1], histnorm)
         
     power = Params["p"]
+    print(fiterrors)
 
     if (fitisok == False):
         print("WARNING: POWER LAW FIT DID NOT CONVERGE")
@@ -727,3 +728,48 @@ def Compare_pp_pPB_Avg_lists(strings,string_descrp_list,colors):
     plt.show()
 
     print("                Central Values:")
+    
+    
+def LaTeX_Table(FF_Dictionary):
+    
+    plot = True
+    
+    print(r"%s Intg. %s"%(description_string,Phi_String)),
+
+    fig = plt.figure(figsize=(12,6))
+
+    for i,SYS in enumerate(Systems):
+        
+        hist = FF_Dictionary["%s_Combined_FF"%(SYS)][:NzT-ZT_OFF_PLOT]
+        histerr = FF_Dictionary["%s_Combined_FF_Errors"%(SYS)][:NzT-ZT_OFF_PLOT]
+        binwidths = zT_widths[:NzT-ZT_OFF_PLOT]
+        bincenters = zT_centers[:NzT-ZT_OFF_PLOT]
+        histnorm = sum(np.multiply(hist, binwidths*2))
+        Params, fiterrors, chi2dof, fitisok = getSingleparameterPowerlawParamsAndErrors(hist, histerr, bincenters, bincenters[0] - binwidths[0], bincenters[-1] - binwidths[-1], histnorm)
+
+        p = Params["p"]
+        p_error = fiterrors["p"]
+        
+        if (fitisok == False):
+            print("WARNING: POWER LAW FIT DID NOT CONVERGE")
+        if plot:
+            ax = fig.add_subplot(1,2,(i+1))
+            model = map(singleparameterPowerlawFunction(**Params), zT_centers[:NzT-ZT_OFF_PLOT])
+        
+        plt.plot(zT_centers[:NzT-ZT_OFF_PLOT], model, 'g:')
+        plt.yscale("log")
+        plt.plot(zT_centers[:NzT-ZT_OFF_PLOT],FF_Dictionary["%s_Combined_FF"%(SYS)][:NzT-ZT_OFF_PLOT])
+
+        string = r"%s & $\alpha %1.2f \pm %1.2f, \chi^2/\mathrm{dof} = %1.2f $ &"%(description_string,p,p_error,chi2dof)
+        print(string),
+
+    pp_sys_Error = (FF_Dictionary["pp_Combined_FF"][:NzT-ZT_OFF_PLOT])*math.sqrt(0.15**2+0.05**2)
+    p_Pb_sys_Error = (FF_Dictionary["p-Pb_Combined_FF"][:NzT-ZT_OFF_PLOT])*math.sqrt(0.15**2+0.05**2)
+    Chi2,NDF,Pval = Get_pp_pPb_List_Chi2(FF_Dictionary["pp_Combined_FF"][:NzT-ZT_OFF_PLOT],
+                                             FF_Dictionary["pp_Combined_FF_Errors"][:NzT-ZT_OFF_PLOT],
+                                             pp_sys_Error,
+                                             FF_Dictionary["p-Pb_Combined_FF"][:NzT-ZT_OFF_PLOT],
+                                             FF_Dictionary["p-Pb_Combined_FF_Errors"][:NzT-ZT_OFF_PLOT],
+                                             p_Pb_sys_Error)
+        
+    print("$\chi^2/dof = %1.2f, p = %1.2f \\\\"%(Chi2/NDF,Pval))
