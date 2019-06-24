@@ -56,7 +56,7 @@ Shower = "LO"
 #description_string = "pT_Rebin_1_pDevNONE"
 #description_string = "pT_Rebin_1_90p"
 #description_string= "pT_Rebin_1_8dPhi"
-description_string= "pT_Rebin_1_16dPhi"
+#description_string= "pT_Rebin_1_16dPhi"
 
 #description_string = "pT_Rebin_2"
 
@@ -79,8 +79,11 @@ description_string= "pT_Rebin_1_16dPhi"
 #description_string = "zT_Rebin_12"
 #description_string = "zT_Rebin_12pT150"
 #description_string = "zT_Rebin_12_06zT"
-description_string = "zT_Rebin_8_06zT"
+#description_string = "zT_Rebin_8_06zT"
 #description_string = "zT_Rebin_9_06zT"
+#description_string = "zT_Rebin_9_004zT06zT"
+
+description_string = "zT_Rebin_10_003zT06zT"
 #description_string = "zT_Rebin_14"
 
 
@@ -188,6 +191,9 @@ if (description_string == "zT_Rebin_9"):
 if(description_string == "zT_Rebin_9_06zT"):
     zTbins = np.asarray([0.050, 0.066, 0.087, 0.114, 0.151, 0.199, 0.262, 0.345, 0.455, 0.600])
     
+if(description_string == "zT_Rebin_9_004zT06zT"):
+    zTbins = np.asarray([0.040, 0.054, 0.073, 0.099, 0.133, 0.180, 0.243, 0.329, 0.444, 0.600])
+    
 if (description_string == "zT_Rebin_10"):
     zTbins = np.asarray([0.05, 0.0675, 0.0910, 0.1228, 0.1657, 0.2236, 0.3017, 0.4071, 0.5493, 0.7411, 1.00])
     
@@ -197,6 +203,9 @@ if ("zT_Rebin_12" in description_string):
 if ("zT_Rebin_12_06zT" in description_string):
     zTbins = np.asarray([0.050, 0.062, 0.076, 0.093, 0.114, 0.141, 0.173, 0.213, 0.262, 0.322, 0.397, 0.488, 0.600])
                         
+if (description_string == "zT_Rebin_10_003zT06zT"):
+    zTbins = np.asarray([0.033, 0.044, 0.059, 0.079, 0.105, 0.141, 0.188, 0.251, 0.336, 0.449, 0.600])
+        
 if (description_string == "zT_Rebin_14"):
     zTbins = np.asarray([0.05, 0.06, 0.08, 0.10, 0.12, 0.15, 0.18, 0.22, 0.28, 0.34, 0.42, 0.53, 0.65, 0.81, 1.00])
     
