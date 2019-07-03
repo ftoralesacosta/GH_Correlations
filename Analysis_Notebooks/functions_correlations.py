@@ -102,55 +102,55 @@ def Plot_UB_Subtraction(Dict):
         for ipt in range (N_pT_Bins):
             fig = plt.figure(figsize=(37,17))
             if not(Ped_Sub_First):
-                fig = plt.figure(figsize=(18,12))
-            #if (ipt > 0): continue
-            #ipt = ipt+2
-            for izt in range (0,NzT-ZT_OFF_PLOT):
-                ztb = izt-zT_offset
-
-                UE_Band = "None"
-                if not(Ped_Sub_First):
                     #ax = fig.add_subplot(2,3,(ztb+1))
-                    if (NzT ==4):
-                        ax = fig.add_subplot(2,3,(ztb+1))
-                    elif (NzT ==6):
-                        ax = fig.add_subplot(2,3,(ztb+1))
-                    elif(NzT ==7):
-                        ax = fig.add_subplot(3,3,(ztb+1))
-                else:
-                    #Sig
-                    if (NzT ==4):
-                        ax = fig.add_subplot(2,4,(2*ztb+1))
-                    elif (NzT ==6):
-                        ax = fig.add_subplot(3,4,(2*ztb+1))
-                    elif(NzT ==7):
-                        ax = fig.add_subplot(4,4,(2*ztb+1))
-                        #ax.plot(delta_phi_centers,Dict["%s_CSR"%(SYS)][ipt][ztb],'bo',ms=10)
+                fig = plt.figure(figsize=(24,12))
+                if (NzT >=7 and NzT <=9):
+                    ax = plt.figure(figsize=(22,18))
+                if (NzT >=10 and NzT<=12):
+                    ax = plt.figure(figsize=(22,24))
+                if (NzT >12):
+                    ax = plt.figure(figsize=(22,30))
+
+            for izt in range (NzT-ZT_OFF_PLOT):
+                ztb = izt-zT_offset
+                if (NzT ==4):
+                    ax = fig.add_subplot(2,2,izt+1)
+
+                elif (NzT ==6):
+                    ax = fig.add_subplot(2,3,izt+1)
+                elif (NzT >=7 and NzT <=9):
+                    ax = fig.add_subplot(3,3,izt+1)
+                elif (NzT >9 and NzT <=12):
+                    ax = fig.add_subplot(4,3,izt+1)
+                elif (NzT >12):
+                    ax = fig.add_subplot(5,3,izt+1)
+                
+                UE_Band = "None"
                     
-                    UE_Band = ax.fill_between(ue_error_bar,-Dict["%s_Uncorr_Error"%(SYS)][ipt][ztb][0],
+                UE_Band = ax.fill_between(ue_error_bar,-Dict["%s_Uncorr_Error"%(SYS)][ipt][ztb][0],
                                 Dict["%s_Uncorr_Error"%(SYS)][ipt][ztb][0],facecolor='purple',alpha=0.35) 
 
-                    plt.axhline(y=0,color='gray',linestyle='--',linewidth=1.3,alpha=0.8)
+                plt.axhline(y=0,color='gray',linestyle='--',linewidth=1.3,alpha=0.8)
 
                 s_plot = ax.errorbar(delta_phi_centers,Dict["%s_CSR"%(SYS)][ipt][ztb],xerr=phi_width,
                                      yerr=Dict["%s_CSR_Errors"%(SYS)][ipt][ztb],fmt='bo',ecolor='b',
                                      label='Signal Region (stat. error)')
 
 
-                plt.xlabel(r'|$\Delta \varphi$|',fontsize=fsize+4)
-                plt.xticks(fontsize=(fsize))
-                plt.xlim((0.39269908169872414,3.14159))
-                plt.ylabel(r'$1/N_{\mathrm{trig}} \: \: \mathrm{d}N/\mathrm{d}\Delta\eta$',fontsize=fsize+2)
-                empt, = ax.plot([], [], ' ')
-                empt2, = ax.plot([],[],' ')
+                #ax.xlabel(r'|$\Delta \varphi$|',fontsize=fsize+4)
+                #ax.xticks(fontsize=(fsize))
+                #ax.xlim((0.39269908169872414,3.14159))
+                #ax.ylabel(r'$1/N_{\mathrm{trig}} \: \: \mathrm{d}N/\mathrm{d}\Delta\eta$',fontsize=fsize+2)
+                empt, = plt.plot([], [], ' ')
+                empt2, = plt.plot([],[],' ')
                 plt.yticks(fontsize=fsize-5)
 
                 if not(Ped_Sub_First):
-                    leg = ax.legend([s_plot,UE_Band,empt,empt2],['Shower Sig. Region (stat. error)',"UB Error",r'%1.2f < $z_\mathrm{T}$ < %1.2f'
+                    leg = plt.legend([s_plot,UE_Band,empt,empt2],['Shower Sig. Region (stat. error)',"UB Error",r'%1.2f < $z_\mathrm{T}$ < %1.2f'
                             %(zTbins[izt],zTbins[izt+1]),r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],
                             loc='best',title = "Alice %s 5 TeV",fontsize=14,frameon=False,numpoints=1)
                 else:
-                    leg = ax.legend([s_plot,empt,empt2],['Shower Sig. Region (stat. error)',r'%1.2f < $z_\mathrm{T}$ < %1.2f'
+                    leg = plt.legend([s_plot,empt,empt2],['Shower Sig. Region (stat. error)',r'%1.2f < $z_\mathrm{T}$ < %1.2f'
                             %(zTbins[izt],zTbins[izt+1]),r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],
                             loc='best',title = "Alice %s 5 TeV",fontsize=14,frameon=False,numpoints=1)
                     
@@ -163,6 +163,8 @@ def Plot_UB_Subtraction(Dict):
                 if not(Ped_Sub_First):
                     plt.setp(leg.get_title(),fontsize=14)
 
+                continue
+                
                 
                 if (Ped_Sub_First):
                     #bkg
@@ -173,11 +175,11 @@ def Plot_UB_Subtraction(Dict):
                     elif(NzT ==7):
                         ax = fig.add_subplot(4,4,(2*ztb+1))
 
-                    plt.xlabel(r'|$\Delta \varphi$|',fontsize=fsize+4)
-                    plt.xticks(fontsize=(fsize))
-                    plt.xlim((0.39269908169872414,3.14159))
-                    plt.ylabel(r'$1/N_{\mathrm{trig}} \: \: \mathrm{d}N/\mathrm{d}\Delta\eta$',fontsize=fsize+2)
-                    plt.yticks(fontsize=fsize-5)
+                    #plt.xlabel(r'|$\Delta \varphi$|',fontsize=fsize+4)
+                    #plt.xticks(fontsize=(fsize))
+                    #plt.xlim((0.39269908169872414,3.14159))
+                    #plt.ylabel(r'$1/N_{\mathrm{trig}} \: \: \mathrm{d}N/\mathrm{d}\Delta\eta$',fontsize=fsize+2)
+                    #plt.yticks(fontsize=fsize-5)
 
                     ax.plot(delta_phi_centers,Dict["%s_CBR"%(SYS)][ipt][ztb],'ro',ms=10)
                     b_plot = ax.errorbar(delta_phi_centers,Dict["%s_CBR"%(SYS)][ipt][ztb],xerr=phi_width,yerr=Dict["%s_CBR_Errors"%(SYS)][ipt][ztb],fmt=None,ecolor='r')
@@ -388,7 +390,7 @@ def Plot_pp_pPb_Cs(Dict):
 
             plt.annotate(r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]), xy=(0.05, 0.65), xycoords='axes fraction', ha='left', va='top', fontsize=16)
             
-            if (len(Dict["p-Pb_CSR"]) > 2):
+            if (len(Dict["p-Pb_CSR"]) > 1):
                 plt.annotate(r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]), xy=(0.05, 0.6), xycoords='axes fraction', ha='left', va='top', fontsize=16)
             else:
                 plt.annotate(r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[0],pTbins[N_pT_Bins]), xy=(0.05, 0.6), xycoords='axes fraction', ha='left', va='top', fontsize=16)
@@ -401,6 +403,89 @@ def Plot_pp_pPb_Cs(Dict):
         plt.show()
         #fig.savefig('pics/Gamma_hadron_corr_zT_%i.pdf'%(ztb))
         fig.savefig('pics/%s/%s_Gamma_hadron_corr_%i.pdf'%(Shower,Shower,ipt))
+        
+        
+        #Above can be adapted for pp & PbPb comparisons
+
+def Plot_pp_pPb_Cs_Individual(Dict):
+    
+    Quad_UE = True
+    Sub_Plots = True
+    
+    for ipt in range (len(Dict["p-Pb_CSR"])):
+        
+        for izt in range (NzT-ZT_OFF_PLOT):
+            
+            fig = plt.figure(figsize=(10,8))
+
+            pPb = plt.errorbar(delta_phi_centers,Dict["p-Pb_CSR"][ipt][izt],xerr=phi_width,yerr=Dict["p-Pb_CSR_Errors"][ipt][izt],fmt='bo',capsize=4,markersize=11)
+            pp = plt.errorbar(delta_phi_centers,Dict["pp_CSR"][ipt][izt],xerr=phi_width,yerr=Dict["pp_CSR_Errors"][ipt][izt],fmt='ro',capsize=4,markersize=11)
+
+            if(Use_MC):
+                MC = plt.errorbar(delta_phi_centers,["MC_CSR"][ipt][izt],xerr=phi_width,yerr=["MC_CSR_Errors"][ipt][ztb],fmt='go',capsize=4,markersize=11)
+
+
+            plt.xlabel(r'|$\Delta \varphi$|',fontsize=28)
+            plt.xticks(fontsize=18)
+            plt.xlim((0.39269908169872414,3.14159))
+
+            plt.ylabel(r'$1/N_{\gamma} \: \: \mathrm{d}N/\mathrm{d}\Delta \eta$',fontsize=28)
+            plt.yticks(fontsize=18)
+            plt.axhline(y=0,color='gray',linestyle='--',linewidth=1.3,alpha=0.8)        
+
+            if not(Quad_UE):
+                pp_UE = plt.fill_between(ue_error_bar,-Dict["pp_Uncorr_Error"][ipt][izt][0],
+                Dict['pp_Uncorr_Error'][ipt][izt][0],facecolor='red',alpha=0.35) #Other for pp
+                
+                pPb_UE = plt.fill_between(ue_error_bar,-Dict["p-Pb_Uncorr_Error"][ipt][izt][0],
+                Dict['p-Pb_Uncorr_Error'][ipt][izt][0],facecolor='blue',alpha=0.35)#One for p-Pb
+            
+            else:
+                pp_UE = Dict["pp_Uncorr_Error"][ipt][izt][0]/(ZYAM_Max_i-ZYAM_Min_i)
+                pPb_UE = Dict["p-Pb_Uncorr_Error"][ipt][izt][0]/(ZYAM_Max_i-ZYAM_Min_i)
+                UE_Val =math.sqrt(pp_UE**2 + pPb_UE**2)
+                Combined_UE = plt.fill_between(ue_error_bar,-UE_Val,UE_Val,facecolor='purple',alpha=0.35)
+                
+            Int_Window = plt.axvline(x=dPhi_Bins[-N_Phi_Integrate-1],linestyle='--',color="green",alpha=1.0)
+            
+            #MC_UE = ax.fill_between(ue_error_bar,-Dict["MC_Uncorr_Error"][ipt][ztb][0],Dict["MC_Uncorr_Error"][ipt][ztb][0],facecolor='green',alpha=0.35)#One for p-Pb
+            
+            
+            Chi2,NDF,Pval = Get_pp_pPb_List_Chi2(Dict["p-Pb_CSR"][ipt][izt],Dict["p-Pb_CSR_Errors"][ipt][izt],Dict["p-Pb_Uncorr_Error"][ipt][izt],
+                                        Dict["pp_CSR"][ipt][izt],Dict["pp_CSR_Errors"][ipt][izt],Dict["pp_Uncorr_Error"][ipt][izt])
+                        
+            plt.annotate("$\chi^2$ = %1.1f, ndf = %i, p = %1.2f"%(Chi2,NDF,Pval), xy=(0.01, 0.06), xycoords='axes fraction', ha='left', va='top', fontsize=16)
+
+            if(Use_MC):
+                leg = plt.legend([pp,pPb,MC,pp_UE,pPb_UE,MC_UE],['pp $\sqrt{s}= 5$ TeV (stat. error)',
+                    'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)','pythia GJ $\sqrt{s}=5$ TeV (stat. error)', 
+                    'pp UE Error', 'p-Pb UE Error','pythia UE Error'],
+                    loc = "upper left",fontsize=16,frameon=False,numpoints=1)
+            else:    
+                if not(Quad_UE):
+                    leg = plt.legend([pp,pPb,pp_UE,pPb_UE],['pp $\sqrt{s}= 5$ TeV (stat. error)',
+                    'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)', 'pp UB Error', 'p-Pb UB Error'],
+                    loc = "upper left",fontsize=16,frameon=False,numpoints=1)
+                else:
+                    leg = plt.legend([pp,pPb,Combined_UE],['pp $\sqrt{s}= 5$ TeV (stat. error)',
+                    'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)', 'UB Error'],
+                    loc = "upper left",fontsize=16,frameon=False,numpoints=1)
+
+            plt.annotate(r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]), xy=(0.05, 0.75), xycoords='axes fraction', ha='left', va='top', fontsize=16)
+            
+            if (len(Dict["p-Pb_CSR"]) > 2):
+                plt.annotate(r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]), xy=(0.05, 0.7), xycoords='axes fraction', ha='left', va='top', fontsize=16)
+            else:
+                plt.annotate(r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[0],pTbins[N_pT_Bins]), xy=(0.05, 0.7), xycoords='axes fraction', ha='left', va='top', fontsize=16)
+            
+            leg.set_title("ALICE Work in Progress")
+            leg._legend_box.align = "left"
+            plt.setp(leg.get_title(),fontsize=22)
+            fig.tight_layout()
+
+            plt.show()
+            #fig.savefig('pics/Gamma_hadron_corr_zT_%i.pdf'%(ztb))
+            fig.savefig('pics/%s/%s_Gamma_hadron_corr_%i_%i.pdf'%(Shower,Shower,ipt,izt))
         
         
         #Above can be adapted for pp & PbPb comparisons
@@ -570,7 +655,7 @@ def Compare_Cs_pTBins():
             
                 
         
-def Integrate_Away_Side(Phi_array,Phi_Errors,LE_Error):
+def Integrate_Away_Side(Phi_array,Phi_Errors,LE_Error,N_Phi_Intgl=N_Phi_Integrate):
     
     Use_Uncorr_Error = True
     FF_zt = np.zeros((len(Phi_array), NzT))
@@ -586,11 +671,11 @@ def Integrate_Away_Side(Phi_array,Phi_Errors,LE_Error):
             zT_width = zTbins[izt+1]-zTbins[izt]
             #zT_width = 1
             
-            temp_phi = Phi_array[ipt][izt][-N_Phi_Integrate:]/(dPhi_Width*N_Phi_Integrate)
+            temp_phi = Phi_array[ipt][izt][-N_Phi_Intgl:]/(dPhi_Width*N_Phi_Intgl)
             #print(temp_phi)
             
             FF_zt[ipt][izt] = temp_phi.sum()/zT_width
-            temp_error = (Phi_Errors[ipt][izt][-N_Phi_Integrate:]/(dPhi_Width*N_Phi_Integrate))**2
+            temp_error = (Phi_Errors[ipt][izt][-N_Phi_Intgl:]/(dPhi_Width*N_Phi_Intgl))**2
             
             if (Use_Uncorr_Error):
                 FF_zt_Errors[ipt][izt] = (math.sqrt(temp_error.sum() + (LE_Error[ipt][izt][0])**2))/zT_width
@@ -600,7 +685,7 @@ def Integrate_Away_Side(Phi_array,Phi_Errors,LE_Error):
     return FF_zt, FF_zt_Errors
 
 
-def Get_Fragmentation(Dict,Use_Avg_Cs=False):
+def Get_Fragmentation(Dict,N_Phi_Intgl=N_Phi_Integrate,Use_Avg_Cs=False):
     
     Keys = []
     
@@ -621,7 +706,7 @@ def Get_Fragmentation(Dict,Use_Avg_Cs=False):
 
     for index,SYS in enumerate(Systems):
         
-        temp_FF, temp_FF_Errors = Integrate_Away_Side(Dict["%s_CSR"%(SYS)],Dict["%s_CSR_Errors"%(SYS)],Dict["%s_Uncorr_Error"%(SYS)])
+        temp_FF, temp_FF_Errors = Integrate_Away_Side(Dict["%s_CSR"%(SYS)],Dict["%s_CSR_Errors"%(SYS)],Dict["%s_Uncorr_Error"%(SYS)],N_Phi_Intgl,)
         temp_purity_Errors = []
         
         for ipt in range(len(Dict["%s_CSR"%(SYS)])): 
@@ -730,7 +815,7 @@ def Plot_FF(FF_Dict):
     
 def ProcessData(input_x, input_y, input_yerr,UE_binmin=2, UE_binmax=9,label='data',color='black'):
 
-    Printing = False
+    Printing = True
     
     x = input_x 
     dphi = x[1]-x[0]
@@ -799,7 +884,7 @@ def GetRatio(pp_y,pp_yerr,pPb_y,pPb_yerr,bincenters):
     plt.savefig('test.pdf')
     plt.xlim([0.4,np.pi])
     
-    Printing = False
+    Printing = True 
     if (Printing):
         print 'pp average = {:2.3f} +/- {:2.3f} (total UE and stat uncertainty)'.format(pp_avg,pp_error)
         print '##############################'

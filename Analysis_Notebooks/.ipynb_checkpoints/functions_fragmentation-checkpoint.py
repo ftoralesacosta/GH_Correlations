@@ -1,4 +1,6 @@
 from default_values import *
+from functions_root_nparray import *
+from functions_correlations import *
 import matplotlib.pyplot as plt
 import matplotlib
 from ROOT import TGraphErrors
@@ -265,7 +267,7 @@ def Plot_pp_pPb_Avg_FF(Comb_Dict):
             bottom=Comb_Dict["%s_Combined_FF"%(SYS)][:NzT-ZT_OFF_PLOT]-Sys_Uncertainty[:NzT-ZT_OFF_PLOT],width=zt_box[:NzT-ZT_OFF_PLOT], align='center',color='white',edgecolor="black",label="Systematic Uncertainty")
 
     plt.yscale('log')                                                                                                                                                                                                                                                              
-    plt.ylabel(r"$\frac{1}{N_{\mathrm{\gamma}}}\frac{\mathrm{d}N}{\mathrm{d}z_{\mathrm{T}} \mathrm{d}\Delta\eta}$",fontsize=24)
+    pplt.ylabel(r"$\frac{1}{N_{\mathrm{\gamma}}}\frac{\mathrm{d}N}{\mathrm{d}z_{\mathrm{T}}\mathrm{d}\Delta\phi\mathrm{d}\Delta\eta}$",fontsize=24)
     plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^\mathrm{h}/p_\mathrm{T}^\mathrm{\gamma}$",fontsize=20)
     plt.xticks(fontsize=16)
     plt.yticks(fontsize=16)
@@ -392,13 +394,14 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
             label=SYS)
             #label=r' %s %1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(SYS,pTbins[0],pTbins[N_pT_Bins]))
 
-        Sys_Plot_pp = plt.bar(zT_centers[:NzT-ZT_OFF_PLOT], Sys_Uncertainty[:NzT-ZT_OFF_PLOT]+Sys_Uncertainty[:NzT-ZT_OFF_PLOT], 
-            bottom=Comb_Dict["%s_Combined_FF"%(SYS)][:NzT-ZT_OFF_PLOT]-Sys_Uncertainty[:NzT-ZT_OFF_PLOT],width=zt_box[:NzT-ZT_OFF_PLOT], align='center',color=sys_col,alpha=0.3)
+        Sys_Plot_pp = plt.bar(zT_centers[:NzT-ZT_OFF_PLOT], Sys_Uncertainty[:NzT-ZT_OFF_PLOT]+Sys_Uncertainty[:NzT-ZT_OFF_PLOT],
+            bottom=Comb_Dict["%s_Combined_FF"%(SYS)][:NzT-ZT_OFF_PLOT]-Sys_Uncertainty[:NzT-ZT_OFF_PLOT],width=zT_widths[:NzT-ZT_OFF_PLOT], align='center',color=sys_col,alpha=0.3)
+            #bottom=Comb_Dict["%s_Combined_FF"%(SYS)][:NzT-ZT_OFF_PLOT]-Sys_Uncertainty[:NzT-ZT_OFF_PLOT],width=zt_box[:NzT-ZT_OFF_PLOT], align='center',color=sys_col,alpha=0.3)
         
         
         if (plot_power):
             model,p,chi2dof = Fit_FF_PowerLaw(Comb_Dict,SYS)
-            plt.plot(zT_centers[:NzT-ZT_OFF_PLOT], model, sys_col,label=r"%s $\alpha = %1.2f\ \chi^2/dof = %1.2f$"%(SYS,p,chi2dof))
+            plt.plot(zT_centers[:NzT-ZT_OFF_PLOT], model, sys_col,label=r"%s $\alpha = %1.2f\pm 0.1 \chi^2 = %1.2f$"%(SYS,p,chi2dof))
         
     plt.yscale('log')                             
     plt.ylabel(r"$\frac{1}{N_{\mathrm{\gamma}}}\frac{\mathrm{d}N}{\mathrm{d}z_{\mathrm{T}}\mathrm{d}\Delta\phi\mathrm{d}\Delta\eta}$",fontsize=24)
@@ -423,7 +426,9 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
 
     plt.annotate("$\chi^2$ = %1.1f, ndf = %i, p = %1.2f"%(Chi2,NDF,Pval), xy=(0.01, 0.06), xycoords='axes fraction', ha='left', va='top', fontsize=16)
     #plt.annotate("$\chi^2$ = %1.1f, ndf = %i, p = %f"%(Chi2,NDF,Pval), xy=(0.99, 0.06), xycoords='axes fraction', ha='right', va='top', fontsize=16)
-        
+    
+    plt.annotate("%s"%(description_string),xy=(0.01,0.1),xycoords="axes fraction",ha="left",va="top",fontsize=12)
+    
     leg = plt.legend(numpoints=1,frameon=True,edgecolor='white', framealpha=0.0, fontsize=16)
     leg.set_title("ALICE Work in Progress\n  $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV \n")
     plt.setp(leg.get_title(),fontsize=20)
@@ -438,7 +443,7 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
          {'color': 'black', 'fontsize': 16, 'ha': 'left', 'va': 'top',
           'bbox': dict(boxstyle="square", fc="blue",alpha=0.3, ec="None", pad=0.2)})
 
-    plt.title(r'Integrated $\mathrm{\gamma}$-Hadron Correlation: $%s < \Delta\varphi < \pi, |\Delta\eta| < %1.1f$ '%(Phi_String,eta_max),fontdict = {'fontsize' : 19})
+    plt.title(r'Integrated $\mathrm{\gamma}$-Hadron Correlation: $%s < \Delta\varphi < \pi$ '%(Phi_String),fontdict = {'fontsize' : 19})
     
     fig.add_axes((0.1,0.1,0.88,0.2))
 
@@ -454,6 +459,10 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
     Ratio_Error = np.sqrt((pPb_Combined_Errors/pPb_Combined)**2 + (pp_Combined_Errors/pp_Combined)**2)*Ratio
     Ratio_Plot = plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT], Ratio[:NzT-ZT_OFF_PLOT], yerr=Ratio_Error[:NzT-ZT_OFF_PLOT],xerr=zT_widths[:NzT-ZT_OFF_PLOT], fmt='ko',capsize=3, ms=6,lw=1)
     
+        #Save
+    np.save("npy_files/%s_Averaged_FF_Ratio_%s.npy"%(Shower,description_string),Ratio)
+    np.save("npy_files/%s_Averaged_FF_Ratio_Errors_%s.npy"%(Shower,description_string),Ratio_Error)
+    
     Purity_Uncertainty = np.sqrt((pp_purity_Uncertainty/pPb_Combined)**2 + (pPb_purity_Uncertainty/pPb_Combined)**2)*Ratio
     Efficiency_Uncertainty = np.ones(len(pPb_Combined))*0.05*math.sqrt(2)*Ratio 
     if (CorrectedP):
@@ -461,7 +470,7 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
     
     Sys_Plot = plt.bar(zT_centers[:NzT-ZT_OFF_PLOT], Ratio_Systematic[:NzT-ZT_OFF_PLOT]+Ratio_Systematic[:NzT-ZT_OFF_PLOT],
             #bottom=Ratio[:NzT-ZT_OFF_PLOT]-Ratio_Systematic[:NzT-ZT_OFF_PLOT], width=zt_box[:NzT-ZT_OFF_PLOT], align='center',edgecolor="k",color='w')
-            bottom=Ratio[:NzT-ZT_OFF_PLOT]-Ratio_Systematic[:NzT-ZT_OFF_PLOT], width=zt_box[:NzT-ZT_OFF_PLOT], align='center',color='black',alpha=0.2)
+            bottom=Ratio[:NzT-ZT_OFF_PLOT]-Ratio_Systematic[:NzT-ZT_OFF_PLOT], width=zT_widths[:NzT-ZT_OFF_PLOT], align='center',color='black',alpha=0.2)
     
     #Sys_Plot = plt.bar(zT_centers[:NzT-ZT_OFF_PLOT], 2*Ratio_Systematic[:NzT-ZT_OFF_PLOT], 
     #   bottom=1.0-Ratio_Systematic[:NzT-ZT_OFF_PLOT], width=2*zT_widths[:NzT-ZT_OFF_PLOT], align='center',color='black',alpha = 0.2)
@@ -534,7 +543,8 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
         plt.xlim(xmin = 0.0,xmax=0.7)
     elif(NzT==7):
         plt.xlim(xmin = 0.0,xmax=1.0)
-    plt.xlim(xmin = 0.0,xmax=zTbins[NzT-ZT_OFF_PLOT])
+    #plt.xlim(xmin = 0.0,xmax=zTbins[NzT-ZT_OFF_PLOT])
+    plt.xlim(xmin = 0.0,xmax=0.67)
     plt.axhline(y=1, color='k', linestyle='--')
 
     ### ROOT LINEAR and CONSTANT FITS ###
@@ -567,7 +577,7 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
     Fit_Band = ROOT.TGraphErrors(len(zT_Points));
     for i in range(len(zT_Points)-ZT_OFF_PLOT):
         Fit_Band.SetPoint(i, zT_Points[i], 0)
-    (ROOT.TVirtualFitter.GetFitter()).GetConfidenceIntervals(Fit_Band,0.95)
+    (ROOT.TVirtualFitter.GetFitter()).GetConfidenceIntervals(Fit_Band,0.68)
     
     band_errors = np.zeros(len(zT_Points))
     for i in range (len(zT_Points)):
@@ -631,9 +641,9 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
     
 
     
-def Compare_pp_pPB_Avg_Ratio_lists(strings,string_descrp_list,colors,Show_Fits,Avg_Cs = False):
+def Compare_pp_pPB_Avg_Ratio_lists(strings,string_descrp_list,colors,Show_Fits = False,Avg_Cs = False):
     
-    plt.figure(figsize=(15,10.5))
+    plt.figure(figsize=(8,8))
     
     for (string,string_descr,colr) in zip(strings,string_descrp_list,colors):
         
@@ -645,7 +655,7 @@ def Compare_pp_pPB_Avg_Ratio_lists(strings,string_descrp_list,colors,Show_Fits,A
             Ratio = np.load("npy_files/LO_Cs_Avg_FF_Ratio_%s.npy"%(string))
             Ratio_Error = np.load("npy_files/LO_Cs_Avg_FF_Ratio_Errors_%s.npy"%(string))
 
-        Zbins = np.geomspace(0.05, 1.0, num=len(Ratio)+1)
+        Zbins = np.geomspace(0.06, 0.6, num=len(Ratio)+1)
         zT_centers = (Zbins[1:] + Zbins[:-1]) / 2
         zT_widths = [(j-i)/2 for i, j in zip(Zbins[:-1], Zbins[1:])]
         
@@ -697,7 +707,7 @@ def Compare_pp_pPB_Avg_Ratio_lists(strings,string_descrp_list,colors,Show_Fits,A
     
 def Compare_pp_pPB_Avg_lists(strings,string_descrp_list,colors):
         
-    plt.figure(figsize=(15,10.5)) 
+    plt.figure(figsize=(8,8)) 
     shapes = ["o","x","s"]
     
     for (string,string_descr,colr) in zip(strings,string_descrp_list,colors):
@@ -708,7 +718,10 @@ def Compare_pp_pPB_Avg_lists(strings,string_descrp_list,colors):
             FF_Errors = np.load("npy_files/%s_%s_Averaged_Fragmentation_Functions_Errors_%s.npy"%(Shower,SYS,string))
             print("loading npy_files/%s_%s_Averaged_Fragmentation_Functions_Errors_%s.npy"%(Shower,SYS,string))
         
-            
+            Zbins = np.geomspace(0.05, 1.0, num=len(FF)+1)
+            zT_centers = (Zbins[1:] + Zbins[:-1]) / 2
+            zT_widths = [(j-i)/2 for i, j in zip(Zbins[:-1], Zbins[1:])]
+        
             plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT]+0.2, FF[:NzT-ZT_OFF_PLOT],xerr=zT_widths[:NzT-ZT_OFF_PLOT],
                 yerr=FF_Errors[:NzT-ZT_OFF_PLOT],linewidth=1, fmt=shape,color=colr,capsize=1,label="%s (%s)"%(string_descr,SYS))
 
@@ -760,7 +773,7 @@ def LaTeX_Table(FF_Dictionary):
         plt.yscale("log")
         plt.plot(zT_centers[:NzT-ZT_OFF_PLOT],FF_Dictionary["%s_Combined_FF"%(SYS)][:NzT-ZT_OFF_PLOT])
 
-        string = r"%s & $\alpha %1.2f \pm %1.2f, \chi^2/\mathrm{dof} = %1.2f $ &"%(description_string,p,p_error,chi2dof)
+        string = r" & $%1.2f \pm %1.2f$ & %1.2f"%(p,p_error,chi2dof)
         print(string),
 
     pp_sys_Error = (FF_Dictionary["pp_Combined_FF"][:NzT-ZT_OFF_PLOT])*math.sqrt(0.15**2+0.05**2)
@@ -772,4 +785,40 @@ def LaTeX_Table(FF_Dictionary):
                                              FF_Dictionary["p-Pb_Combined_FF_Errors"][:NzT-ZT_OFF_PLOT],
                                              p_Pb_sys_Error)
         
-    print("$\chi^2/dof = %1.2f, p = %1.2f \\\\"%(Chi2/NDF,Pval))
+    print(" & $%1.2f/%i\ %1.2f $\\\\"%(Chi2,NDF,Pval))
+    
+def Compare_FF_Integration(ranges,strings):
+
+    for SYS in Systems:
+        fig = plt.figure(figsize=(10,7)) 
+        for window,phi_string in zip(ranges,strings):
+
+            dphi_start_integral = 0
+            for i,dphi in enumerate(dPhi_Bins):
+                if (dphi >= window):
+                    dphi_start = i
+                    break
+
+            N_Phi_Bin_start = len(delta_phi_centers)-dphi_start
+
+            rad_start = window
+            Corr = ROOT_to_nparray() # Make a dictionary from numpy arrays
+            Correlated_Subtraction_Weights(Corr)
+            Ped_Sub_After_Cs(Corr)
+            Frags = Get_Fragmentation(Corr,N_Phi_Bin_start)
+            plt.errorbar(zT_centers,(Frags["%s_FF"%(SYS)][0]/np.sum(Frags["%s_FF"%(SYS)][0])),yerr=(Frags["%s_FF_Errors"%(SYS)][0]/np.sum(Frags["%s_FF"%(SYS)][0])),xerr=zT_widths[:NzT-ZT_OFF_PLOT],linewidth=1, fmt=".",capsize=1,label=r'Integrating $\Delta\phi > %s$'%(phi_string))
+
+            plt.yscale('log')                                                                                                                                                                                                                                                              
+            plt.ylabel(r"$\frac{1}{N_{\mathrm{\gamma}}}\frac{\mathrm{d}N}{\mathrm{d}z_{\mathrm{T}}\mathrm{d}\Delta\phi\mathrm{d}\Delta\eta}\ \mathrm{(normalized)}$",fontsize=24)
+            plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^\mathrm{h}/p_\mathrm{T}^\mathrm{\gamma}$",fontsize=20)
+                    #plt.xlim(xmin = 0.1,xmax=0.7)
+                    #plt.ylim(ymin = 0.001,ymax=20)
+
+            leg = plt.legend(numpoints=1,frameon=False)
+            leg.set_title("ALICE Work in Progress\n  $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV %s"%(SYS))
+            plt.setp(leg.get_title(),fontsize=18)
+
+            plt.title(r'Integrated $\mathrm{\gamma}$-Hadron Correlation',fontdict = {'fontsize' : 19})
+
+        #Plot_pp_pPb_Avg_FF_and_Ratio(Combined_Frags)
+        #Combined_Frags = Average_FF(Frags)

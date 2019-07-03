@@ -33,6 +33,13 @@ Uncorr_Estimate = "ZYAM"
 rad_start = 2.7
 Phi_String = "7\pi/8"
 
+
+ZYAM_Start = 0.39
+#ZYAM_Start = 0.41
+
+ZYAM_End = 1.5
+#ZYAM_End = 1.3
+
         #DEFAULTS:
 
 Shower = "LO"
@@ -79,15 +86,25 @@ Shower = "LO"
 #description_string = "zT_Rebin_12"
 #description_string = "zT_Rebin_12pT150"
 #description_string = "zT_Rebin_12_06zT"
-#description_string = "zT_Rebin_8_06zT"
+#description_string = "zT_Rebin_8_06zT" 
 #description_string = "zT_Rebin_9_06zT"
-#description_string = "zT_Rebin_9_004zT06zT"
+#description_string = "zT_Rebin_9_004zT06zT" 
+#description_string = "zT_Rebin_9_003zT06zT"
+#description_string = "zT_Rebin_9_004zT06zTcheck"
 
-description_string = "zT_Rebin_10_003zT06zT"
+#description_string = "zT_Rebin_10_003zT06zT"
 #description_string = "zT_Rebin_14"
 
 
+#description_string = "zT_Rebin_7_006zT06zTpT2"
 
+#description_string = "zT_Rebin_6_006zT06zT"
+#description_string = "zT_Rebin_7_006zT06zT"
+#description_string = "zT_Rebin_8_006zT06zT" #DEFAULT
+#description_string = "zT_Rebin_9_006zT06zT"
+#description_string= "zT_Rebin_8_006zT06zTpT2"
+description_string = "zT_Rebin_8_006zT06zTminpT15"
+#description_string = "zT_Rebin_8_006zT06zT_Small_Zyam_Avg"
 
 pPb_File = '../InputData/%s/pPb_SE_L0_Correlation_GMB_Ratio.root'%(description_string)
 pp_File = '../InputData/%s/pp_SE_L0_Correlation_GMB_Ratio.root'%(description_string)
@@ -117,7 +134,7 @@ zT_offset = 0
 ZT_OFF_PLOT = 0 #Offset for FF plotting
 
 #deta
-eta_max = 1.2 #Range of Signal Correlations
+eta_max = 1.19 #Range of Signal Correlations
 
 #dPhi
 if ("8dPhi" in description_string):
@@ -128,34 +145,6 @@ dPhi_Width = dPhi_Bins[1]-dPhi_Bins[0]
 delta_phi_centers = [i*math.pi/N_dPhi_Bins+math.pi/N_dPhi_Bins/2 for i in range(0,N_dPhi_Bins)] #skip first dPhi bin to avoid Isolation
 
 #UE
-
-ue_error_bar = [] #Horiz. width of UE at first plotted dphi point
-
-#for i,dphi in enumerate(dPhi_Bins):
-#    if (dphi > 0.39):
-#        ue_error_bar.append(dPhi_Bins[i])
-#        break;
-        
-#for i,dphi in enumerate(dPhi_Bins):
-#    #if (dphi > 0.78):
-#    if(dphi > 1.5):
-#        ue_error_bar.append(dPhi_Bins[i+1])
-#        break;
-
-ZYAM_Min_i = 0
-for i,dphi in enumerate(dPhi_Bins):
-    #if (dphi > 1.17):
-    if (dphi > 0.39):
-        ZYAM_Min_i = i
-        ue_error_bar.append(dPhi_Bins[ZYAM_Min_i])
-        break
-
-ZYAM_Max_i = 0       
-for i,dphi in enumerate(dPhi_Bins):
-    if (dphi > 1.7):
-        ZYAM_Max_i = i
-        ue_error_bar.append(dPhi_Bins[ZYAM_Max_i])
-        break
 
 dphi_start_integral = 0
 for i,dphi in enumerate(dPhi_Bins):
@@ -179,6 +168,18 @@ if (description_string == "zT_Rebin_5"):
 if (description_string == "zT_Rebin_6"):
     zTbins = np.asarray([0.05, 0.08, 0.14, 0.22, 0.37, 0.61, 1.00])
     
+if ("zT_Rebin_7_006zT06zT" in description_string):
+    zTbins = np.asarray([0.060, 0.083, 0.116, 0.161, 0.224, 0.311, 0.432, 0.600])
+
+if ("zT_Rebin_6_006zT06zT" in description_string):
+    zTbins = np.asarray([0.060, 0.088, 0.129, 0.190, 0.278, 0.409, 0.600])
+
+if ("zT_Rebin_8_006zT06zT" in description_string):
+    zTbins = np.asarray([0.060, 0.080, 0.107, 0.142, 0.190, 0.253, 0.337, 0.450, 0.600])
+    
+if ("zT_Rebin_9_006zT06zT" in description_string):
+    zTbins = np.asarray([0.060, 0.077, 0.100, 0.129, 0.167, 0.216, 0.278, 0.360, 0.465, 0.600])
+    
 if (description_string == "zT_Rebin_8"):
     zTbins = np.asarray([0.05, 0.07, 0.11, 0.15, 0.22, 0.33, 0.47, 0.69, 1.00])
     
@@ -191,7 +192,7 @@ if (description_string == "zT_Rebin_9"):
 if(description_string == "zT_Rebin_9_06zT"):
     zTbins = np.asarray([0.050, 0.066, 0.087, 0.114, 0.151, 0.199, 0.262, 0.345, 0.455, 0.600])
     
-if(description_string == "zT_Rebin_9_004zT06zT"):
+if("zT_Rebin_9_004zT06zT" in description_string):
     zTbins = np.asarray([0.040, 0.054, 0.073, 0.099, 0.133, 0.180, 0.243, 0.329, 0.444, 0.600])
     
 if (description_string == "zT_Rebin_10"):
@@ -205,6 +206,9 @@ if ("zT_Rebin_12_06zT" in description_string):
                         
 if (description_string == "zT_Rebin_10_003zT06zT"):
     zTbins = np.asarray([0.033, 0.044, 0.059, 0.079, 0.105, 0.141, 0.188, 0.251, 0.336, 0.449, 0.600])
+    
+if (description_string == "zT_Rebin_9_003zT06zT"):
+    zTbins = np.asarray([0.033, 0.046, 0.063, 0.087, 0.120, 0.165, 0.228, 0.315, 0.435, 0.600])
         
 if (description_string == "zT_Rebin_14"):
     zTbins = np.asarray([0.05, 0.06, 0.08, 0.10, 0.12, 0.15, 0.18, 0.22, 0.28, 0.34, 0.42, 0.53, 0.65, 0.81, 1.00])
@@ -212,7 +216,7 @@ if (description_string == "zT_Rebin_14"):
 if ("pT_Rebin_1" in description_string):
     pTbins = [12.0,40.0]
     
-if ("pT_Rebin_2" in description_string):
+if ("pT_Rebin_2" in description_string or "pT2" in description_string):
     pTbins = [12.0,22.0,40.0]
     
 if ("pT_Rebin_3" in description_string):
@@ -229,6 +233,30 @@ N_pT_Bins = len(pTbins)-1
 if (description_string == "dPhi_Rebin_8"):
     N_dPhi_Bins = 8
 
+if ("Small_Zyam_Avg" in description_string):
+    ZYAM_Start = 0.41
+
+    ZYAM_End = 1.3
+    
+ue_error_bar = [] #Horiz. width of UE at first plotted dphi point
+
+ZYAM_Min_i = 0
+for i,dphi in enumerate(dPhi_Bins):
+    #if (dphi > 1.17):
+    if (dphi > ZYAM_Start):
+        ZYAM_Min_i = i
+        ue_error_bar.append(dPhi_Bins[ZYAM_Min_i])
+        break
+
+ZYAM_Max_i = 0       
+for i,dphi in enumerate(dPhi_Bins):
+    if (dphi > ZYAM_End):
+        ZYAM_Max_i = i
+        ue_error_bar.append(dPhi_Bins[ZYAM_Max_i])
+        break
+        
+        
+    
 def Get_Purity(filename):
     file = ROOT.TFile(filename)
     purities = np.zeros(N_pT_Bins)
