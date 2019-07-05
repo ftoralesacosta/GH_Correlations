@@ -789,36 +789,90 @@ def LaTeX_Table(FF_Dictionary):
     
 def Compare_FF_Integration(ranges,strings):
 
+    Corr = ROOT_to_nparray() # Make a dictionary from numpy arrays
+    Correlated_Subtraction_Weights(Corr)
+    Ped_Sub_After_Cs(Corr)
+    
+    colors = ["b","r","g"]
+    markers = ["o","^","s"]
+    
     for SYS in Systems:
-        fig = plt.figure(figsize=(10,7)) 
-        for window,phi_string in zip(ranges,strings):
-
-            dphi_start_integral = 0
+        
+        fig = plt.figure(figsize=(8,8))
+        fig.add_axes((0.1,0.3,0.88,0.6))
+        
+        denominator_window = 2.7
+        for i,dphi in enumerate(dPhi_Bins):
+            if (dphi >= denominator_window):
+                dphi_start = i
+                break
+        N_Phi_Bin_start = len(delta_phi_centers)-dphi_start
+        
+        Frag_denominator = Get_Fragmentation(Corr,N_Phi_Bin_start) # R=04 is the denominator
+        denominator = Frag_denominator["%s_FF"%(SYS)][0]/np.sum(Frag_denominator["%s_FF"%(SYS)][0])
+        denominator_error = Frag_denominator["%s_FF_Errors"%(SYS)][0]/np.sum(Frag_denominator["%s_FF"%(SYS)][0])
+        
+        for window,phi_string,markr in zip(ranges,strings,markers):
+            
             for i,dphi in enumerate(dPhi_Bins):
                 if (dphi >= window):
                     dphi_start = i
                     break
-
             N_Phi_Bin_start = len(delta_phi_centers)-dphi_start
-
-            rad_start = window
-            Corr = ROOT_to_nparray() # Make a dictionary from numpy arrays
-            Correlated_Subtraction_Weights(Corr)
-            Ped_Sub_After_Cs(Corr)
+            
             Frags = Get_Fragmentation(Corr,N_Phi_Bin_start)
-            plt.errorbar(zT_centers,(Frags["%s_FF"%(SYS)][0]/np.sum(Frags["%s_FF"%(SYS)][0])),yerr=(Frags["%s_FF_Errors"%(SYS)][0]/np.sum(Frags["%s_FF"%(SYS)][0])),xerr=zT_widths[:NzT-ZT_OFF_PLOT],linewidth=1, fmt=".",capsize=1,label=r'Integrating $\Delta\phi > %s$'%(phi_string))
+            plt.errorbar(zT_centers,(Frags["%s_FF"%(SYS)][0]/np.sum(Frags["%s_FF"%(SYS)][0])),yerr=(Frags["%s_FF_Errors"%(SYS)][0]/np.sum(Frags["%s_FF"%(SYS)][0])),xerr=zT_widths[:NzT-ZT_OFF_PLOT],linewidth=1,fmt=".",marker=markr,capsize=1,label=r'Integral $\Delta\phi > %s$'%(phi_string))
 
-            plt.yscale('log')                                                                                                                                                                                                                                                              
+            plt.yscale('log')   
+            plt.yticks(fontsize=16)
             plt.ylabel(r"$\frac{1}{N_{\mathrm{\gamma}}}\frac{\mathrm{d}N}{\mathrm{d}z_{\mathrm{T}}\mathrm{d}\Delta\phi\mathrm{d}\Delta\eta}\ \mathrm{(normalized)}$",fontsize=24)
             plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^\mathrm{h}/p_\mathrm{T}^\mathrm{\gamma}$",fontsize=20)
                     #plt.xlim(xmin = 0.1,xmax=0.7)
-                    #plt.ylim(ymin = 0.001,ymax=20)
+            plt.ylim(ymin = 0.001,ymax=0.6)
 
-            leg = plt.legend(numpoints=1,frameon=False)
-            leg.set_title("ALICE Work in Progress\n  $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV %s"%(SYS))
-            plt.setp(leg.get_title(),fontsize=18)
+            #leg = plt.legend(numpoints=1,frameon=False)
+            #leg.set_title("ALICE Work in Progress\n  $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV %s"%(SYS))
+            #
+            #plt.setp(leg.get_title(),fontsize=18)
+            
+            leg = plt.legend(numpoints=1,frameon=True,edgecolor='white', framealpha=0.0, fontsize=14)
+            leg.set_title("ALICE Work in Progress\n$\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV %s \n"%(SYS))
+            plt.setp(leg.get_title(),fontsize=20)
+            plt.annotate("%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$"%(pTbins[0],pTbins[N_pT_Bins]),xy=(0.52, 0.81), xycoords='axes fraction', ha='left', va='top', fontsize=14,fontweight=10)
 
             plt.title(r'Integrated $\mathrm{\gamma}$-Hadron Correlation',fontdict = {'fontsize' : 19})
+            
+            
+        fig.add_axes((0.1,0.1,0.88,0.2))
+        
+        for window,phi_string,colr,markr in zip(ranges,strings,colors,markers):
+            
+            for i,dphi in enumerate(dPhi_Bins):
+                if (dphi >= window):
+                    dphi_start = i
+                    break
+            N_Phi_Bin_start = len(delta_phi_centers)-dphi_start
+            
+            Frags = Get_Fragmentation(Corr,N_Phi_Bin_start)
+
+            numerator = Frags["%s_FF"%(SYS)][0]/np.sum(Frags["%s_FF"%(SYS)][0])
+            numerator_error = Frags["%s_FF_Errors"%(SYS)][0]/np.sum(Frags["%s_FF"%(SYS)][0])
+            Ratio = numerator/denominator
+            Ratio_error = np.sqrt((numerator_error/numerator)**2 + (denominator_error/denominator)**2)*Ratio
+
+            plt.errorbar(zT_centers,Ratio,yerr=0,xerr=zT_widths[:NzT-ZT_OFF_PLOT],linewidth=1, fmt=".",marker=markr,capsize=1)
+
+            plt.axhline(y=1, color='k', linestyle='--')
+    
+            plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^{\mathrm{h}}/p_\mathrm{T}^\gamma$",fontsize=20)
+            plt.ylabel(r"$\frac{R}{R=0.4}$",fontsize=24)
+            plt.ylim((0.65,1.35))
+            plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^\mathrm{h}/p_\mathrm{T}^\mathrm{\gamma}$",fontsize=20)
+            plt.xticks(fontsize=16)
+            plt.yticks(fontsize=14)
+            plt.xlim(0,0.65)
+
+            
 
         #Plot_pp_pPb_Avg_FF_and_Ratio(Combined_Frags)
         #Combined_Frags = Average_FF(Frags)

@@ -100,10 +100,10 @@ Shower = "LO"
 
 #description_string = "zT_Rebin_6_006zT06zT"
 #description_string = "zT_Rebin_7_006zT06zT"
-#description_string = "zT_Rebin_8_006zT06zT" #DEFAULT
+description_string = "zT_Rebin_8_006zT06zT" #DEFAULT
 #description_string = "zT_Rebin_9_006zT06zT"
 #description_string= "zT_Rebin_8_006zT06zTpT2"
-description_string = "zT_Rebin_8_006zT06zTminpT15"
+#description_string = "zT_Rebin_8_006zT06zTminpT15"
 #description_string = "zT_Rebin_8_006zT06zT_Small_Zyam_Avg"
 
 pPb_File = '../InputData/%s/pPb_SE_L0_Correlation_GMB_Ratio.root'%(description_string)
@@ -284,6 +284,12 @@ zT_widths = np.asarray(zT_widths)
 zT_centers = (zTbins[1+zT_offset:] + zTbins[zT_offset:-1]) / 2
 NzT = len(zTbins)-zT_offset-1
 zt_box = np.ones(NzT) * 0.03 #plotting Uncert. Boxes
+
+import itertools
+#marker = itertools.cycle((',', '+', '.', 'o', '*'))
+marker = itertools.cycle(('.', 'o', '^', '+', '*')) 
+
+
 
 if (False):
     pPb_File = '../InputData/pPb_SE_L0_Correlation_GMB_Ratio_Track.root'
