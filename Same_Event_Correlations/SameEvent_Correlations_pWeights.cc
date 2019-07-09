@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
   double iso_max = 0;
   double noniso_min = 0;
   double noniso_max = 0;
-  double deta_max = 0;
+  //double deta_max = 0;
   isolationDet determiner = CLUSTER_ISO_ITS_04;
   int n_eta_bins = 0;
   int n_phi_bins = 0;  
@@ -188,9 +188,9 @@ int main(int argc, char *argv[])
           noniso_max = atof(value);
           std::cout << "noniso_max: " << noniso_max << std::endl; }
 
-      else if (strcmp(key, "deta_max") == 0) {
-          deta_max = atof(value);
-          std::cout << "deta_max: " << deta_max << std::endl; }
+      // else if (strcmp(key, "deta_max") == 0) {
+      //     deta_max = atof(value);
+      //     std::cout << "deta_max: " << deta_max << std::endl; }
 
       else if (strcmp(key, "N_Phi_Bins") == 0) {
 	n_phi_bins = atoi(value);

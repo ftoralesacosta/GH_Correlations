@@ -14,7 +14,7 @@ EcrossoverE_min:              0.05
 iso_max:                      1.5
 noniso_min:                   5.0
 noniso_max:                   10.0
-deta_max:                     0.6
+#deta_max:                     0.6 #depricated
 N_Phi_Bins:                   16
 N_Eta_Bins:                   14
 Track_pT_Min:		      0.5
