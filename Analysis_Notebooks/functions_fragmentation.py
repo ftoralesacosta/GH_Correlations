@@ -463,7 +463,7 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
     np.save("npy_files/%s_Averaged_FF_Ratio_%s.npy"%(Shower,description_string),Ratio)
     np.save("npy_files/%s_Averaged_FF_Ratio_Errors_%s.npy"%(Shower,description_string),Ratio_Error)
     
-    Purity_Uncertainty = np.sqrt((pp_purity_Uncertainty/pPb_Combined)**2 + (pPb_purity_Uncertainty/pPb_Combined)**2)*Ratio
+    Purity_Uncertainty = np.sqrt((pp_purity_Uncertainty/pp_Combined)**2 + (pPb_purity_Uncertainty/pPb_Combined)**2)*Ratio
     Efficiency_Uncertainty = np.ones(len(pPb_Combined))*0.05*math.sqrt(2)*Ratio 
     if (CorrectedP):
         Ratio_Systematic = np.sqrt(Purity_Uncertainty**2 + Efficiency_Uncertainty**2)
@@ -480,7 +480,7 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
     
     plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^{\mathrm{h}}/p_\mathrm{T}^\gamma$",fontsize=20)
     plt.ylabel(r"$\frac{\mathrm{p-Pb}}{\mathrm{pp}}$",fontsize=24)
-    plt.ylim((-0.5, 2.6))
+    plt.ylim((-0.7, 2.7))
     plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^\mathrm{h}/p_\mathrm{T}^\mathrm{\gamma}$",fontsize=20)
     plt.xticks(fontsize=16)
     plt.yticks(fontsize=16)

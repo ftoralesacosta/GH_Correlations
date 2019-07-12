@@ -30,6 +30,9 @@ Uncorr_Estimate = "ZYAM"
 #rad_start = 2.3
 #Phi_String = "3\pi/4"
 
+#rad_start = 2.15
+#Phi_String = "11\pi/16"
+
 rad_start = 2.7
 Phi_String = "7\pi/8"
 
@@ -100,7 +103,14 @@ Shower = "LO"
 
 #description_string = "zT_Rebin_6_006zT06zT"
 #description_string = "zT_Rebin_7_006zT06zT"
+
 description_string = "zT_Rebin_8_006zT06zT" #DEFAULT
+description_string = "zT_Rebin_8_006zT06zTOldBinNewPurity"
+
+#description_string = "zT_Rebin_8_06zTNEW"
+#description_string = "zT_Rebin_8_06zTNEWNEW_local"
+#description_string = "zT_Rebin_8_06zTNEWNEW"
+#description_string = "zT_Rebin_8_06zTNEWNEWNEW"
 #description_string = "zT_Rebin_9_006zT06zT"
 #description_string= "zT_Rebin_8_006zT06zTpT2"
 #description_string = "zT_Rebin_8_006zT06zTminpT15"
@@ -174,7 +184,7 @@ if ("zT_Rebin_7_006zT06zT" in description_string):
 if ("zT_Rebin_6_006zT06zT" in description_string):
     zTbins = np.asarray([0.060, 0.088, 0.129, 0.190, 0.278, 0.409, 0.600])
 
-if ("zT_Rebin_8_006zT06zT" in description_string):
+if ("zT_Rebin_8_006zT06zT" in description_string or "zT_Rebin_8" in description_string):
     zTbins = np.asarray([0.060, 0.080, 0.107, 0.142, 0.190, 0.253, 0.337, 0.450, 0.600])
     
 if ("zT_Rebin_9_006zT06zT" in description_string):
