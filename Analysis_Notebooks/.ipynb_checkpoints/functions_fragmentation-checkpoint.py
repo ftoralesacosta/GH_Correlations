@@ -405,12 +405,13 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
             model,p,chi2dof = Fit_FF_PowerLaw(Comb_Dict,SYS)
             plt.plot(zT_centers[:NzT-ZT_OFF_PLOT], model, sys_col,label=r"%s $\alpha = %1.2f\pm 0.1 \chi^2 = %1.2f$"%(SYS,p,chi2dof))
     
-    plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT],pythia_FF,fmt='-g',label="Pythia 8.2 Monash")   
+    plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT],pythia_FF,xerr=zT_widths[:NzT-ZT_OFF_PLOT],fmt='-g',label="Pythia 8.2 Monash")   
     
     plt.yscale('log')                             
     plt.ylabel(r"$\frac{1}{N_{\mathrm{\gamma}}}\frac{\mathrm{d}N}{\mathrm{d}z_{\mathrm{T}}\mathrm{d}\Delta\phi\mathrm{d}\Delta\eta}$",fontsize=24)
     plt.ylim(0.037,15)
     plt.yticks(fontsize=16)
+    plt.xticks(fontsize=0)
     plt.xlim(0,0.65)
 
         
@@ -484,10 +485,10 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
     
     plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^{\mathrm{h}}/p_\mathrm{T}^\gamma$",fontsize=20)
     plt.ylabel(r"$\frac{\mathrm{p-Pb}}{\mathrm{pp}}$",fontsize=24)
-    plt.ylim((-0.5, 2.5))
+    #plt.ylim((-0.5, 2.5))
     plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^\mathrm{h}/p_\mathrm{T}^\mathrm{\gamma}$",fontsize=20)
     plt.xticks(fontsize=16)
-    plt.yticks(fontsize=16)
+    plt.yticks([0.5,1.0,1.5,2.0,2.5],fontsize=16)
     plt.xlim(0,0.65)
 
     #model_p-Pb = Fit_FF_PowerLaw(Comb_Dict,"p-Pb")

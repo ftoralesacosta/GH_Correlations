@@ -36,8 +36,8 @@ Uncorr_Estimate = "ZYAM"
 rad_start = 2.7
 Phi_String = "7\pi/8"
 
-rad_start = 2.9
-Phi_String = "15\pi/16"
+#rad_start = 2.9
+#Phi_String = "15\pi/16"
 
 
 ZYAM_Start = 0.39
@@ -107,8 +107,8 @@ Shower = "LO"
 #description_string = "zT_Rebin_6_006zT06zT"
 #description_string = "zT_Rebin_7_006zT06zT"
 
-description_string = "zT_Rebin_8_006zT06zT" #DEFAULT
-#description_string = "zT_Rebin_8_006zT06zTOldBinNewPurity"
+#description_string = "zT_Rebin_8_006zT06zT" #DEFAULT
+description_string = "zT_Rebin_8_006zT06zTOldBinNewPurity"
 
 #description_string = "zT_Rebin_8_06zTNEW"
 #description_string = "zT_Rebin_8_06zTNEWNEW_local"
