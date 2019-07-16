@@ -287,7 +287,7 @@ def Plot_UB():
                 else:
                     leg.set_title("ALICE Work in Progress, $\sqrt{s_{\mathrm{_{NN}}}}=$5 TeV %s"%(sys))
                 plt.setp(leg.get_title(),fontsize=15)
-            fig.savefig('pics/%s/%s_%s_Gamma_hadron_UE_pT_%i__zT_%i.pdf'%(Shower,Shower,sys,ipt,izt), bbox_inches='tight')        
+            fig.savefig('pics/%s/%s/UE_Plot_%s_pT_%i__zT_%i.pdf'%(Shower,description_string,sys,ipt,izt), bbox_inches='tight')        
             print("")
         print("")
         #return

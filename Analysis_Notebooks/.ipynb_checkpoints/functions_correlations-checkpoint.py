@@ -336,7 +336,8 @@ def Plot_pp_pPb_Cs(Dict):
 
             pPb = plt.errorbar(delta_phi_centers,Dict["p-Pb_CSR"][ipt][izt],xerr=phi_width,yerr=Dict["p-Pb_CSR_Errors"][ipt][izt],fmt='bo',capsize=4,markersize=11)
             pp = plt.errorbar(delta_phi_centers,Dict["pp_CSR"][ipt][izt],xerr=phi_width,yerr=Dict["pp_CSR_Errors"][ipt][izt],fmt='ro',capsize=4,markersize=11)
-
+            pyth = plt.errorbar(delta_phi_centers,pythia[izt],pythia_error[izt],fmt="-g",capsize=4)
+            
             if(Use_MC):
                 MC = plt.errorbar(delta_phi_centers,["MC_CSR"][ipt][izt],xerr=phi_width,yerr=["MC_CSR_Errors"][ipt][ztb],fmt='go',capsize=4,markersize=11)
 
@@ -363,7 +364,7 @@ def Plot_pp_pPb_Cs(Dict):
                 UE_Val =math.sqrt(pp_UE**2 + pPb_UE**2)
                 Combined_UE = ax.fill_between(ue_error_bar,-UE_Val,UE_Val,facecolor='purple',alpha=0.35)
                 
-            Int_Window = ax.axvline(x=dPhi_Bins[-N_Phi_Integrate-1],linestyle='--',color="green",alpha=1.0)
+            Int_Window = ax.axvline(x=dPhi_Bins[-N_Phi_Integrate-1],linestyle='--',color="black",alpha=1.0)
             
             #MC_UE = ax.fill_between(ue_error_bar,-Dict["MC_Uncorr_Error"][ipt][ztb][0],Dict["MC_Uncorr_Error"][ipt][ztb][0],facecolor='green',alpha=0.35)#One for p-Pb
             
@@ -384,11 +385,11 @@ def Plot_pp_pPb_Cs(Dict):
                     'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)', 'pp UB Error', 'p-Pb UB Error'],
                     loc = "upper left",fontsize=16,frameon=False,numpoints=1)
                 else:
-                    leg = plt.legend([pp,pPb,Combined_UE],['pp $\sqrt{s}= 5$ TeV (stat. error)',
-                    'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)', 'UB Error'],
+                    leg = plt.legend([pp,pPb,pyth,Combined_UE],['pp $\sqrt{s}= 5$ TeV (stat. error)',
+                    'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)', 'Pythia 8.2 Monash','UB Error'],
                     loc = "upper left",fontsize=16,frameon=False,numpoints=1)
 
-            plt.annotate(r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]), xy=(0.05, 0.65), xycoords='axes fraction', ha='left', va='top', fontsize=16)
+            plt.annotate(r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]), xy=(0.05, 0.53), xycoords='axes fraction', ha='left', va='top', fontsize=16)
             
             if (len(Dict["p-Pb_CSR"]) > 1):
                 plt.annotate(r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]), xy=(0.05, 0.6), xycoords='axes fraction', ha='left', va='top', fontsize=16)
@@ -402,7 +403,7 @@ def Plot_pp_pPb_Cs(Dict):
 
         plt.show()
         #fig.savefig('pics/Gamma_hadron_corr_zT_%i.pdf'%(ztb))
-        fig.savefig('pics/%s/%s_Gamma_hadron_corr_%i.pdf'%(Shower,Shower,ipt))
+        fig.savefig('pics/%s/%s/Cs_Final_All_pT_%i.pdf'%(Shower,description_string,ipt))
         
         
         #Above can be adapted for pp & PbPb comparisons
@@ -420,7 +421,8 @@ def Plot_pp_pPb_Cs_Individual(Dict):
 
             pPb = plt.errorbar(delta_phi_centers,Dict["p-Pb_CSR"][ipt][izt],xerr=phi_width,yerr=Dict["p-Pb_CSR_Errors"][ipt][izt],fmt='bo',capsize=4,markersize=11)
             pp = plt.errorbar(delta_phi_centers,Dict["pp_CSR"][ipt][izt],xerr=phi_width,yerr=Dict["pp_CSR_Errors"][ipt][izt],fmt='ro',capsize=4,markersize=11)
-
+            pyth = plt.errorbar(delta_phi_centers,pythia[izt],pythia_error[izt],fmt="-g",capsize=4)
+            
             if(Use_MC):
                 MC = plt.errorbar(delta_phi_centers,["MC_CSR"][ipt][izt],xerr=phi_width,yerr=["MC_CSR_Errors"][ipt][ztb],fmt='go',capsize=4,markersize=11)
 
@@ -485,7 +487,8 @@ def Plot_pp_pPb_Cs_Individual(Dict):
 
             plt.show()
             #fig.savefig('pics/Gamma_hadron_corr_zT_%i.pdf'%(ztb))
-            fig.savefig('pics/%s/%s_Gamma_hadron_corr_%i_%i.pdf'%(Shower,Shower,ipt,izt))
+            fig.savefig('pics/%s/%s/Cs_Final_Indv_pT_%i_zT_%i.pdf'%(Shower,description_string,ipt,izt))
+
         
         
         #Above can be adapted for pp & PbPb comparisons
@@ -879,12 +882,14 @@ def GetRatio(pp_y,pp_yerr,pPb_y,pPb_yerr,bincenters):
     ratio_err = ratio*np.sqrt(np.power(pPb_error/pPb_avg,2.0) + np.power(pp_error/pp_avg,2.0))
     plt.xticks(fontsize=16)
     plt.yticks(fontsize=16)
+    plt.ylabel(r'$1/N_{\gamma} \: \: \mathrm{d^2}N/\mathrm{d}\Delta \eta \mathrm{d}\Delta \phi$',fontsize=28)
+    plt.xlabel(r'|$\Delta \varphi$|',fontsize=28)
     plt.legend(fontsize=16,frameon=False)
     plt.tight_layout() 
-    plt.savefig('test.pdf')
+    #plt.savefig('test.pdf')
     plt.xlim([0.4,np.pi])
     
-    Printing = True 
+    Printing = False 
     if (Printing):
         print 'pp average = {:2.3f} +/- {:2.3f} (total UE and stat uncertainty)'.format(pp_avg,pp_error)
         print '##############################'

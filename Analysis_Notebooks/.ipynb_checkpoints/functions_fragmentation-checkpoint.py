@@ -6,6 +6,8 @@ import matplotlib
 from ROOT import TGraphErrors
 import scipy
 import iminuit
+from matplotlib import rcParams
+rcParams.update({'figure.autolayout': True})
 
 def FF_Ratio(FF_Dict):
     
@@ -393,7 +395,7 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
             yerr=Comb_Dict["%s_Combined_FF_Errors"%(SYS)][:NzT-ZT_OFF_PLOT],linewidth=1, fmt='o',color=sys_col,capsize=1,
             label=SYS)
             #label=r' %s %1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(SYS,pTbins[0],pTbins[N_pT_Bins]))
-
+            
         Sys_Plot_pp = plt.bar(zT_centers[:NzT-ZT_OFF_PLOT], Sys_Uncertainty[:NzT-ZT_OFF_PLOT]+Sys_Uncertainty[:NzT-ZT_OFF_PLOT],
             bottom=Comb_Dict["%s_Combined_FF"%(SYS)][:NzT-ZT_OFF_PLOT]-Sys_Uncertainty[:NzT-ZT_OFF_PLOT],width=zT_widths[:NzT-ZT_OFF_PLOT], align='center',color=sys_col,alpha=0.3)
             #bottom=Comb_Dict["%s_Combined_FF"%(SYS)][:NzT-ZT_OFF_PLOT]-Sys_Uncertainty[:NzT-ZT_OFF_PLOT],width=zt_box[:NzT-ZT_OFF_PLOT], align='center',color=sys_col,alpha=0.3)
@@ -402,11 +404,13 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
         if (plot_power):
             model,p,chi2dof = Fit_FF_PowerLaw(Comb_Dict,SYS)
             plt.plot(zT_centers[:NzT-ZT_OFF_PLOT], model, sys_col,label=r"%s $\alpha = %1.2f\pm 0.1 \chi^2 = %1.2f$"%(SYS,p,chi2dof))
-        
+    
+    plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT],pythia_FF,fmt='-g',label="Pythia 8.2 Monash")   
+    
     plt.yscale('log')                             
     plt.ylabel(r"$\frac{1}{N_{\mathrm{\gamma}}}\frac{\mathrm{d}N}{\mathrm{d}z_{\mathrm{T}}\mathrm{d}\Delta\phi\mathrm{d}\Delta\eta}$",fontsize=24)
+    plt.ylim(0.037,15)
     plt.yticks(fontsize=16)
-    #plt.ylim(0.03,20)
     plt.xlim(0,0.65)
 
         
@@ -427,20 +431,20 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
     plt.annotate("$\chi^2$ = %1.1f, ndf = %i, p = %1.2f"%(Chi2,NDF,Pval), xy=(0.01, 0.06), xycoords='axes fraction', ha='left', va='top', fontsize=16)
     #plt.annotate("$\chi^2$ = %1.1f, ndf = %i, p = %f"%(Chi2,NDF,Pval), xy=(0.99, 0.06), xycoords='axes fraction', ha='right', va='top', fontsize=16)
     
-    plt.annotate("%s"%(description_string),xy=(0.01,0.1),xycoords="axes fraction",ha="left",va="top",fontsize=12)
+    #plt.annotate("%s"%(description_string),xy=(0.01,0.1),xycoords="axes fraction",ha="left",va="top",fontsize=12)
     
     leg = plt.legend(numpoints=1,frameon=True,edgecolor='white', framealpha=0.0, fontsize=16)
     leg.set_title("ALICE Work in Progress\n  $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV \n")
     plt.setp(leg.get_title(),fontsize=20)
     plt.annotate("%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$"%(pTbins[0],pTbins[N_pT_Bins]),xy=(0.53, 0.81), xycoords='axes fraction', ha='left', va='top', fontsize=16)
     
-    crap_boxes = True
-    if crap_boxes:
-        plt.text(0.468, 2.0, '   ',
-         {'color': 'black', 'fontsize': 16, 'ha': 'left', 'va': 'top',
+    crap_boxes = False
+    if (crap_boxes):
+        plt.text(0.441, 2.92, '__',
+         {'color': 'black', 'alpha': 0.0, 'fontsize': 16, 'ha': 'left', 'va': 'top',
           'bbox': dict(boxstyle="square", fc='red',alpha=0.3, ec="None", pad=0.2)})
-        plt.text(0.468, 1.5, '   ',
-         {'color': 'black', 'fontsize': 16, 'ha': 'left', 'va': 'top',
+        plt.text(0.441, 1.95, '__',
+         {'color': 'black','alpha':0.0, 'fontsize': 16, 'ha': 'left', 'va': 'top',
           'bbox': dict(boxstyle="square", fc="blue",alpha=0.3, ec="None", pad=0.2)})
 
     plt.title(r'Integrated $\mathrm{\gamma}$-Hadron Correlation: $%s < \Delta\varphi < \pi$ '%(Phi_String),fontdict = {'fontsize' : 19})
@@ -480,7 +484,7 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
     
     plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^{\mathrm{h}}/p_\mathrm{T}^\gamma$",fontsize=20)
     plt.ylabel(r"$\frac{\mathrm{p-Pb}}{\mathrm{pp}}$",fontsize=24)
-    plt.ylim((-0.7, 2.7))
+    plt.ylim((-0.5, 2.5))
     plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^\mathrm{h}/p_\mathrm{T}^\mathrm{\gamma}$",fontsize=20)
     plt.xticks(fontsize=16)
     plt.yticks(fontsize=16)
@@ -491,7 +495,8 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
         #plt.yscale("log")
     
     plt.gcf()
-    plt.savefig("pics/%s/%s_Averaged_pT_FFunction_and_Ratio.pdf"%(Shower,description_string), bbox='tight')
+    #plt.tight_layout()
+    plt.savefig("pics/%s/%s/Final_FFunction_and_Ratio.pdf"%(Shower,description_string), bbox_inches = "tight")
     plt.show()
         
 def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
@@ -617,7 +622,7 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
     plt.setp(leg.get_title(),fontsize=20)
 
     plt.gcf()
-    plt.savefig("pics/Averaged_pT_FFunction_ratio_%s.pdf"%(Shower), bbox_inches='tight')
+    plt.savefig("pics/%s/%s/Ratio_Fits.pdf"%(Shower,description_string), bbox='tight')
     plt.show()
 
     print("                Central Values:")
@@ -793,8 +798,8 @@ def Compare_FF_Integration(ranges,strings):
     Correlated_Subtraction_Weights(Corr)
     Ped_Sub_After_Cs(Corr)
     
-    colors = ["b","r","g"]
-    markers = ["o","^","s"]
+    colors = ["b","r","g","p"]
+    markers = ["o","^","s","*"]
     
     for SYS in Systems:
         
@@ -866,11 +871,14 @@ def Compare_FF_Integration(ranges,strings):
     
             plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^{\mathrm{h}}/p_\mathrm{T}^\gamma$",fontsize=20)
             plt.ylabel(r"$\frac{R}{R=0.4}$",fontsize=24)
-            plt.ylim((0.65,1.35))
+            plt.ylim((0.61,1.39))
             plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^\mathrm{h}/p_\mathrm{T}^\mathrm{\gamma}$",fontsize=20)
             plt.xticks(fontsize=16)
             plt.yticks(fontsize=14)
             plt.xlim(0,0.65)
+            plt.gcf()
+            #plt.tight_layout()
+            plt.savefig("pics/%s/%s/%s_Integrations_FFunction_Comparison.pdf"%(Shower,description_string,SYS),bbox_inches = "tight")
 
             
 
