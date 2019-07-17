@@ -10,31 +10,44 @@ import root_pandas as rpd
 import ROOT
 from default_values import *
 
-def Get_NTriggers(filename, ipt, Signal_DNN=True): 
+def Get_NTriggers_2D(filename, ipt, Signal_DNN=True): 
     file = ROOT.TFile(filename)
-    if (Signal_DNN == "Inclusive"):
-        ntrig_histo = file.Get('N_Triggers_pT%1.0f_%1.0f' %(pT_Bins[ipt],pT_Bins[ipt+1]))
+    
+    if (Signal_DNN == "NoIso_NoShape"):
+        ntrig_histo = file.Get("N_Inclusive_Triggers_pT%1.0f_%1.0f" %(pTbins[ipt],pTbins[ipt+1]))
+    
+    elif (Signal_DNN == "Inclusive"):
+        ntrig_histo = file.Get('N_Triggers_pT%1.0f_%1.0f' %(pTbins[ipt],pTbins[ipt+1]))
+    
     else:
         DNN_Rgn = int(Signal_DNN) + 2*(1-int(Signal_DNN))
-        ntrig_histo = file.Get('N_DNN%i_Triggers_pT%1.0f_%1.0f' %(DNN_Rgn,pT_Bins[ipt],pT_Bins[ipt+1]))
+        ntrig_histo = file.Get('N_DNN%i_Triggers_pT%1.0f_%1.0f' %(DNN_Rgn,pTbins[ipt],pTbins[ipt+1]))
+    
     NTriggers = 1
     if not(ntrig_histo == None):
         NTriggers = ntrig_histo.GetEntries()
     file.Close()
     return NTriggers
 
-def Get_2D_Correlation(filename, ipt, izt, Signal_DNN=True):     #returns TH2D
+def Get_2D_Correlation(filename, ipt, izt,ntriggers,Signal_DNN=True):     #returns TH2D
 
     file = ROOT.TFile(filename)    
-    if (Signal_DNN == "Inclusive"):
+    
+    if (Signal_DNN == "NoIso_NoShape"):
+        histo2D = file.Get('Inclusive_Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f' 
+                  %(pTbins[ipt],pTbins[ipt+1],100*zTbins[izt],100*zTbins[izt+1]))
+                               
+    elif (Signal_DNN == "Inclusive"):
         histo2D = file.Get('Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f' 
-                  %(pT_Bins[ipt],pT_Bins[ipt+1],100*zT_Bins[izt],100*zT_Bins[izt+1]))
+                  %(pTbins[ipt],pTbins[ipt+1],100*zTbins[izt],100*zTbins[izt+1]))
 
     else:
         DNN_Rgn = int(Signal_DNN) + 2*(1-int(Signal_DNN)) #convert bool to DNN_1 (Sgn) or DNN_2 (Bkgd)
         histo2D = file.Get('DNN%i_Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f' 
-                           %(DNN_Rgn,pT_Bins[ipt], pT_Bins[ipt+1], 100*zT_Bins[izt],100*zT_Bins[izt+1]))
+                           %(DNN_Rgn,pTbins[ipt], pTbins[ipt+1], 100*zTbins[izt],100*zTbins[izt+1]))
 
+    if not(ntriggers == None):
+        histo2D.Scale(1.0/ntriggers)
     return histo2D
 
 
