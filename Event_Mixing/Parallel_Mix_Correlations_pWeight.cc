@@ -61,9 +61,9 @@ Float_t Get_Purity_ErrFunction(Float_t pT_GeV, std::string deviation) {
 
   Float_t purity_val = 0;
 
-  Float_t par[3] = {0.548247710,
-                    8.794543375,
-                    12.7423900};
+  Float_t par[3] = {0.539705386488,
+                    8.88586771026,
+                    12.2892853578};
 
   if (strcmp(deviation.data(),"Plus")==0){
     par[0] = 0.60750016509;
