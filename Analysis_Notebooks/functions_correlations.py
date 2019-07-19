@@ -313,7 +313,8 @@ def Plot_pp_pPb_Cs(Dict):
         #plt.figure(figsize=(10,7))
         fig = plt.figure(figsize=(24,12))
         if (NzT >=7 and NzT <=9):
-            fig = plt.figure(figsize=(22,18))
+            #fig = plt.figure(figsize=(35,16))
+            fig = plt.figure(figsize=(16,35))
         if (NzT >=10 and NzT<=12):
             fig = plt.figure(figsize=(22,24))
         if (NzT >12):
@@ -328,7 +329,7 @@ def Plot_pp_pPb_Cs(Dict):
             elif (NzT ==6):
                 ax = fig.add_subplot(2,3,izt+1)
             elif (NzT >=7 and NzT <=9):
-                ax = fig.add_subplot(3,3,izt+1)
+                ax = fig.add_subplot(4,2,izt+1)
             elif (NzT >9 and NzT <=12):
                 ax = fig.add_subplot(4,3,izt+1)
             elif (NzT >12):
@@ -342,13 +343,13 @@ def Plot_pp_pPb_Cs(Dict):
                 MC = plt.errorbar(delta_phi_centers,["MC_CSR"][ipt][izt],xerr=phi_width,yerr=["MC_CSR_Errors"][ipt][ztb],fmt='go',capsize=4,markersize=11)
 
 
-            if (izt>2):
+            if (izt>5):
                 plt.xlabel(r'|$\Delta \varphi$|',fontsize=28)
-            plt.xticks(fontsize=18)
+            plt.xticks(fontsize=24)
             plt.xlim((0.39269908169872414,3.14159))
-            if (izt%3 == 0):
+            if (izt%2 == 0):
                 plt.ylabel(r'$1/N_{\gamma} \: \: \mathrm{d}N/\mathrm{d}\Delta \eta$',fontsize=28)
-            plt.yticks(fontsize=18)
+            plt.yticks(fontsize=24)
             plt.axhline(y=0,color='gray',linestyle='--',linewidth=1.3,alpha=0.8)        
 
             if not(Quad_UE):
@@ -372,7 +373,7 @@ def Plot_pp_pPb_Cs(Dict):
             Chi2,NDF,Pval = Get_pp_pPb_List_Chi2(Dict["p-Pb_CSR"][ipt][izt],Dict["p-Pb_CSR_Errors"][ipt][izt],Dict["p-Pb_Uncorr_Error"][ipt][izt],
                                         Dict["pp_CSR"][ipt][izt],Dict["pp_CSR_Errors"][ipt][izt],Dict["pp_Uncorr_Error"][ipt][izt])
                         
-            plt.annotate("$\chi^2$ = %1.1f, ndf = %i, p = %1.2f"%(Chi2,NDF,Pval), xy=(0.99, 0.06), xycoords='axes fraction', ha='right', va='top', fontsize=16)
+            plt.annotate("$\chi^2$ = %1.1f, ndf = %i, p = %1.2f"%(Chi2,NDF,Pval), xy=(0.99, 0.05), xycoords='axes fraction', ha='right', va='top', fontsize=16)
 
             if(Use_MC):
                 leg = plt.legend([pp,pPb,MC,pp_UE,pPb_UE,MC_UE],['pp $\sqrt{s}= 5$ TeV (stat. error)',
@@ -387,14 +388,14 @@ def Plot_pp_pPb_Cs(Dict):
                 else:
                     leg = plt.legend([pp,pPb,pyth,Combined_UE],['pp $\sqrt{s}= 5$ TeV (stat. error)',
                     'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)', 'Pythia 8.2 Monash','UB Error'],
-                    loc = "upper left",fontsize=16,frameon=False,numpoints=1)
+                    loc = "upper left",fontsize=18,frameon=False,numpoints=1)
 
-            plt.annotate(r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]), xy=(0.05, 0.53), xycoords='axes fraction', ha='left', va='top', fontsize=16)
+            plt.annotate(r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]), xy=(0.05, 0.67), xycoords='axes fraction', ha='left', va='top', fontsize=18)
             
             if (len(Dict["p-Pb_CSR"]) > 1):
-                plt.annotate(r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]), xy=(0.05, 0.6), xycoords='axes fraction', ha='left', va='top', fontsize=16)
+                plt.annotate(r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]), xy=(0.05, 0.62), xycoords='axes fraction', ha='left', va='top', fontsize=18)
             else:
-                plt.annotate(r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[0],pTbins[N_pT_Bins]), xy=(0.05, 0.6), xycoords='axes fraction', ha='left', va='top', fontsize=16)
+                plt.annotate(r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[0],pTbins[N_pT_Bins]), xy=(0.05, 0.62), xycoords='axes fraction', ha='left', va='top', fontsize=18)
             
             leg.set_title("ALICE Work in Progress")
             leg._legend_box.align = "left"

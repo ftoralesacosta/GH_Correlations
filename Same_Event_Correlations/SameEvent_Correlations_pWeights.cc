@@ -36,10 +36,6 @@ Float_t Get_Purity_ErrFunction(Float_t pT_GeV, std::string deviation) {
    //                   8.09242373515,
    //                   11.8085154181};
 
-//   Float_t par[3] = {0.5482448657828,
-//   		    8.79463092642,
-//   		    12.7424783991};
-
   Float_t par[3] = {0.539705386488,
 		    8.88586771026,
 		    12.2892853578};
@@ -623,7 +619,6 @@ int main(int argc, char *argv[])
     Bool_t Isolated = false;
 
     Long64_t nentries = _tree_event->GetEntries();         
-    //Long64_t nentries = 200;
     std::cout << " Total Number of entries in TTree: " << nentries << std::endl;
 
     //WEIGHTING and CLUSTER SPECTRA LOOP

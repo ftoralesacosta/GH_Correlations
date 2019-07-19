@@ -542,7 +542,7 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
 
     plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^{\mathrm{h}}/p_\mathrm{T}^\gamma$",fontsize=20)
     plt.ylabel(r"$\frac{\mathrm{p-Pb}}{\mathrm{pp}}$",fontsize=20)
-    plt.ylim((-0.5, 2.5))
+    plt.ylim((-0.49, 2.9))
     #plt.yticks(np.arange(-0, 2, step=0.2))
     
     if(NzT == 6):
@@ -567,10 +567,10 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
     p0e = f.GetParError(0)
     p0col = "blue"
     if (Show_Fits):
-        plt.annotate("Constant Fit", xy=(0.4, 0.99), xycoords='axes fraction', ha='left', va='top', color=p0col,fontsize=20,alpha=.7)
-        plt.annotate(r"$p0 = {0:.2f} \pm {1:.2f}$".format(p0,p0e), xy=(0.4, 0.94), xycoords='axes fraction', ha='left', va='top', color=p0col,fontsize=18,alpha=.7)
-        plt.annotate(r"$\chi^2_{red} = %1.2f$"%(chi2_red), xy=(0.4, 0.89), xycoords='axes fraction', ha='left', va='top', color=p0col,fontsize=18,alpha=.7)
-        plt.annotate(r"$p_{val} = %1.2f$"%(pval), xy=(0.4, 0.84), xycoords='axes fraction', ha='left', va='top', color=p0col,fontsize=18,alpha=.7)
+        plt.annotate("Constant Fit", xy=(0.05, 0.99), xycoords='axes fraction', ha='left', va='top', color=p0col,fontsize=20,alpha=.7)
+        plt.annotate(r"$p0 = {0:.2f} \pm {1:.2f}$".format(p0,p0e), xy=(0.05, 0.94), xycoords='axes fraction', ha='left', va='top', color=p0col,fontsize=18,alpha=.7)
+        plt.annotate(r"$\chi^2_{red} = %1.2f$"%(chi2_red), xy=(0.05, 0.89), xycoords='axes fraction', ha='left', va='top', color=p0col,fontsize=18,alpha=.7)
+        plt.annotate(r"$p_{val} = %1.2f$"%(pval), xy=(0.05, 0.84), xycoords='axes fraction', ha='left', va='top', color=p0col,fontsize=18,alpha=.7)
 
         plt.fill_between(np.arange(0,1.1,0.1), p0+p0e, p0-p0e,color=p0col,alpha=.2)
 
@@ -602,11 +602,11 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
     p1col = "Green"
     if (Show_Fits):
         
-        plt.annotate("Linear Fit", xy=(0.69, 0.99), xycoords='axes fraction', ha='left', va='top', color=p1col,fontsize=20,alpha=.7)
-        plt.annotate(r"$p0 = %1.2f \pm %1.2f$"%(p0,p0e), xy=(0.69, 0.94), xycoords='axes fraction', ha='left', va='top', color=p1col,fontsize=18,alpha=.7)
-        plt.annotate(r"$p1 = %1.2f \pm %1.2f$"%(p1,p1e), xy=(0.69, 0.89), xycoords='axes fraction', ha='left', va='top', color=p1col,fontsize=18,alpha=.7)
-        plt.annotate(r"$\chi^2_{red} = %1.2f$"%(chi2_red), xy=(0.69, 0.84), xycoords='axes fraction', ha='left', va='top', color=p1col,fontsize=18,alpha=.7)
-        plt.annotate(r"$p_{val} = %1.2f$"%(pval), xy=(0.69, 0.79), xycoords='axes fraction', ha='left', va='top', color=p1col,fontsize=18,alpha=.7)
+        plt.annotate("Linear Fit", xy=(0.4, 0.99), xycoords='axes fraction', ha='left', va='top', color=p1col,fontsize=20,alpha=.7)
+        plt.annotate(r"$p0 = %1.2f \pm %1.2f$"%(p0,p0e), xy=(0.4, 0.94), xycoords='axes fraction', ha='left', va='top', color=p1col,fontsize=18,alpha=.7)
+        plt.annotate(r"$p1 = %1.2f \pm %1.2f$"%(p1,p1e), xy=(0.4, 0.89), xycoords='axes fraction', ha='left', va='top', color=p1col,fontsize=18,alpha=.7)
+        plt.annotate(r"$\chi^2_{red} = %1.2f$"%(chi2_red), xy=(0.4, 0.84), xycoords='axes fraction', ha='left', va='top', color=p1col,fontsize=18,alpha=.7)
+        plt.annotate(r"$p_{val} = %1.2f$"%(pval), xy=(0.4, 0.79), xycoords='axes fraction', ha='left', va='top', color=p1col,fontsize=18,alpha=.7)
         
         axes = plt.gca()
         x_vals = np.array(zT_Points)

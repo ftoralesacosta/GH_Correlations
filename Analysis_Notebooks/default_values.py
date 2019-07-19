@@ -107,9 +107,9 @@ Shower = "LO"
 #description_string = "zT_Rebin_6_006zT06zT"
 #description_string = "zT_Rebin_7_006zT06zT"
 
-description_string = "zT_Rebin_8_006zT06zT" #DEFAULT
+#description_string = "zT_Rebin_8_006zT06zT" #DEFAULT
 #description_string = "zT_Rebin_8_006zT06zTOldBinNewPurity"
-#description_string = "zT_Rebin_8_006zT06zTOldBinNewNewPurity"
+description_string = "zT_Rebin_8_006zT06zTOldBinNewNewPurity"
 
 #description_string = "zT_Rebin_8_06zTNEW"
 #description_string = "zT_Rebin_8_06zTNEWNEW_local"

@@ -168,10 +168,10 @@ def Plot_UB():
     for sys,ifile in zip(Systems,Files):
         print("%s: $z_T$ interval   & LE Signal Region & LE Background Region & ZYAM Signal Region & ZYAM Background Region"%(sys))
         for ipt in range (N_pT_Bins):
-            fig = plt.figure(figsize=(34,28))
+            fig = plt.figure(figsize=(36,16))
             #if (ipt > 0): continue
             #ipt = ipt+2
-            for izt in range (0,NzT):
+            for izt in range (NzT):
 
                 ztb = izt-zT_offset
 
@@ -205,21 +205,21 @@ def Plot_UB():
 
 
                                        #--------------plot--------------------#
+                    
 
-                ax = fig.add_subplot(3,3,izt+1)
                 if (NzT ==4):
                     ax = fig.add_subplot(2,2,izt+1)
                 elif (NzT ==6):
                     ax = fig.add_subplot(2,3,izt+1)
                 elif (NzT >=7 and NzT <=9):
-                    ax = fig.add_subplot(3,3,izt+1)
+                    ax = fig.add_subplot(2,4,izt+1)
                 elif (NzT >9 and NzT <=12):
                     ax = fig.add_subplot(4,3,izt+1)
                 elif (NzT >12):
                     ax = fig.add_subplot(5,3,izt+1)
-                    
 
-                fsize = 20
+
+                fsize = 14
 
                 #sig
                 ax.plot(delta_phi_centers,Sig_Phi_Array,'bo',ms=10)
@@ -228,14 +228,18 @@ def Plot_UB():
                 ax.plot(delta_phi_centers,Sig_LE_Phi_Array,'s',color="Grey",alpha=0.6,ms=10)
                 s_le_plot = ax.errorbar(delta_phi_centers,Sig_LE_Phi_Array,xerr=phi_width,yerr=Sig_LE_Error_Array,fmt=None,ecolor='Grey',alpha=0.8,label="0.8 <|$\Delta\eta$| < %1.1f"%(eta_max))
 
-                plt.xlabel(r'|$\Delta \varphi$|',fontsize=fsize+4)
-                plt.xticks(fontsize=(fsize))
+                
+                if (izt>3):
+                    plt.xlabel(r'|$\Delta \varphi$|',fontsize=36)
+                plt.xticks(fontsize=26)
                 plt.xlim((0.39269908169872414,3.14159))
-                plt.ylabel(r'$1/N_{\mathrm{trig}} \: \: \mathrm{d}N/\mathrm{d}\Delta\eta$',fontsize=fsize+2)
+                if (izt%4 == 0):
+                    plt.ylabel(r'$1/N_{\gamma} \: \: \mathrm{d}N/\mathrm{d}\Delta \eta$',fontsize=36)
+                plt.yticks(fontsize=26)
+                
                 #plt.ylim((-0.001,1.2*max(Sig_LE_Phi_Array)))
                 empt, = ax.plot([], []," ")
                 empt2, = ax.plot([],[]," ")
-                plt.yticks(fontsize=fsize-5)
 
                 fill_x = [0,3.14159]
                 s_z_line = ax.fill_between(ue_error_bar, Sig_Z_Value-Sig_Z_Error,Sig_Z_Value+Sig_Z_Error,interpolate=False,edgecolor='blue',linewidth=0.0, alpha=0.6,facecolor='blue')
@@ -243,12 +247,12 @@ def Plot_UB():
 
                 leg = ax.legend([s_plot,s_le_plot,s_le_line,s_z_line,empt,empt2],['Shower Sig. Region (stat. error)','0.8 <|$\Delta\eta$| < %1.1f'%(eta_max),'Large $\Delta\eta$ Estimate',
                     'ZYAM',r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]),r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],
-                    loc='best',title = "Alice %s 5 TeV",fontsize=14,frameon=False,numpoints=1)
+                    loc='best',title = "Alice %s 5 TeV",fontsize=25,frameon=False,numpoints=1)
                 if (sys == 'pp'):
                     leg.set_title("ALICE Work in Progress, $\sqrt{s}=$5 TeV %s"%(sys))
                 else:
                     leg.set_title("ALICE Work in Progress, $\sqrt{s_{\mathrm{_{NN}}}}=$5 TeV %s"%(sys))                
-                plt.setp(leg.get_title(),fontsize=14)
+                plt.setp(leg.get_title(),fontsize=25)
 
                 continue
                 
@@ -262,12 +266,14 @@ def Plot_UB():
                     ax = fig.add_subplot(4,4,(2*ztb+2))
                     
                 #ax = fig.add_subplot(1,2,1)
-                plt.xlabel(r'|$\Delta \varphi$|',fontsize=fsize+4)
-                plt.xticks(fontsize=(fsize))
+                
+                if (izt>3):
+                    plt.xlabel(r'|$\Delta \varphi$|',fontsize=32)
+                plt.xticks(fontsize=32)
                 plt.xlim((0.39269908169872414,3.14159))
-                plt.ylabel(r'$1/N_{\mathrm{trig}} \: \: \mathrm{d}N/\mathrm{d}\Delta\eta$',fontsize=fsize+2)
-                #plt.ylim((-0.01,1.2*max(Bkg_LE_Phi_Array)))
-                plt.yticks(fontsize=fsize-5)
+                if (izt%4 == 0):
+                    plt.ylabel(r'$1/N_{\gamma} \: \: \mathrm{d}N/\mathrm{d}\Delta \eta$',fontsize=32)
+                plt.yticks(fontsize=32)
 
                 fill_x = [0,3.14149]
                 b_z_line = plt.fill_between(fill_x, Bkg_Z_Value-Bkg_Z_Error,Bkg_Z_Value+Bkg_Z_Error,interpolate=False,edgecolor='cyan',linewidth=0.0, alpha=0.3,facecolor='cyan')
@@ -287,8 +293,8 @@ def Plot_UB():
                 else:
                     leg.set_title("ALICE Work in Progress, $\sqrt{s_{\mathrm{_{NN}}}}=$5 TeV %s"%(sys))
                 plt.setp(leg.get_title(),fontsize=15)
-            fig.savefig('pics/%s/%s/UE_Plot_%s_pT_%i__zT_%i.pdf'%(Shower,description_string,sys,ipt,izt), bbox_inches='tight')        
             print("")
+        #fig.savefig('pics/%s/%s/UE_Plot_%s_pT_%i__zT_%i.pdf'%(Shower,description_string,sys,ipt,izt), bbox_inches='tight')        
         print("")
         #return
 
