@@ -109,8 +109,9 @@ Shower = "LO"
 
 #description_string = "zT_Rebin_8_006zT06zT" #DEFAULT
 #description_string = "zT_Rebin_8_006zT06zTOldBinNewPurity"
-#description_string = "zT_Rebin_8_006zT06zTOldBinNewNewPurity"
-description_string = "zT_Rebin_8_006zT06zTOldBinNewNewPurity8dPhi"
+description_string = "zT_Rebin_8_006zT06zTOldBinNewNewPurity"
+#description_string = "zT_Rebin_8_006zT06zTOldBinNewNewPurity8dPhi"
+#description_string = "zT_Rebin_6_006zT06zTminpT13"
 
 #description_string = "zT_Rebin_9_006zT06zT"
 #description_string= "zT_Rebin_8_006zT06zTpT2"
@@ -140,7 +141,7 @@ pTbins = [12,40]
 #N_pT_Bins = len(pTbins)-1
 
 #zT
-zTbins = np.asarray([0.05, 0.07670637, 0.11767734, 0.18053204, 0.27695915, 0.42489062, 0.65183634,1])
+zTbins = np.asarray([0.060, 0.088, 0.129, 0.190, 0.278, 0.409, 0.600])
 zT_offset = 0
 ZT_OFF_PLOT = 0 #Offset for FF plotting
 
@@ -239,6 +240,9 @@ if ("pT_Rebin_4" in description_string):
 if ("pT_Rebin_5" in description_string):
     pTbins = [12.00, 15.27, 19.42, 24.71, 31.44, 40.00]
 
+if ("minpT13" in description_string):
+    pTbins = [13.0,40.0]
+    
 N_pT_Bins = len(pTbins)-1
 
 if (description_string == "dPhi_Rebin_8"):

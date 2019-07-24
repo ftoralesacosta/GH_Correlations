@@ -171,7 +171,8 @@ def Plot_UB():
     for sys,ifile in zip(Systems,Files):
         print("%s: $z_T$ interval   & LE Signal Region & LE Background Region & ZYAM Signal Region & ZYAM Background Region"%(sys))
         for ipt in range (N_pT_Bins):
-            fig = plt.figure(figsize=(36,16))
+            fig = plt.figure(figsize=(20,35))
+            #fig = plt.figure(figsize=(36,16))
             #if (ipt > 0): continue
             #ipt = ipt+2
             for izt in range (NzT):
@@ -215,7 +216,8 @@ def Plot_UB():
                 elif (NzT ==6):
                     ax = fig.add_subplot(2,3,izt+1)
                 elif (NzT >=7 and NzT <=9):
-                    ax = fig.add_subplot(2,4,izt+1)
+                    #ax = fig.add_subplot(2,4,izt+1)
+                    ax = fig.add_subplot(4,2,izt+1)
                 elif (NzT >9 and NzT <=12):
                     ax = fig.add_subplot(4,3,izt+1)
                 elif (NzT >12):
