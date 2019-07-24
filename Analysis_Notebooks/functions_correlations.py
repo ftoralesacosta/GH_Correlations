@@ -8,85 +8,6 @@ import math
 from default_values import *
 from functions_root_nparray import ZYAM_Line
 
-def Plot_UB_Subtraction_old(Dict):
-    fsize = 20
-    for SYS,ifile in zip(Systems,Files):
-        if (SYS == "p-Pb"):
-            print("\n \n                                       PROTON-LEAD")
-        else:
-            SYS=SYS
-        if (SYS == "pp"):
-            print("\n \n                                       PROTON-PROTON")
-
-
-        for ipt in range (N_pT_Bins):
-            fig = plt.figure(figsize=(34,17))
-            #if (ipt > 0): continue
-            #ipt = ipt+2
-            for izt in range (zT_offset,NzT+zT_offset):
-                ztb = izt-zT_offset
-
-                #sig
-                if (NzT ==4):
-                    ax = fig.add_subplot(2,4,(2*ztb+1))
-                elif (NzT ==6):
-                    ax = fig.add_subplot(3,4,(2*ztb+1))
-                #ax.plot(delta_phi_centers,Dict["%s_CSR"%(SYS)][ipt][ztb],'bo',ms=10)
-                s_plot = ax.errorbar(delta_phi_centers,Dict["%s_CSR"%(SYS)][ipt][ztb],xerr=phi_width,
-                    yerr=Dict["%s_CSR_Errors"%(SYS)][ipt][ztb],fmt='bo',ecolor='b',label='Signal Region (stat. error)')
-
-                UE_Band = ax.fill_between(ue_error_bar,-Dict["%s_Uncorr_Error"%(SYS)][ipt][ztb][0],
-                     Dict["%s_Uncorr_Error"%(SYS)][ipt][ztb][0],facecolor='purple',alpha=0.35) 
-
-                plt.axhline(y=0,color='gray',linestyle='--',linewidth=1.3,alpha=0.8)
-
-
-                plt.xlabel(r'|$\Delta \varphi$|',fontsize=fsize+4)
-                plt.xticks(fontsize=(fsize))
-                plt.xlim((0.39269908169872414,3.14159))
-                plt.ylabel(r'$1/N_{\mathrm{trig}} \: \: \mathrm{d}N/\mathrm{d}\Delta\eta$',fontsize=fsize+2)
-                empt, = ax.plot([], [], ' ')
-                empt2, = ax.plot([],[],' ')
-                plt.yticks(fontsize=fsize-5)
-
-                leg = ax.legend([s_plot,UE_Band,empt,empt2],['Shower Sig. Region (stat. error)',"UB Error",r'%1.2f < $z_\mathrm{T}$ < %1.2f'
-                    %(zTbins[izt],zTbins[izt+1]),r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],
-                    loc='best',title = "Alice %s 5 TeV",fontsize=14,frameon=False,numpoints=1)
-
-                if (SYS == 'pp'):
-                    leg.set_title("ALICE Work in Progress, $\sqrt{s}=$5 TeV %s"%(SYS))
-                else:
-                    leg.set_title("ALICE Work in Progress, $\sqrt{s_{\mathrm{_{NN}}}}=$5 TeV %s"%(SYS))                
-                plt.setp(leg.get_title(),fontsize=14)
-
-
-                #bkg
-                if (NzT ==4):
-                    ax = fig.add_subplot(2,4,(2*ztb+2))
-                elif (NzT ==6):
-                    ax = fig.add_subplot(3,4,(2*ztb+2))
-
-                plt.xlabel(r'|$\Delta \varphi$|',fontsize=fsize+4)
-                plt.xticks(fontsize=(fsize))
-                plt.xlim((0.39269908169872414,3.14159))
-                plt.ylabel(r'$1/N_{\mathrm{trig}} \: \: \mathrm{d}N/\mathrm{d}\Delta\eta$',fontsize=fsize+2)
-                plt.yticks(fontsize=fsize-5)
-
-                ax.plot(delta_phi_centers,Dict["%s_CBR"%(SYS)][ipt][ztb],'ro',ms=10)
-                b_plot = ax.errorbar(delta_phi_centers,Dict["%s_CBR"%(SYS)][ipt][ztb],xerr=phi_width,yerr=Dict["%s_CBR_Errors"%(SYS)][ipt][ztb],fmt=None,ecolor='r')
-                UE_Band = ax.fill_between(ue_error_bar,-Dict["%s_Uncorr_Error"%(SYS)][ipt][ztb][0],Dict["%s_Uncorr_Error"%(SYS)][ipt][ztb][0],facecolor='purple',alpha=0.35) 
-                plt.axhline(y=0,color='gray',linestyle='--',linewidth=1.3,alpha=0.8)
-
-
-                leg = ax.legend([b_plot,UE_Band,empt,empt2],[' Shower Bkg Region (stat. error)',"UB Error",r'%1.2f < $z_\mathrm{T}$ < %1.2f'
-                    %(zTbins[izt],zTbins[izt+1]),r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],
-                    loc='best',fontsize=14,frameon=False,numpoints=1)
-                if (SYS == 'pp'):
-                    leg.set_title("ALICE Work in Progress, $\sqrt{s}=$5 TeV %s"%(SYS))
-                else:
-                    leg.set_title("ALICE Work in Progress, $\sqrt{s_{\mathrm{_{NN}}}}=$5 TeV %s"%(SYS))
-                plt.setp(leg.get_title(),fontsize=15)
-                fig.savefig('pics/%s/%s_%s_Gamma_hadron_UE_sub_zT_%i.pdf'%(Shower,Shower,SYS,izt), bbox_inches='tight')
 
 def Plot_UB_Subtraction(Dict):
     fsize = 20
@@ -210,18 +131,30 @@ def Plot_Sub_UB_Overlay(Dict):
              sys_color = 'green'
 
         for ipt in range (N_pT_Bins):
-            fig = plt.figure(figsize=(50,8))
-            #if (ipt > 0): continue
-            #ipt = ipt+2
-            for izt in range (zT_offset,NzT+zT_offset):
-                ztb = izt-zT_offset
+            
+            fig = plt.figure(figsize=(24,12))
+            if (NzT >=7 and NzT <=9):
+                #fig = plt.figure(figsize=(35,16))
+                fig = plt.figure(figsize=(20,35))
+            if (NzT >=10 and NzT<=12):
+                fig = plt.figure(figsize=(22,24))
+            if (NzT >12):
+                fig = plt.figure(figsize=(22,30))
 
-                if (NzT == 4):
-                    ax = fig.add_subplot(1,4,(ztb+1))
-                elif (NzT == 6):
-                    ax = fig.add_subplot(1,6,(ztb+1))
-                elif (NzT == 7):
-                    ax = fig.add_subplot(1,7,(ztb+1))
+            for izt in range (NzT-ZT_OFF_PLOT):
+                ztb = izt
+                if (NzT ==4):
+                    ax = fig.add_subplot(2,2,izt+1)
+
+                elif (NzT ==6):
+                    ax = fig.add_subplot(2,3,izt+1)
+                elif (NzT >=7 and NzT <=9):
+                    ax = fig.add_subplot(4,2,izt+1)
+                elif (NzT >9 and NzT <=12):
+                    ax = fig.add_subplot(4,3,izt+1)
+                elif (NzT >12):
+                    ax = fig.add_subplot(5,3,izt+1)
+
 
                 ax.plot(delta_phi_centers,Dict["%s_CSR"%(SYS)][ipt][ztb],'bo',color="blue",ms=10)
                 s_plot = ax.errorbar(delta_phi_centers,Dict["%s_CSR"%(SYS)][ipt][ztb],xerr=phi_width,
@@ -231,8 +164,8 @@ def Plot_Sub_UB_Overlay(Dict):
                 b_plot = ax.errorbar(delta_phi_centers,Dict["%s_CBR"%(SYS)][ipt][ztb]*(1-purity[ipt]),xerr=phi_width,
                     yerr=Dict["%s_CBR_Errors"%(SYS)][ipt][ztb]*(1-purity[ipt]),fmt='ro',ecolor="red",label='Background Region (stat. error)')
 
-                UE_Band = ax.fill_between(ue_error_bar,-Dict["%s_Uncorr_Error"%(SYS)][ipt][ztb][0],Dict["%s_Uncorr_Error"%(SYS)][ipt][ztb][0],facecolor="purple",alpha=0.35) 
-                plt.axhline(y=0,color='gray',linestyle='--',linewidth=1.3,alpha=0.8)
+                #UE_Band = ax.fill_between(ue_error_bar,-Dict["%s_Uncorr_Error"%(SYS)][ipt][ztb][0],Dict["%s_Uncorr_Error"%(SYS)][ipt][ztb][0],facecolor="purple",alpha=0.35) 
+                #plt.axhline(y=0,color='gray',linestyle='--',linewidth=1.3,alpha=0.8)
 
 
                 plt.xlabel(r'|$\Delta \varphi$|',fontsize=fsize+4)
@@ -242,31 +175,17 @@ def Plot_Sub_UB_Overlay(Dict):
                 #plt.ylim((0,1.2*max(Sig_LE_Phi_Array)))
                 empt, = ax.plot([], [], ' ')
                 empt2, = ax.plot([],[],' ')
-                plt.yticks(fontsize=fsize-5)
+                plt.yticks(fontsize=20)
 
-                leg = ax.legend([s_plot,b_plot,UE_Band,empt,empt2],['Shower Sig Region (stat. error)','Shower Bkg Region (scaled) (stat. error)',
-                    "UB Error",r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]),r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],
-                    loc='best',title = "Alice %s 5 TeV",fontsize=14,frameon=False,numpoints=1)
+                leg = ax.legend([s_plot,b_plot,empt,empt2],['Shower Sig Region (stat. error)','Shower Bkg Region (scaled) (stat. error)',r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]),r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],
+                    loc='best',title = "Alice %s 5 TeV",fontsize=20,frameon=False,numpoints=1)
                 if (SYS == 'pp'):
                     leg.set_title("ALICE Work in Progress, $\sqrt{s}=$5 TeV %s"%(SYS))
                 else:
                     leg.set_title("ALICE Work in Progress, $\sqrt{s_{\mathrm{_{NN}}}}=$5 TeV %s"%(SYS))                
-                plt.setp(leg.get_title(),fontsize=14)
-            fig.savefig('pics/%s/%s_%s_Region_Overlays_UE_sub_pT_%i.pdf'%(Shower,Shower,SYS,ipt), bbox_inches='tight')
+                plt.setp(leg.get_title(),fontsize=20)
+            fig.savefig('pics/%s/%s/%s_SR_BR_Overlay_pT_%i.pdf'%(Shower,description_string,SYS,ipt))
 
-def Correlated_Subtraction(Dict):   
-    for SYS in Systems:
-        for ipt in range (N_pT_Bins):
-            #if (ipt > 0): continue
-            
-            Dict["%s_CSR"%(SYS)][ipt] = (Dict["%s_CSR"%(SYS)][ipt] - (1-purity[ipt])*Dict["%s_CBR"%(SYS)][ipt])/purity[ipt]
-            Dict["%s_CSR_Errors"%(SYS)][ipt] = np.sqrt((Dict["%s_CSR_Errors"%(SYS)][ipt]/purity[ipt])**2 + (1-purity[ipt]*Dict["%s_CBR"%(SYS)][ipt]/purity[ipt]**2))
-            Dict["%s_Uncorr_Error"%(SYS)][ipt] = Dict["%s_Uncorr_Error"%(SYS)][ipt]/purity[ipt]
-            
-            
-            #if not(Ped_Sub_First):
-            #    Ped_Sub_After_Cs(Dict)
-            
 def Correlated_Subtraction_Weights(Dict):   
     for SYS in Systems:
         for ipt in range (N_pT_Bins):
@@ -314,7 +233,7 @@ def Plot_pp_pPb_Cs(Dict):
         fig = plt.figure(figsize=(24,12))
         if (NzT >=7 and NzT <=9):
             #fig = plt.figure(figsize=(35,16))
-            fig = plt.figure(figsize=(16,35))
+            fig = plt.figure(figsize=(20,35))
         if (NzT >=10 and NzT<=12):
             fig = plt.figure(figsize=(22,24))
         if (NzT >12):
@@ -322,7 +241,6 @@ def Plot_pp_pPb_Cs(Dict):
         
         for izt in range (NzT-ZT_OFF_PLOT):
 
-            n_rows = int(NzT/3)+1
             if (NzT ==4):
                 ax = fig.add_subplot(2,2,izt+1)
                 
@@ -340,9 +258,10 @@ def Plot_pp_pPb_Cs(Dict):
             pyth = plt.errorbar(delta_phi_centers,pythia[izt],pythia_error[izt],fmt="-g",capsize=4)
             
             if(Use_MC):
-                MC = plt.errorbar(delta_phi_centers,["MC_CSR"][ipt][izt],xerr=phi_width,yerr=["MC_CSR_Errors"][ipt][ztb],fmt='go',capsize=4,markersize=11)
+                pyth = plt.errorbar(delta_phi_centers,pythia[izt],pythia_error[izt],fmt="-g",capsize=4)
 
-
+            if (izt > 1 and izt < 4):
+                plt.xlabel(r'|$\Delta \varphi$|',fontsize=28)
             if (izt>5):
                 plt.xlabel(r'|$\Delta \varphi$|',fontsize=28)
             plt.xticks(fontsize=24)
@@ -373,29 +292,28 @@ def Plot_pp_pPb_Cs(Dict):
             Chi2,NDF,Pval = Get_pp_pPb_List_Chi2(Dict["p-Pb_CSR"][ipt][izt],Dict["p-Pb_CSR_Errors"][ipt][izt],Dict["p-Pb_Uncorr_Error"][ipt][izt],
                                         Dict["pp_CSR"][ipt][izt],Dict["pp_CSR_Errors"][ipt][izt],Dict["pp_Uncorr_Error"][ipt][izt])
                         
-            plt.annotate("$\chi^2$ = %1.1f, ndf = %i, p = %1.2f"%(Chi2,NDF,Pval), xy=(0.99, 0.05), xycoords='axes fraction', ha='right', va='top', fontsize=16)
+            plt.annotate("$\chi^2$ = %1.1f, ndf = %i, p = %1.2f"%(Chi2,NDF,Pval), xy=(0.99, 0.05), xycoords='axes fraction', ha='right', va='top', fontsize=24)
 
             if(Use_MC):
-                leg = plt.legend([pp,pPb,MC,pp_UE,pPb_UE,MC_UE],['pp $\sqrt{s}= 5$ TeV (stat. error)',
-                    'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)','pythia GJ $\sqrt{s}=5$ TeV (stat. error)', 
-                    'pp UE Error', 'p-Pb UE Error','pythia UE Error'],
-                    loc = "upper left",fontsize=16,frameon=False,numpoints=1)
+                    leg = plt.legend([pp,pPb,pyth,Combined_UE],['pp $\sqrt{s}= 5$ TeV (stat. error)',
+                    'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)', 'Pythia 8.2 Monash','UB Error'],
+                    loc = "upper left",fontsize=20,frameon=False,numpoints=1)
             else:    
                 if not(Quad_UE):
                     leg = plt.legend([pp,pPb,pp_UE,pPb_UE],['pp $\sqrt{s}= 5$ TeV (stat. error)',
                     'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)', 'pp UB Error', 'p-Pb UB Error'],
-                    loc = "upper left",fontsize=16,frameon=False,numpoints=1)
+                    loc = "upper left",fontsize=20,frameon=False,numpoints=1)
                 else:
                     leg = plt.legend([pp,pPb,pyth,Combined_UE],['pp $\sqrt{s}= 5$ TeV (stat. error)',
                     'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)', 'Pythia 8.2 Monash','UB Error'],
-                    loc = "upper left",fontsize=18,frameon=False,numpoints=1)
+                    loc = "upper left",fontsize=20,frameon=False,numpoints=1)
 
-            plt.annotate(r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]), xy=(0.05, 0.67), xycoords='axes fraction', ha='left', va='top', fontsize=18)
+            plt.annotate(r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]), xy=(0.05, 0.68), xycoords='axes fraction', ha='left', va='top', fontsize=20)
             
             if (len(Dict["p-Pb_CSR"]) > 1):
-                plt.annotate(r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]), xy=(0.05, 0.62), xycoords='axes fraction', ha='left', va='top', fontsize=18)
+                plt.annotate(r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]), xy=(0.05, 0.63), xycoords='axes fraction', ha='left', va='top', fontsize=20)
             else:
-                plt.annotate(r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[0],pTbins[N_pT_Bins]), xy=(0.05, 0.62), xycoords='axes fraction', ha='left', va='top', fontsize=18)
+                plt.annotate(r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[0],pTbins[N_pT_Bins]), xy=(0.05, 0.63), xycoords='axes fraction', ha='left', va='top', fontsize=20)
             
             leg.set_title("ALICE Work in Progress")
             leg._legend_box.align = "left"

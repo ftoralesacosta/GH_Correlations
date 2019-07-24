@@ -82,6 +82,9 @@ def GetLEProj(filename, ipt, izt, Signal_DNN=True,DoAverage=True):
     LE_Projection.SetDirectory(0)
     LE_Projection.Add(LE_Projection_pos,1)
 
+    if (N_dPhi_Bins == 8):
+        LE_Projection.Rebin(2)
+        
     LE_Projection.Scale(1.0/((eta_max+0.1-(eta_min-0.1))*2)) #scale by eta region
     #print((eta_max+0.1-(eta_min-0.1))*2)
     
@@ -142,8 +145,8 @@ def GetPhiProj(filename,prfx,ipt, izt, Signal_DNN=True):
                                         100*zTbins[izt+1]),Eta_Axis.FindBin(-eta_max),Eta_Axis.FindBin(eta_max))
                                             
     PhiProjection.SetDirectory(0)
-#    if (N_dPhi_Bins == 8):
-#        PhiProjection.Rebin(2)
+    if (N_dPhi_Bins == 8):
+        PhiProjection.Rebin(2)
     #PhiProjection.Scale(1.0/(2*eta_max))
     PhiProjection.Scale(1.0/(2*1.2))
     
@@ -251,7 +254,7 @@ def Plot_UB():
                 if (sys == 'pp'):
                     leg.set_title("ALICE Work in Progress, $\sqrt{s}=$5 TeV %s"%(sys))
                 else:
-                    leg.set_title("ALICE Work in Progress, $\sqrt{s_{\mathrm{_{NN}}}}=$5 TeV %s"%(sys))                
+                    leg.set_title("ALICE Work in Prog, $\sqrt{s_{\mathrm{_{NN}}}}=$5 TeV %s"%(sys))                
                 plt.setp(leg.get_title(),fontsize=25)
 
                 continue
@@ -294,7 +297,7 @@ def Plot_UB():
                     leg.set_title("ALICE Work in Progress, $\sqrt{s_{\mathrm{_{NN}}}}=$5 TeV %s"%(sys))
                 plt.setp(leg.get_title(),fontsize=15)
             print("")
-        #fig.savefig('pics/%s/%s/UE_Plot_%s_pT_%i__zT_%i.pdf'%(Shower,description_string,sys,ipt,izt), bbox_inches='tight')        
+        fig.savefig('pics/%s/%s/UE_Plot_%s_pT_%i__zT_%i.pdf'%(Shower,description_string,sys,ipt,izt), bbox_inches='tight')        
         print("")
         #return
 
