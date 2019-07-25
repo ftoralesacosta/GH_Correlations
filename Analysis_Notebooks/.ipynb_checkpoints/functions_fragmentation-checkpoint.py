@@ -647,7 +647,7 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
     
 
     
-def Compare_pp_pPB_Avg_Ratio_lists(strings,string_descrp_list,colors,Show_Fits = False,Avg_Cs = False):
+def Compare_pp_pPB_Avg_Ratio_lists(save_name,strings,string_descrp_list,colors,Show_Fits = False,Avg_Cs = False):
     
     plt.figure(figsize=(8,8))
     
@@ -704,14 +704,14 @@ def Compare_pp_pPB_Avg_Ratio_lists(strings,string_descrp_list,colors,Show_Fits =
     plt.setp(leg.get_title(),fontsize=20)
 
     plt.gcf()
-    #plt.savefig("pics/Comprison_Averaged_pT_FFunction_ratio_%s_%s_and_%s.pdf"%(Shower,string_descr,string_descr2), bbox_inches='tight')
+    plt.savefig('pics/%s/%s/Ratio_FF_Averages_%s.pdf'%(Shower,default_string,save_name),bbox_inches='tight')
     plt.show()
 
     print("                Central Values:")
     print(Ratio[ZT_OFF_PLOT:])
     
     
-def Compare_pp_pPB_Avg_lists(strings,string_descrp_list,colors):
+def Compare_pp_pPB_Avg_lists(save_name,strings,string_descrp_list,colors):
         
     plt.figure(figsize=(8,8)) 
     shapes = ["o","x","s"]
@@ -735,7 +735,7 @@ def Compare_pp_pPB_Avg_lists(strings,string_descrp_list,colors):
             plt.ylabel(r"$\frac{1}{N_{\mathrm{\gamma}}}\frac{\mathrm{d}N}{\mathrm{d}z_{\mathrm{T}} \mathrm{d}\Delta\eta}$",fontsize=20)
             plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^\mathrm{h}/p_\mathrm{T}^\mathrm{\gamma}$",fontsize=20)
             #plt.xlim(xmin = 0.1,xmax=0.7)
-            #plt.ylim(ymin = 0.001,ymax=20)
+            plt.ylim(ymin = 0.01,ymax=20)
             
     leg = plt.legend(numpoints=1,frameon=False)
     leg.set_title("ALICE Work in Progress\n  $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV")
@@ -743,7 +743,7 @@ def Compare_pp_pPB_Avg_lists(strings,string_descrp_list,colors):
 
     plt.title(r'Integrated $\mathrm{\gamma}$-Hadron Correlation: $2\pi/3 < \Delta\varphi < \pi, |\Delta\eta| < %1.1f$ '%(eta_max),fontdict = {'fontsize' : 19})
     plt.gcf()
-    plt.savefig("pics/%s/Averaged_pT_FFunction_%s.pdf"%(Shower,Shower), bbox_inches='tight')
+    plt.savefig('pics/%s/%s/FF_Averages_%s.pdf'%(Shower,default_string,save_name),bbox_inches='tight')
     plt.show()
 
     print("                Central Values:")

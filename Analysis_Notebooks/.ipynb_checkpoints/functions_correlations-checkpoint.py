@@ -492,31 +492,30 @@ def Save_Avg_Cs_npy(Corr):
         np.save("npy_files/%s_%s_Combined_%s_Cs_Uncorr_Error"%(Shower,description_string,SYS),Corr["%s_Uncorr_Error"%(SYS)])
                 
                 
-def Compare_Cs_Averages(strings,string_descrp_list,colors):
+def Compare_Cs_Averages(save_name,strings,string_descrp_list,colors):
     
     #shapes = ["o","x","s"]
     for SYS in Systems:
         fig = plt.figure(figsize=(22,18))
         
         for (string,string_descr,colr) in zip(strings,string_descrp_list,colors):
-            print(string)
             
             CS_Avg = np.load("npy_files/%s_%s_Combined_%s_Cs.npy"%(Shower,string,SYS))[0]
             CS_Avg_Err = np.load("npy_files/%s_%s_Combined_%s_Cs_Errors.npy"%(Shower,string,SYS))[0]
             CS_Avg_Uncorr_Err = np.load("npy_files/%s_%s_Combined_%s_Cs_Uncorr_Error.npy"%(Shower,string,SYS))[0]
             
-            for izt in range(NzT-ZT_OFF_PLOT):
+            for izt in range(len(CS_Avg)):
                 
                 if (NzT ==4):
                     ax = fig.add_subplot(2,2,izt+1)
                 elif (NzT ==6):
                     ax = fig.add_subplot(2,3,izt+1)
-                elif (NzT ==7):
+                elif (NzT >7 and NzT < 10):
                     ax = fig.add_subplot(3,3,izt+1)
    
-                N_dPhi = len(CS_Avg)+1
-                dPhi_Centers = [i*math.pi/N_dPhi+math.pi/N_dPhi/2 for i in range(0,N_dPhi)] #skip first dPhi bin to avoid Isolation
-                    
+                N_Phi = len(CS_Avg[izt])
+                dPhi_Centers = [i*math.pi/N_Phi+math.pi/N_Phi/2 for i in range(0,N_Phi)] #skip first dPhi bin to avoid Isolation
+                
                 plt.errorbar(dPhi_Centers,CS_Avg[izt],xerr=phi_width,yerr=CS_Avg_Err[izt],fmt='o',color = colr,capsize=4,markersize=11,label = "average %s"%(string_descr))
                 
                 plt.xlim((0.39269908169872414,3.14159))
@@ -527,9 +526,12 @@ def Compare_Cs_Averages(strings,string_descrp_list,colors):
                 if (izt%3 == 0):
                     plt.ylabel(r'$1/N_{\gamma} \: \: \mathrm{d}N/\mathrm{d}\Delta \eta$',fontsize=28)
                 
+                zbins= np.geomspace(0.06, 0.6, num= len(CS_Avg)+1)
+                
                 leg = plt.legend(numpoints=1,frameon=False,loc="best")
-                leg.set_title("%s :%1.2f < $z_\mathrm{T}$ < %1.2f"%(SYS,zTbins[izt],zTbins[izt+1]))
+                leg.set_title("%s :%1.2f < $z_\mathrm{T}$ < %1.2f"%(SYS,zbins[izt],zbins[izt+1]))
                 plt.setp(leg.get_title(),fontsize=18)
+                fig.savefig('pics/%s/%s/Cs_Averages_%s.pdf'%(Shower,default_string,save_name),bbox_inches='tight')
                     
             
 def Compare_Cs_pTBins():
@@ -573,7 +575,8 @@ def Compare_Cs_pTBins():
                 
                 leg = plt.legend(numpoints=1,frameon=False,loc="best")
                 leg.set_title("%s :%1.2f < $z_\mathrm{T}$ < %1.2f"%(SYS,zTbins[izt],zTbins[izt+1]))
-                plt.setp(leg.get_title(),fontsize=18)           
+                plt.setp(leg.get_title(),fontsize=18)      
+                fig.savefig('pics/%s/%s/Cs_pT_Compare_zT_%i.pdf'%(Shower,description_string,izt))
             
                 
         

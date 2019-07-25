@@ -40,11 +40,11 @@ Phi_String = "7\pi/8"
 #Phi_String = "15\pi/16"
 
 
-ZYAM_Start = 0.39
-#ZYAM_Start = 0.41
+#ZYAM_Start = 0.39
+ZYAM_Start = 0.41
 
-ZYAM_End = 1.5
-#ZYAM_End = 1.3
+#ZYAM_End = 1.5
+ZYAM_End = 1.3
 
         #DEFAULTS:
 
@@ -107,12 +107,20 @@ Shower = "LO"
 #description_string = "zT_Rebin_6_006zT06zT"
 #description_string = "zT_Rebin_7_006zT06zT"
 
-#description_string = "zT_Rebin_8_006zT06zT" #DEFAULT
+#description_string = "zT_Rebin_8_006zT06zT" 
 #description_string = "zT_Rebin_8_006zT06zTOldBinNewPurity"
 #description_string = "zT_Rebin_8_006zT06zTOldBinNewNewPurity"
-#description_string = "zT_Rebin_8_006zT06zTOldBinNewNewPurity8dPhi"
-#description_string = "zT_Rebin_6_006zT06zTminpT13"
-description_string = "pT_Rebin_2_006zT06zTOldBinNewNewPurity"
+
+#----------^^^ OLD ^^^ --------
+
+
+default_string = "zT_Rebin_8_006zT06zTOldBinNewNewPurity8dPhi"
+description_string = default_string
+
+#description_string = "zT_Rebin_7_006zT06zT"
+#description_string = "zT_Rebin_9_006zT06zT"
+#description_string = "pT_Rebin_2_006zT06zTOldBinNewNewPurity"
+description_string = "zT_Rebin_8_006zT06zTOldBinNewNewPurity_Small_Zyam"
 
 #description_string = "zT_Rebin_9_006zT06zT"
 #description_string= "zT_Rebin_8_006zT06zTpT2"
