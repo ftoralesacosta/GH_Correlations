@@ -552,7 +552,7 @@ def Compare_Cs_pTBins():
                 ax = fig.add_subplot(2,2,izt+1)
             elif (NzT ==6):
                 ax = fig.add_subplot(2,3,izt+1)
-            elif (NzT ==7):
+            elif (NzT >6):
                 ax = fig.add_subplot(3,3,izt+1)
                 
             plt.errorbar(delta_phi_centers,CS_Avg[izt],xerr=phi_width,yerr=CS_Avg_Err[izt],fmt='ko',capsize=4,markersize=11,

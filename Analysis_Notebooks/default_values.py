@@ -109,9 +109,10 @@ Shower = "LO"
 
 #description_string = "zT_Rebin_8_006zT06zT" #DEFAULT
 #description_string = "zT_Rebin_8_006zT06zTOldBinNewPurity"
-description_string = "zT_Rebin_8_006zT06zTOldBinNewNewPurity"
+#description_string = "zT_Rebin_8_006zT06zTOldBinNewNewPurity"
 #description_string = "zT_Rebin_8_006zT06zTOldBinNewNewPurity8dPhi"
 #description_string = "zT_Rebin_6_006zT06zTminpT13"
+description_string = "pT_Rebin_2_006zT06zTOldBinNewNewPurity"
 
 #description_string = "zT_Rebin_9_006zT06zT"
 #description_string= "zT_Rebin_8_006zT06zTpT2"
@@ -141,7 +142,7 @@ pTbins = [12,40]
 #N_pT_Bins = len(pTbins)-1
 
 #zT
-zTbins = np.asarray([0.060, 0.088, 0.129, 0.190, 0.278, 0.409, 0.600])
+zTbins = np.asarray([0.060, 0.080, 0.107, 0.142, 0.190, 0.253, 0.337, 0.450, 0.600])
 zT_offset = 0
 ZT_OFF_PLOT = 0 #Offset for FF plotting
 
