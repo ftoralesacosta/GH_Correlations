@@ -11,7 +11,7 @@ do
 done
 
 cd $1
-hadd pPb_SE_L0_Correlation_GMB_Ratio.root 13*_SE_L0_Correlation_GMB_Ratio.root
+hadd -f pPb_SE_L0_Correlation_GMB_Ratio.root 13*_SE_L0_Correlation_GMB_Ratio.root
 cp 17q_SE_L0_Correlation_GMB_Ratio.root pp_SE_L0_Correlation_GMB_Ratio.root
 
 echo "DIVIDE CORRELATIONS AND CREATED pPb and pp Files"
