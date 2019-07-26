@@ -80,9 +80,9 @@ int main(int argc, char *argv[]){
 
   TAxis* z = histo2D->GetZaxis();
   //z->SetTitle("#frac{1}{#it{N}_{#gamma}} #frac{d^{2}}{d#Delta#etad#Delta#varphi}");
-  z->SetTitle("#frac{1}{#it{N}_{#gamma}}");
-  z->SetTitleOffset(1.8);
-  z->SetTitleSize(0.04);
+  //z->SetTitle("#frac{1}{#it{N}_{#gamma}}");
+  //z->SetTitleOffset(1.8);
+  //z->SetTitleSize(0.04);
   z->SetLabelSize(0.03);
   z->CenterTitle();
 
