@@ -367,12 +367,12 @@ def ROOT_to_nparray():
                         
                     UB_Error = np.sqrt(SR_UB_Error**2 + BR_UB_Error**2)
 
-                    Dict["%s_CSR"%(SYS)][ipt][izt] = Sig_Phi_Array
-                    Dict["%s_CSR_Errors"%(SYS)][ipt][izt] = Sig_Phi_Error_Array
-                    Dict["%s_CBR"%(SYS)][ipt][izt] = Bkg_Phi_Array
-                    Dict["%s_CBR_Errors"%(SYS)][ipt][izt] = Bkg_Phi_Error_Array
-                    Dict["%s_Uncorr_Error"%(SYS)][ipt][izt] = UB_Error #constant in for zT bins
-                    Dict["%s_Uncorr_Estimate"%(SYS)][ipt][izt] = SR_UB
+                    Dict["%s_CSR"%(SYS)][ipt][izt] = Sig_Phi_Array/dPhi_Width
+                    Dict["%s_CSR_Errors"%(SYS)][ipt][izt] = Sig_Phi_Error_Array/dPhi_Width
+                    Dict["%s_CBR"%(SYS)][ipt][izt] = Bkg_Phi_Array/dPhi_Width
+                    Dict["%s_CBR_Errors"%(SYS)][ipt][izt] = Bkg_Phi_Error_Array/dPhi_Width
+                    Dict["%s_Uncorr_Error"%(SYS)][ipt][izt] = UB_Error/dPhi_Width #constant in for zT bins
+                    Dict["%s_Uncorr_Estimate"%(SYS)][ipt][izt] = SR_UB/dPhi_Width
 
     return Dict    
         

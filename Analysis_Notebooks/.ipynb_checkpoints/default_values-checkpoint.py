@@ -40,11 +40,11 @@ Phi_String = "7\pi/8"
 #Phi_String = "15\pi/16"
 
 
-#ZYAM_Start = 0.39
-ZYAM_Start = 0.41
+ZYAM_Start = 0.39
+#ZYAM_Start = 0.41
 
-#ZYAM_End = 1.5
-ZYAM_End = 1.3
+ZYAM_End = 1.5
+#ZYAM_End = 1.3
 
         #DEFAULTS:
 
@@ -121,7 +121,7 @@ description_string = default_string
 #description_string = "zT_Rebin_9_006zT06zT"
 #description_string = "pT_Rebin_2_006zT06zTOldBinNewNewPurity"
 #description_string = "zT_Rebin_8_006zT06zTOldBinNewNewPurity_Small_Zyam"
-description_string= "zT_Rebin_8_006zT06zTpT2"
+#description_string= "zT_Rebin_8_006zT06zTpT2"
 
 
 #description_string = "zT_Rebin_8_006zT06zTminpT15"
@@ -425,3 +425,7 @@ if (N_dPhi_Bins == 8):
 
     pythia = pythia[:8]
     pythia_error = pythia_error[:8]
+
+    
+pythia = np.asarray(pythia)/dPhi_Width
+pythia_error = np.asarray(pythia_error)/dPhi_Width

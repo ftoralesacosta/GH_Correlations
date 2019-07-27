@@ -587,7 +587,8 @@ def Integrate_Away_Side(Phi_array,Phi_Errors,LE_Error,N_Phi_Intgl=N_Phi_Integrat
     FF_zt_Errors = np.zeros((len(Phi_array), NzT))
     
     if Use_Uncorr_Error:
-        LE_Error = LE_Error/(dPhi_Width*(ZYAM_Max_i-ZYAM_Min_i))
+        #LE_Error = LE_Error/(dPhi_Width*(ZYAM_Max_i-ZYAM_Min_i))
+        LE_Error = LE_Error/(ZYAM_Max_i-ZYAM_Min_i)
     
     for ipt in range(len(Phi_array)):
         
@@ -596,11 +597,13 @@ def Integrate_Away_Side(Phi_array,Phi_Errors,LE_Error,N_Phi_Intgl=N_Phi_Integrat
             zT_width = zTbins[izt+1]-zTbins[izt]
             #zT_width = 1
             
-            temp_phi = Phi_array[ipt][izt][-N_Phi_Intgl:]/(dPhi_Width*N_Phi_Intgl)
+            #temp_phi = Phi_array[ipt][izt][-N_Phi_Intgl:]/(dPhi_Width*N_Phi_Intgl)
+            temp_phi = Phi_array[ipt][izt][-N_Phi_Intgl:]/(N_Phi_Intgl)
             #print(temp_phi)
             
             FF_zt[ipt][izt] = temp_phi.sum()/zT_width
-            temp_error = (Phi_Errors[ipt][izt][-N_Phi_Intgl:]/(dPhi_Width*N_Phi_Intgl))**2
+            #temp_error = (Phi_Errors[ipt][izt][-N_Phi_Intgl:]/(dPhi_Width*N_Phi_Intgl))**2
+            temp_error = (Phi_Errors[ipt][izt][-N_Phi_Intgl:]/(N_Phi_Intgl))**2
             
             if (Use_Uncorr_Error):
                 FF_zt_Errors[ipt][izt] = (math.sqrt(temp_error.sum() + (LE_Error[ipt][izt][0])**2))/zT_width
@@ -742,12 +745,20 @@ def ProcessData(input_x, input_y, input_yerr,UE_binmin=2, UE_binmax=9,label='dat
 
     Printing = True
     
+    if (N_dPhi_Bins == 8):
+        UE_binmin = 1
+        UE_binmax = 3
+    
     x = input_x 
     dphi = x[1]-x[0]
     xerr = np.multiply(np.ones(len(x)),dphi/2.0)
     
-    y = np.divide(input_y, dphi)
-    yerr = np.divide(input_yerr,dphi)
+    #y = np.divide(input_y, dphi)
+    #yerr = np.divide(input_yerr,dphi)
+    
+    y = np.divide(input_y, 1.0)
+    yerr = np.divide(input_yerr,1.0)
+    
     yerr_squared = np.power(yerr,2.0)
     
     plt.errorbar(x,y,yerr=yerr,xerr=xerr,label=label+" before subtraction",alpha=0.4,color=color, linestyle = 'None')
@@ -764,6 +775,8 @@ def ProcessData(input_x, input_y, input_yerr,UE_binmin=2, UE_binmax=9,label='dat
     plt.fill_between(x[UE_binmin:UE_binmax], UE_rate - UE_error, UE_rate+UE_error, alpha=.5,color='grey')
     y_sub = np.subtract(y,UE_rate)
     plt.errorbar(x,y_sub,yerr=yerr,xerr=xerr,label=label+" after subtraction",alpha=0.9,color=color,marker='o', linestyle = 'None')
+    
+    ue_band_x = [x[UE_binmin]-dphi/2,x[UE_binmax]+dphi/2]
     plt.fill_between(x[UE_binmin:UE_binmax], 0.0- UE_error, 0.0+UE_error, alpha=.5,color='grey')
       
     plt.ylabel('Rate per dphixdeta',fontsize=16)
@@ -771,7 +784,13 @@ def ProcessData(input_x, input_y, input_yerr,UE_binmin=2, UE_binmax=9,label='dat
 
     #subtract UE
     y = np.subtract(y, UE_rate)
-    binmax = 6
+    
+    binmax = 4
+    
+    if (N_dPhi_Bins == 8):
+        binmax = 2
+    
+    
     #for i in range(1,binmax+1):
         #print 'Rate bin #', i
         #print '{:2.3f}  +/- {:2.3f} (stat) +/- {:2.3f} (UE syst) tracks per unit dphi'.format(y[-i],yerr[-i],UE_error) 
@@ -789,8 +808,10 @@ def ProcessData(input_x, input_y, input_yerr,UE_binmin=2, UE_binmax=9,label='dat
             print '{:2.1%} relative stat error'.format(combination_error/combination)
             print ' ' 
 
-    plt.fill_between(x[UE_binmin:UE_binmax], 0.0- UE_error, 0.0+UE_error, alpha=.6,color='grey')
-    plt.fill_between(x[-binmax:], combination - total_error, combination+total_error, alpha=.6,color=color)
+    plt.fill_between(ue_band_x, 0.0- UE_error, 0.0+UE_error, alpha=.6,color='grey')
+    
+    integ_band_x = [x[-binmax]-dphi/2,x[-1]]
+    plt.fill_between(integ_band_x, combination - total_error, combination+total_error, alpha=.6,color=color)
     #plt.fill_between(x[-binmax:], combination - combination_error, combination+combination_error, alpha=.5)
     
 
