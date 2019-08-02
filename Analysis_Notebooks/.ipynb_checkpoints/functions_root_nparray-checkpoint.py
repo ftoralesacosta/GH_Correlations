@@ -169,7 +169,7 @@ def GetPhiProj(filename,prfx,ipt, izt, Signal_DNN=True):
 
 def Plot_UB():
     for sys,ifile in zip(Systems,Files):
-        print("%s: $z_T$ interval   & LE Signal Region & LE Background Region & ZYAM Signal Region & ZYAM Background Region"%(sys))
+        print("%s: $z_\mathrm{T}$ interval & ZYAM  & Large $\Delta\eta$ & Difference"%(sys))
         for ipt in range (N_pT_Bins):
             fig = plt.figure(figsize=(20,35))
             #fig = plt.figure(figsize=(36,16))
@@ -184,9 +184,9 @@ def Plot_UB():
 
                 S_LE, S_LE_Error = GetLE_Val(Sig_LE_Phi_Array, Sig_LE_Error_Array)
                 
-                print("Large Eta Error per unit phi")
-                print(S_LE/(phi_width))
-                print(S_LE_Error/phi_width)
+                #print("Large Eta Error per unit phi")
+                #print(S_LE/(phi_width))
+                #print(S_LE_Error/phi_width)
                 
                 Bkg_LE, Bkg_LE_Error = GetLE_Val(Bkg_LE_Phi_Array, Bkg_LE_Error_Array)
 
@@ -200,12 +200,12 @@ def Plot_UB():
                 Bkg_Z_Value,Bkg_Z_Error = ZYAM_Line(Bkg_Phi_Array, Bkg_Phi_Error_Array)
                 
                 
-                print("ZYAM per unit phi")
-                print(Sig_Z_Value/phi_width)
-                print(Sig_Z_Error/phi_width)
+                #print("ZYAM per unit phi")
+                #print(Sig_Z_Value/phi_width)
+                #print(Sig_Z_Error/phi_width)
 
-                print("%1.2f - %1.2f & %1.3f $\pm$ %1.3f & %1.3f $\pm$ %1.3f \\\\"
-                      %(zTbins[izt],zTbins[izt+1],S_LE,S_LE_Error,Sig_Z_Value,Sig_Z_Error))
+                print("%1.2f - %1.2f & %1.3f $\pm$ %1.3f & %1.3f $\pm$ %1.3f & %1.3f $\pm$ %1.3f\\\\"
+                      %(zTbins[izt],zTbins[izt+1],Sig_Z_Value,Sig_Z_Error,S_LE,S_LE_Error,abs(Sig_Z_Value-S_LE), math.sqrt(Sig_Z_Error**2 + S_LE_Error**2) ))
 
 
                                        #--------------plot--------------------#

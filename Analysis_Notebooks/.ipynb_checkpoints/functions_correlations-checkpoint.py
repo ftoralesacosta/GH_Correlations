@@ -336,7 +336,7 @@ def Plot_pp_pPb_Cs_Individual(Dict):
         
         for izt in range (NzT-ZT_OFF_PLOT):
             
-            fig = plt.figure(figsize=(10,8))
+            fig = plt.figure(figsize=(10,9))
 
             pPb = plt.errorbar(delta_phi_centers,Dict["p-Pb_CSR"][ipt][izt],xerr=phi_width,yerr=Dict["p-Pb_CSR_Errors"][ipt][izt],fmt='bo',capsize=4,markersize=11)
             pp = plt.errorbar(delta_phi_centers,Dict["pp_CSR"][ipt][izt],xerr=phi_width,yerr=Dict["pp_CSR_Errors"][ipt][izt],fmt='ro',capsize=4,markersize=11)
@@ -350,10 +350,9 @@ def Plot_pp_pPb_Cs_Individual(Dict):
             plt.xticks(fontsize=18)
             plt.xlim((0.39269908169872414,3.14159))
 
-            plt.ylabel(r'$1/N_{\gamma} \: \: \mathrm{d}N/\mathrm{d}\Delta \eta$',fontsize=28)
+            plt.ylabel(r'$1/N_{\gamma} \: \: \mathrm{d}N/\mathrm{d}\Delta \eta \Delta \varphi$',fontsize=28)
             plt.yticks(fontsize=18)
             plt.axhline(y=0,color='gray',linestyle='--',linewidth=1.3,alpha=0.8)        
-
             if not(Quad_UE):
                 pp_UE = plt.fill_between(ue_error_bar,-Dict["pp_Uncorr_Error"][ipt][izt][0],
                 Dict['pp_Uncorr_Error'][ipt][izt][0],facecolor='red',alpha=0.35) #Other for pp
@@ -367,7 +366,7 @@ def Plot_pp_pPb_Cs_Individual(Dict):
                 UE_Val =math.sqrt(pp_UE**2 + pPb_UE**2)
                 Combined_UE = plt.fill_between(ue_error_bar,-UE_Val,UE_Val,facecolor='purple',alpha=0.35)
                 
-            Int_Window = plt.axvline(x=dPhi_Bins[-N_Phi_Integrate-1],linestyle='--',color="green",alpha=1.0)
+            Int_Window = plt.axvline(x=dPhi_Bins[-N_Phi_Integrate-1],linestyle='--',color="black",alpha=0.7)
             
             #MC_UE = ax.fill_between(ue_error_bar,-Dict["MC_Uncorr_Error"][ipt][ztb][0],Dict["MC_Uncorr_Error"][ipt][ztb][0],facecolor='green',alpha=0.35)#One for p-Pb
             
@@ -375,35 +374,34 @@ def Plot_pp_pPb_Cs_Individual(Dict):
             Chi2,NDF,Pval = Get_pp_pPb_List_Chi2(Dict["p-Pb_CSR"][ipt][izt],Dict["p-Pb_CSR_Errors"][ipt][izt],Dict["p-Pb_Uncorr_Error"][ipt][izt],
                                         Dict["pp_CSR"][ipt][izt],Dict["pp_CSR_Errors"][ipt][izt],Dict["pp_Uncorr_Error"][ipt][izt])
                         
-            plt.annotate("$\chi^2$ = %1.1f, ndf = %i, p = %1.2f"%(Chi2,NDF,Pval), xy=(0.01, 0.06), xycoords='axes fraction', ha='left', va='top', fontsize=16)
+            plt.annotate("$\chi^2$ = %1.1f, ndf = %i, p = %1.2f"%(Chi2,NDF,Pval), xy=(0.98, 0.06), xycoords='axes fraction', ha='right', va='top', fontsize=22)
 
             if(Use_MC):
-                leg = plt.legend([pp,pPb,MC,pp_UE,pPb_UE,MC_UE],['pp $\sqrt{s}= 5$ TeV (stat. error)',
-                    'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)','pythia GJ $\sqrt{s}=5$ TeV (stat. error)', 
-                    'pp UE Error', 'p-Pb UE Error','pythia UE Error'],
-                    loc = "upper left",fontsize=16,frameon=False,numpoints=1)
+                    leg = plt.legend([pp,pPb,pyth,Combined_UE],['pp $\sqrt{s}= 5$ TeV (stat. error)',
+                    'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)', 'Pythia 8.2 Monash','UB Error'],
+                    loc = "upper left",fontsize=20,frameon=False,numpoints=1)
             else:    
                 if not(Quad_UE):
                     leg = plt.legend([pp,pPb,pp_UE,pPb_UE],['pp $\sqrt{s}= 5$ TeV (stat. error)',
                     'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)', 'pp UB Error', 'p-Pb UB Error'],
-                    loc = "upper left",fontsize=16,frameon=False,numpoints=1)
+                    loc = "upper left",fontsize=20,frameon=False,numpoints=1)
                 else:
-                    leg = plt.legend([pp,pPb,Combined_UE],['pp $\sqrt{s}= 5$ TeV (stat. error)',
-                    'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)', 'UB Error'],
-                    loc = "upper left",fontsize=16,frameon=False,numpoints=1)
+                    leg = plt.legend([pp,pPb,pyth,Combined_UE],['pp $\sqrt{s}= 5$ TeV (stat. error)',
+                    'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)', 'Pythia 8.2 Monash','UB Error'],
+                    loc = "upper left",fontsize=20,frameon=False,numpoints=1)
 
-            plt.annotate(r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]), xy=(0.05, 0.75), xycoords='axes fraction', ha='left', va='top', fontsize=16)
+            plt.annotate(r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]), xy=(0.05, 0.56), xycoords='axes fraction', ha='left', va='top', fontsize=22)
             
-            if (len(Dict["p-Pb_CSR"]) > 2):
-                plt.annotate(r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]), xy=(0.05, 0.7), xycoords='axes fraction', ha='left', va='top', fontsize=16)
+            if (len(Dict["p-Pb_CSR"]) > 1):
+                plt.annotate(r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]), xy=(0.05, 0.64), xycoords='axes fraction', ha='left', va='top', fontsize=22)
             else:
-                plt.annotate(r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[0],pTbins[N_pT_Bins]), xy=(0.05, 0.7), xycoords='axes fraction', ha='left', va='top', fontsize=16)
+                plt.annotate(r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[0],pTbins[N_pT_Bins]), xy=(0.05, 0.64), xycoords='axes fraction', ha='left', va='top', fontsize=22)
             
             leg.set_title("ALICE Work in Progress")
             leg._legend_box.align = "left"
             plt.setp(leg.get_title(),fontsize=22)
             fig.tight_layout()
-
+            
             plt.show()
             #fig.savefig('pics/Gamma_hadron_corr_zT_%i.pdf'%(ztb))
             fig.savefig('pics/%s/%s/Cs_Final_Indv_pT_%i_zT_%i.pdf'%(Shower,description_string,ipt,izt))
@@ -580,15 +578,16 @@ def Compare_Cs_pTBins():
             
                 
         
-def Integrate_Away_Side(Phi_array,Phi_Errors,LE_Error,N_Phi_Intgl=N_Phi_Integrate):
+def Integrate_Away_Side(Phi_array,Phi_Errors,UE_Error,N_Phi_Intgl=N_Phi_Integrate):
     
     Use_Uncorr_Error = True
     FF_zt = np.zeros((len(Phi_array), NzT))
     FF_zt_Errors = np.zeros((len(Phi_array), NzT))
+    FF_zt_UE = np.zeros((len(Phi_array), NzT))
     
     if Use_Uncorr_Error:
         #LE_Error = LE_Error/(dPhi_Width*(ZYAM_Max_i-ZYAM_Min_i))
-        LE_Error = LE_Error/(ZYAM_Max_i-ZYAM_Min_i)
+        UE_Error = UE_Error/(ZYAM_Max_i-ZYAM_Min_i)
     
     for ipt in range(len(Phi_array)):
         
@@ -606,11 +605,13 @@ def Integrate_Away_Side(Phi_array,Phi_Errors,LE_Error,N_Phi_Intgl=N_Phi_Integrat
             temp_error = (Phi_Errors[ipt][izt][-N_Phi_Intgl:]/(N_Phi_Intgl))**2
             
             if (Use_Uncorr_Error):
-                FF_zt_Errors[ipt][izt] = (math.sqrt(temp_error.sum() + (LE_Error[ipt][izt][0])**2))/zT_width
+                FF_zt_Errors[ipt][izt] = (math.sqrt(temp_error.sum() + (UE_Error[ipt][izt][0])**2))/zT_width
+                FF_zt_UE[ipt][izt] = UE_Error[ipt][izt][0]/zT_width
+            
             else:
                 FF_zt_Errors[ipt][izt] = math.sqrt(temp_error.sum())/zT_width
             
-    return FF_zt, FF_zt_Errors
+    return FF_zt, FF_zt_Errors,FF_zt_UE
 
 
 def Get_Fragmentation(Dict,N_Phi_Intgl=N_Phi_Integrate,Use_Avg_Cs=False):
@@ -623,29 +624,34 @@ def Get_Fragmentation(Dict,N_Phi_Intgl=N_Phi_Integrate,Use_Avg_Cs=False):
             Keys.append("%s_FF"%(SYS))
             Keys.append("%s_FF_Errors"%(SYS))
             Keys.append("%s_purity_FF_Errors"%(SYS))
+            Keys.append("%s_UE_FF_Errors"%(SYS))
         
         if Use_Avg_Cs:
             Keys.append("%s_Combined_FF"%(SYS))
             Keys.append("%s_Combined_FF_Errors"%(SYS))
-            Keys.append("%s_purity_Uncertainty"%(SYS))
+            Keys.append("%s_purity_FF_Errors"%(SYS))
+            Keys.append("%s_UE_FF_Errors"%(SYS))
             
     
     FF_Vals = []
 
     for index,SYS in enumerate(Systems):
         
-        temp_FF, temp_FF_Errors = Integrate_Away_Side(Dict["%s_CSR"%(SYS)],Dict["%s_CSR_Errors"%(SYS)],Dict["%s_Uncorr_Error"%(SYS)],N_Phi_Intgl,)
+        temp_FF, temp_FF_Errors, temp_FF_UE_Errors = Integrate_Away_Side(Dict["%s_CSR"%(SYS)],Dict["%s_CSR_Errors"%(SYS)],Dict["%s_Uncorr_Error"%(SYS)],N_Phi_Intgl,)
         temp_purity_Errors = []
+        
         
         for ipt in range(len(Dict["%s_CSR"%(SYS)])): 
             temp_purity_Errors.append(temp_FF[ipt]*(purity_Uncertainty[ipt]/purity[ipt]))  # abs. FF purity uncertainty
-        
+            
+            
         if (Use_Avg_Cs):
-            temp_FF,temp_FF_Errors,temp_purity_Errors = temp_FF[0],temp_FF_Errors[0],temp_purity_Errors[0]
+            temp_FF,temp_FF_Errors,temp_purity_Errors, temp_FF_UE_Errors = temp_FF[0],temp_FF_Errors[0],temp_purity_Errors[0]
             
         FF_Vals.append(temp_FF)
         FF_Vals.append(temp_FF_Errors)
         FF_Vals.append(np.asarray(temp_purity_Errors))
+        FF_Vals.append(temp_FF_UE_Errors)
     
     FF_Dict = dict(zip(Keys,FF_Vals))
     
@@ -657,11 +663,13 @@ def Get_Fragmentation(Dict,N_Phi_Intgl=N_Phi_Integrate,Use_Avg_Cs=False):
                 np.save("npy_files/%s_%s_Fragmentation_Functions_Combined_Cs.npy"%(Shower,SYS),FF_Dict["%s_Combined_FF"%(SYS)])
                 np.save("npy_files/%s_%s_Fragmentation_Function_Errors_Combined_Cs.npy"%(Shower,SYS),FF_Dict["%s_Combined_FF_Errors"%(SYS)])
                 np.save("npy_files/%s_%s_FF_purity_Uncertainty_Combined_Cs.npy"%(Shower,SYS),FF_Dict["%s_purity_Uncertainty"%(SYS)])
+                np.save("npy_files/%s_%s_FF_UE_Uncertainty_Combined_Cs.npy"%(Shower,SYS),FF_Dict["%s_UE_FF_Errors"%(SYS)])
             
             else:
                 np.save("npy_files/%s_%s_Fragmentation_Functions_Unweight_Combined_Cs.npy"%(Shower,SYS),FF_Dict["%s_Combined_FF"%(SYS)])
                 np.save("npy_files/%s_%s_Fragmentation_Function_Errors_Unweight_Combined_Cs.npy"%(Shower,SYS),FF_Dict["%s_Combined_FF_Errors"%(SYS)])
                 np.save("npy_files/%s_%s_FF_purity_Uncertainty_Unweight_Combined_Cs.npy"%(Shower,SYS),FF_Dict["%s_purity_Uncertainty"%(SYS)])
+                np.save("npy_files/%s_%s_FF_UE_Uncertainty_Unweight_Combined_Cs.npy"%(Shower,SYS),FF_Dict["%s_UE_Uncertainty"%(SYS)])
         
         else:
             
@@ -669,16 +677,103 @@ def Get_Fragmentation(Dict,N_Phi_Intgl=N_Phi_Integrate,Use_Avg_Cs=False):
                 np.save("npy_files/%s_%s_Fragmentation_Functions.npy"%(Shower,SYS),FF_Dict["%s_FF"%(SYS)])
                 np.save("npy_files/%s_%s_Fragmentation_Function_Errors.npy"%(Shower,SYS),FF_Dict["%s_FF_Errors"%(SYS)])
                 np.save("npy_files/%s_%s_FF_purity_Uncertainty.npy"%(Shower,SYS),FF_Dict["%s_purity_FF_Errors"%(SYS)])
+                np.save("npy_files/%s_%s_FF_UE_Uncertainty.npy"%(Shower,SYS),FF_Dict["%s_UE_FF_Errors"%(SYS)])
         
             else:
                 np.save("npy_files/%s_%s_Fragmentation_Functions_Unweight.npy"%(Shower,SYS),FF_Dict["%s_FF"%(SYS)])
                 np.save("npy_files/%s_%s_Fragmentation_Function_Errors_Unweight.npy"%(Shower,SYS),FF_Dict["%s_FF_Errors"%(SYS)])
                 np.save("npy_files/%s_%s_FF_purity_Uncertainty_Unweight.npy"%(Shower,SYS),FF_Dict["%s_purity_FF_Errors"%(SYS)])
+                np.save("npy_files/%s_%s_FF_UE_Uncertainty_Unweight.npy"%(Shower,SYS),FF_Dict["%s_UE_FF_Errors"%(SYS)])
         
     
     return FF_Dict
 
 
+def LaTeX_Results_Summary(FF_Dict):
+
+
+        print(FF_Dict["pp_UE_FF_Errors"])
+
+        print("                        LaTeX Table")
+
+        
+        pp_stat_min = np.amin(FF_Dict["pp_FF_Errors"]/FF_Dict["pp_FF"])*100
+        pp_stat_max = np.amax(FF_Dict["pp_FF_Errors"]/FF_Dict["pp_FF"])*100
+        pPb_stat_min = np.amin(FF_Dict["p-Pb_FF_Errors"]/FF_Dict["p-Pb_FF"])*100
+        pPb_stat_max = np.amax(FF_Dict["p-Pb_FF_Errors"]/FF_Dict["p-Pb_FF"])*100
+
+        pp_purity_min = np.amin(FF_Dict["pp_purity_FF_Errors"]/FF_Dict["pp_FF"])*100
+        pp_purity_max = np.amax(FF_Dict["pp_purity_FF_Errors"]/FF_Dict["pp_FF"])*100
+        pPb_purity_min = np.amin(FF_Dict["p-Pb_purity_FF_Errors"]/FF_Dict["p-Pb_FF"])*100
+        pPb_purity_max = np.amax(FF_Dict["p-Pb_purity_FF_Errors"]/FF_Dict["p-Pb_FF"])*100
+        
+        pp_ue_min = np.amin(FF_Dict["pp_UE_FF_Errors"]/FF_Dict["pp_FF"])*100
+        pp_ue_max = np.amax(FF_Dict["pp_UE_FF_Errors"]/FF_Dict["pp_FF"])*100
+        pPb_ue_min = np.amin(FF_Dict["p-Pb_UE_FF_Errors"]/FF_Dict["p-Pb_FF"])*100
+        pPb_ue_max = np.amax(FF_Dict["p-Pb_UE_FF_Errors"]/FF_Dict["p-Pb_FF"])*100
+
+        print("Source   &  pp data & p--Pb~data  \\\\")
+        print("Statistical Uncertainty & {0}\%-{1}\% & {2}\%-{3}\% \\\\".format(int(pp_stat_min+0.5),
+                            int(pp_stat_max+0.5),int(pPb_stat_min+0.5),int(pPb_stat_max+0.5)) )
+        print("\hline")
+
+        print("Purity & {0}\%-{1}\% & {2}\%-{3}\% \\\\".format(int(pp_purity_min+0.5),
+            int(pp_purity_max+0.5),int(pPb_purity_min+0.5),int(pPb_purity_max+0.5)) )
+
+        print("UE & {0}\%-{1}\% & {2}\%-{3}\% \\\\".format(int(pp_ue_min+0.5),
+            int(pp_ue_max+0.5),int(pPb_ue_min+0.5),int(pPb_ue_max+0.5)) )
+        
+        print("Tracking Efficiency &  5\% & 5\%  \\\\ ")
+    
+def LaTeX_Systematics(FF_Dict):
+
+        
+        for SYS in Systems:
+            print("%s"%(SYS))
+            print("\n")
+            stat_rel = (FF_Dict["%s_FF_Errors"%(SYS)]/FF_Dict["%s_FF"%(SYS)])*100
+            purity_rel = (FF_Dict["%s_purity_FF_Errors"%(SYS)]/FF_Dict["%s_FF"%(SYS)])*100
+            UE_rel = (FF_Dict["%s_UE_FF_Errors"%(SYS)]/FF_Dict["%s_FF"%(SYS)])*100  
+            
+            print("$\zt$ interval  & Statistics  & UE Estimate  & Purity   & Tracking Efficiency \\\\")
+            print("\hline")
+            for ipt in range(len(FF_Dict["p-Pb_FF"])):
+                for izt in range(len(FF_Dict["p-Pb_FF"][ipt])):
+                    print("{0}\% - {1}\% & {2}\% & {3}\% & {4}\% & 5\%\\\\".format(zTbins[izt], 
+                    zTbins[izt+1],int(stat_rel[ipt][izt]+0.5),int(UE_rel[ipt][izt]+0.5),int(purity_rel[ipt][izt]+0.5)))
+                    
+def LaTeX_Ratio_Systematics(FF_Dict):
+
+        
+        for SYS in Systems:
+            print("%s"%(SYS))
+            print("\n")
+            
+            
+            
+            pp_stat_rel = (FF_Dict["pp_FF_Errors"]/FF_Dict["pp_FF"])*100
+            pp_purity_rel = (FF_Dict["pp_purity_FF_Errors"]/FF_Dict["pp_FF"])*100
+            pp_UE_rel = (FF_Dict["pp_UE_FF_Errors"]/FF_Dict["pp_FF"])*100 
+            
+            pPb_stat_rel = (FF_Dict["p-Pb_FF_Errors"]/FF_Dict["p-Pb_FF"])*100
+            pPb_purity_rel = (FF_Dict["p-Pb_purity_FF_Errors"]/FF_Dict["p-Pb_FF"])*100
+            pPb_UE_rel = (FF_Dict["p-Pb_UE_FF_Errors"]/FF_Dict["p-Pb_FF"])*100
+            
+            stat_rel = np.sqrt(pp_stat_rel**2 + pPb_stat_rel**2)
+            purity_rel = np.sqrt(pp_purity_rel**2 + pPb_purity_rel**2)
+            UE_rel = np.sqrt(pp_UE_rel**2 + pPb_UE_rel**2)
+            
+            
+            print("$\zt$ interval  & Statistics  & UE Estimate  & Purity   & Tracking Efficiency \\\\")
+            print("\hline")
+            for ipt in range(len(FF_Dict["p-Pb_FF"])):
+                for izt in range(len(FF_Dict["p-Pb_FF"][ipt])):
+                    #print("{0} - {1} & {2}\% & {3}\% & {4}\% & 7\%\\\\".format(zTbins[izt], 
+                    #zTbins[izt+1],int(stat_rel[ipt][izt]+0.5),int(UE_rel[ipt][izt]+0.5),int(purity_rel[ipt][izt]+0.5)))
+                    
+                    print("%1.2f - %1.2f &"%(zTbins[izt],zTbins[izt+1])),
+                    print("{0}\% & {1}\% & {2}\% & 7\%\\\\".format(int(stat_rel[ipt][izt]+0.5),int(UE_rel[ipt][izt]+0.5),int(purity_rel[ipt][izt]+0.5)))
+    
 def Plot_FF(FF_Dict):
     
     fig = plt.figure(figsize=(17,13))

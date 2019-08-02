@@ -102,6 +102,7 @@ def Weighted_Average(FF,FF_Errors,purity_FF_Errors):
     Combined = np.zeros(len(FF[0]))
     Combined_Errors = np.zeros(len(FF_Errors[0]))
     purity_Combined_Errors = np.zeros(len(purity_FF_Errors[0]))
+    
 
     Rel_Stat_Erorr = FF_Errors/FF
     Rel_Purity_Error = purity_FF_Errors/FF
@@ -269,7 +270,7 @@ def Plot_pp_pPb_Avg_FF(Comb_Dict):
             bottom=Comb_Dict["%s_Combined_FF"%(SYS)][:NzT-ZT_OFF_PLOT]-Sys_Uncertainty[:NzT-ZT_OFF_PLOT],width=zt_box[:NzT-ZT_OFF_PLOT], align='center',color='white',edgecolor="black",label="Systematic Uncertainty")
 
     plt.yscale('log')                                                                                                                                                                                                                                                              
-    pplt.ylabel(r"$\frac{1}{N_{\mathrm{\gamma}}}\frac{\mathrm{d}N}{\mathrm{d}z_{\mathrm{T}}\mathrm{d}\Delta\phi\mathrm{d}\Delta\eta}$",fontsize=24)
+    plt.ylabel(r"$\frac{1}{N_{\mathrm{\gamma}}}\frac{\mathrm{d}N}{\mathrm{d}z_{\mathrm{T}}\mathrm{d}\Delta\phi\mathrm{d}\Delta\eta}$",fontsize=24)
     plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^\mathrm{h}/p_\mathrm{T}^\mathrm{\gamma}$",fontsize=20)
     plt.xticks(fontsize=16)
     plt.yticks(fontsize=16)
@@ -299,10 +300,6 @@ def Plot_pp_pPb_Avg_FF(Comb_Dict):
     plt.gcf()
     plt.savefig("pics/%s/Averaged_pT_FFunction_%s.pdf"%(Shower,Shower), bbox='tight')
     plt.show()
-    
-    
-    
-
     
     
     Printing = True
@@ -499,7 +496,9 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
     #plt.tight_layout()
     plt.savefig("pics/%s/%s/Final_FFunction_and_Ratio.pdf"%(Shower,description_string), bbox_inches = "tight")
     plt.show()
-        
+
+    
+    
 def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
     
     pPb_Combined = Comb_Dict["p-Pb_Combined_FF"]
@@ -645,6 +644,13 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
 
     print(Ratio_Systematic[:NzT-ZT_OFF_PLOT])
     
+    
+    print("\n                LaTeX Table:")
+    
+    print("$\zt$ range & pp & p--Pb & p--Pb/pp \\\\")
+    for izt in range (NzT):
+        print("%1.2f - %1.2f & %1.3f $\pm$ %1.3f & %1.3f $\pm$ %1.3f & %1.3f $\pm$ %1.3f \\\\"
+                      %(zTbins[izt], zTbins[izt+1], pp_Combined[izt], pp_Combined_Errors[izt], pPb_Combined[izt], pPb_Combined_Errors[izt], Ratio[izt], Ratio_Error[izt]))
 
     
 def Compare_pp_pPB_Avg_Ratio_lists(save_name,strings,string_descrp_list,colors,Show_Fits = False,Avg_Cs = False):
