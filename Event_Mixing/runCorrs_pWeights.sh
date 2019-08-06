@@ -8,7 +8,7 @@ fi
 date
 
 module load root
-module load hdf5
+#module load hdf5
 
 n_mix=300
 
@@ -20,11 +20,11 @@ do
     echo $name
 
     if [ "17q" = "$name" ]; then #account for 17q-17p mixing
-	echo "./Parallel_Mix_Correlations_pWeight ../InputData/${name}_${p}GeVTrack_paired.root ../InputData/17p_MB_${p}GeV.hdf5 0 $n_mix $p"
-	./Parallel_Mix_Correlations_pWeight ../InputData/${name}_${p}GeVTrack_paired.root ../InputData/17p_MB_${p}GeV.hdf5 0 $n_mix $p
+	echo "./Parallel_Mix_Correlations_pWeight ../InputData/${name}_${p}GeVTrack_paired.root ../InputData/17p_MB_${p}GeV.hdf5 0 $n_mix $p pp"
+	./Parallel_Mix_Correlations_pWeight ../InputData/${name}_${p}GeVTrack_paired.root ../InputData/17p_MB_${p}GeV.hdf5 0 $n_mix $p pp
     else
-	echo "./Parallel_Mix_Correlations_pWeight ../InputData/${name}_${p}GeVTrack_paired.root ../InputData/${name}_MB_${p}GeV.hdf5 0 $n_mix $p"
-	./Parallel_Mix_Correlations_pWeight ../InputData/${name}_${p}GeVTrack_paired.root ../InputData/${name}_MB_${p}GeV.hdf5 0 $n_mix $p
+	echo "./Parallel_Mix_Correlations_pWeight ../InputData/${name}_${p}GeVTrack_paired.root ../InputData/${name}_MB_${p}GeV.hdf5 0 $n_mix $p pPb"
+	./Parallel_Mix_Correlations_pWeight ../InputData/${name}_${p}GeVTrack_paired.root ../InputData/${name}_MB_${p}GeV.hdf5 0 $n_mix $p pPb
     fi
     echo "$nmix Mixed Events DATASET =  $name"
     echo

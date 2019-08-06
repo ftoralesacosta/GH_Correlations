@@ -82,7 +82,15 @@ int main(int argc, char *argv[])
   dummyv[0] = strdup("main");
 
 
-  bool Is_pp = true;
+  bool Is_pp = false;
+
+
+  std::string coll_system = argv[2];
+  if (strcmp(coll_system.c_str(), "pp") == 0)
+    Is_pp = true;
+
+  if (Is_pp)
+      fprintf(stderr,"\n PROTON PROTON SELECTED \n \n");
   
   //Config File
   FILE* config = fopen("../Corr_config.yaml", "r");
@@ -423,7 +431,10 @@ int main(int argc, char *argv[])
   float N_BKGD_Triggers = 0;
   
   TH1F* Signal_pT_Dist = new TH1F("Signal_pT_Dist","Cluster Pt Spectrum For Isolation (its_04) bins 0.55 < DNN < 0.85",(pT_max-pT_min)*2,pT_min,pT_max);
+  TH1F* Signal_pT_Dist_OnlypTWeight = new TH1F("Signal_pT_Dist_OnlypTWeight","Cluster Pt Spectrum For Isolation (its_04) bins 0.55 < DNN < 0.85",(pT_max-pT_min)*2,pT_min,pT_max);
+  
   TH1F* BKGD_pT_Dist = new TH1F("BKGD_pT_Dist","Cluster Pt Spectrum For Isolation (its_04) bins 0.0 < DNN < 0.3",(pT_max-pT_min)*2,pT_min,pT_max);
+    TH1F* BKGD_pT_Dist_OnlypTWeight = new TH1F("BKGD_pT_Dist_OnlypTWeight","Cluster Pt Spectrum For Isolation (its_04) bins 0.0 < DNN < 0.3",(pT_max-pT_min)*2,pT_min,pT_max);
   TH1F* BKGD_pT_Dist_Weighted = new TH1F("BKGD_pT_Dist_Weighted","Weighted Cluster Pt Spectrum For Isolation (its_04) bins 0.0 < DNN < 0.3",(pT_max-pT_min)*2,pT_min,pT_max);
 
   Signal_pT_Dist->Sumw2();

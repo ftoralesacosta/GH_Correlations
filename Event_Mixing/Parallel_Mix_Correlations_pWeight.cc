@@ -36,34 +36,20 @@ using namespace H5;
 
 //int main(int argc, const char rootfilename, const char hdf5filename, const char *mixing_start, const char *mixing_end)
 
-Float_t Get_Purity(Float_t pT_GeV)
+Float_t Get_Purity_ErrFunction(Float_t pT_GeV, std::string deviation,bool Is_pp=false) {
 
-{
+  Float_t purity_val = 0;                                                             
 
-  Float_t purity_val = 0;
+  //p-Pb                                                                                                                                                                                                    
+  Float_t par[3] = {0.564400011365,
+                    8.81589638183,
+                    12.5209151159};
 
-  Float_t Fit_parameters[5] = {3.22749,
-                               -0.663308,
-                               0.0503776,
-                               -0.00153968,
-                               1.65376e-5};
-
-  for (int i; i < sizeof(Fit_parameters)/sizeof(Float_t); i++){
-    //fprintf(stderr,"\n%d: Fit_parameter = %1.12f",__LINE__,Fit_parameters[i]);                                                  
-    purity_val += Fit_parameters[i] * pow(pT_GeV,i);
+  if (Is_pp){
+    par[0] = 0.507999134652;
+    par[1] = 8.33474628579;
+    par[2] = 13.3714887905;
   }
-  //fprintf(stderr,"\n\n");                                                                                                       
-  return purity_val;
-
-}
-
-Float_t Get_Purity_ErrFunction(Float_t pT_GeV, std::string deviation) {
-
-  Float_t purity_val = 0;
-
-  Float_t par[3] = {0.539705386488,
-                    8.88586771026,
-                    12.2892853578};
 
   if (strcmp(deviation.data(),"Plus")==0){
     par[0] = 0.60750016509;
@@ -80,18 +66,26 @@ Float_t Get_Purity_ErrFunction(Float_t pT_GeV, std::string deviation) {
 
   purity_val = par[0]*TMath::Erf((pT_GeV-par[1])/par[2]);
   return purity_val;
-
 }
 
 
-
-int main(int argc, char *argv[])
+int main(int argc ,char *argv[])
 {
-  if (argc < 6) {
-    fprintf(stderr,"\n Batch Syntax is [Gamma-Triggered Paired Root], [Min-Bias HDF5] [Mix Start] [Mix End] [Track Skim GeV] \n");
+  if (argc < 7) {
+    fprintf(stderr,"\n Batch Syntax is [Gamma-Triggered Paired Root], [Min-Bias HDF5] [Mix Start] [Mix End] [Track Skim GeV] [pp or p-Pb]\n");
     exit(EXIT_FAILURE);
   }
 
+
+  bool Is_pp = false;
+
+  
+  std::string coll_system = argv[6];
+  if (strcmp(coll_system.c_str(), "pp") == 0)
+    Is_pp = true;
+    
+  if (Is_pp)
+      fprintf(stderr,"\n PROTON PROTON SELECTED \n \n");
 
   int dummyc = 1;
   char **dummyv = new char *[1];
@@ -707,7 +701,7 @@ int main(int argc, char *argv[])
 
 	Float_t BR_purity_weight;
 	if (Background and Isolated){
-	  BR_purity_weight = (1.0/Get_Purity_ErrFunction(cluster_pt[n],purity_deviation) - 1);
+	  BR_purity_weight = (1.0/Get_Purity_ErrFunction(cluster_pt[n],purity_deviation,Is_pp) - 1);
 	  for (int ipt = 0; ipt < nptbins; ipt++){
             if (cluster_pt[n] >= ptbins[ipt] && cluster_pt[n] < ptbins[ipt+1]){
 	      BR_purity_weight_sum[ipt] += BR_purity_weight;
@@ -717,7 +711,7 @@ int main(int argc, char *argv[])
 
 	Float_t purity_weight;
 	if (Signal and Isolated){
-          purity_weight = 1.0/Get_Purity_ErrFunction(cluster_pt[n],purity_deviation);
+          purity_weight = 1.0/Get_Purity_ErrFunction(cluster_pt[n],purity_deviation,Is_pp);
           for (int ipt = 0; ipt < nptbins; ipt++){
             if (cluster_pt[n] >= ptbins[ipt] && cluster_pt[n] < ptbins[ipt+1]){
 	      purity_weight_sum[ipt] += purity_weight;

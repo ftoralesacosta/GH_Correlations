@@ -8,7 +8,7 @@ EMax_EClus_max:               0.7
 EMax_EClus_min:               0.6
 Eta_max:                      0.67
 Cluster_min:                  2
-Cluster_dist_to_bad_channel:  2
+Cluster_dist_to_bad_channel:  1
 Cluster_N_Local_Maxima:       3.0
 EcrossoverE_min:              0.05
 iso_max:                      1.5
