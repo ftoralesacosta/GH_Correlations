@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 from ROOT import TGraphErrors
 import scipy
-import iminuit
+#import iminuit
 from matplotlib import rcParams
 rcParams.update({'figure.autolayout': True})
 

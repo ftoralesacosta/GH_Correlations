@@ -115,9 +115,11 @@ Shower = "LO"
 
 
 #default_string = "zT_Rebin_8_006zT06zTOldBinNewNewPurity8dPhi"
-default_string = "zT_Rebin_8_006zT06zT"
-description_string = default_string
 
+default_string = "zT_Rebin_8_006zT06zT"
+#description_string = default_string
+
+description_string = "zT_Rebin_8_006zT06zTDist1"
 #description_string = "zT_Rebin_7_006zT06zT"
 #description_string = "zT_Rebin_9_006zT06zT"
 #description_string = "pT_Rebin_2_006zT06zTOldBinNewNewPurity"
