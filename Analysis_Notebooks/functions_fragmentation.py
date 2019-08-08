@@ -482,10 +482,10 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
     
     plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^{\mathrm{h}}/p_\mathrm{T}^\gamma$",fontsize=20)
     plt.ylabel(r"$\frac{\mathrm{p-Pb}}{\mathrm{pp}}$",fontsize=24)
-    #plt.ylim((-0.5, 2.5))
+    plt.ylim((-0.0, 2.7))
     plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^\mathrm{h}/p_\mathrm{T}^\mathrm{\gamma}$",fontsize=20)
     plt.xticks(fontsize=16)
-    plt.yticks([0.5,1.0,1.5,2.0,2.5],fontsize=16)
+    plt.yticks([0,0,0.5,1.0,1.5,2.0,2.5],fontsize=16)
     plt.xlim(0,0.65)
 
     #model_p-Pb = Fit_FF_PowerLaw(Comb_Dict,"p-Pb")
