@@ -388,7 +388,7 @@ int main(int argc, char *argv[])
     float OneMinFakeRate[15] = {0.9821,0.9821,0.9803,0.9751,0.9645,0.9525,0.9278,0.9098,0.8702,0.8593,0.7870,0.7825,0.7624,0.7389,0.6710};
     const float Efficiency = 0.85;
 
-    std::array< float,29 > track_pT_Correction = {0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95,1.0,1.1,1.2,1.4,1.6,1.8,2.0,2.2,2.4,2.6,2.8,3.0,3.2,3.6,4.0,5.0,6.0,8.0,10.0};
+    std::array< float,30 > track_pT_Correction = {0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95,1.0,1.1,1.2,1.4,1.6,1.8,2.0,2.2,2.4,2.6,2.8,3.0,3.2,3.6,4.0,5.0,6.0,8.0,10.0,13.0};
 
     
 
@@ -882,8 +882,8 @@ int main(int argc, char *argv[])
 
 	  if (Is_pp){
 	    track_weight = 1.0;
-	    for (int ipt = 0; ipt < track_pT_Correction.size(); ipt++){
-	      if( (track_pt[itrack] >= track_pT_Correction[ipt]) && (track_pt[itrack] < track_pT_Correction[ipt])){
+	    for (int ipt = 0; ipt < track_pT_Correction.size()-1; ipt++){
+	      if( (track_pt[itrack] >= track_pT_Correction[ipt]) && (track_pt[itrack] < track_pT_Correction[ipt+1])){
 		track_weight = pp_OneMinFakeRate[ipt]/pp_Efficiency[ipt];
 	      }
 	    }
