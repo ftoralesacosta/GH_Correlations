@@ -228,10 +228,10 @@ def Plot_UB():
 
                 #sig
                 ax.plot(delta_phi_centers,Sig_Phi_Array,'bo',ms=10)
-                s_plot = ax.errorbar(delta_phi_centers,Sig_Phi_Array,xerr=phi_width,yerr=Sig_Phi_Error_Array,fmt=None,ecolor='b',label='Signal Region (stat. error)')
+                s_plot = ax.errorbar(delta_phi_centers,Sig_Phi_Array,xerr=phi_width,yerr=Sig_Phi_Error_Array,fmt='',ecolor='b',linestyle='None',label='Signal Region (stat. error)')
 
                 ax.plot(delta_phi_centers,Sig_LE_Phi_Array,'s',color="Grey",alpha=0.6,ms=10)
-                s_le_plot = ax.errorbar(delta_phi_centers,Sig_LE_Phi_Array,xerr=phi_width,yerr=Sig_LE_Error_Array,fmt=None,ecolor='Grey',alpha=0.8,label="0.8 <|$\Delta\eta$| < %1.1f"%(eta_max))
+                s_le_plot = ax.errorbar(delta_phi_centers,Sig_LE_Phi_Array,xerr=phi_width,yerr=Sig_LE_Error_Array,fmt='None',ecolor='Grey',alpha=0.8,linestyle='None',label="0.8 <|$\Delta\eta$| < %1.1f"%(eta_max))
 
                 
                 if (izt>3):

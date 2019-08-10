@@ -37,20 +37,19 @@ Float_t Get_Purity_ErrFunction(Float_t pT_GeV, std::string deviation,bool Is_pp=
    //                   11.8085154181};
 
   //pp
-  // Float_t par[3] = {0.507999134652,
-  // 		    8.33474628579,
-  // 		    13.3714887905};
-  
+  // Float_t par[3] = { 0.500229283252 ,
+  // 		     9.01692090267 ,
+  // 		     11.3732998386 }
   
   //p-Pb
-  Float_t par[3] = {0.564400011365,
-		    8.81589638183,
-		    12.5209151159};
+  Float_t par[3] = {0.549684905516,
+		     8.44338685256,
+		    13.3454091464};
 		    
   if (Is_pp){
-    par[0] = 0.507999134652;
-    par[1] = 8.33474628579;
-    par[2] = 13.3714887905;
+	     par[0] = 0.500229283252;
+	     par[1] = 9.016920902665;
+	     par[2] = 11.373299838596;
   }
 
   if (strcmp(deviation.data(),"Plus")==0){
@@ -82,7 +81,15 @@ int main(int argc, char *argv[])
   dummyv[0] = strdup("main");
 
 
-  bool Is_pp = true;
+  bool Is_pp = false;
+
+
+  std::string coll_system = argv[2];
+  if (strcmp(coll_system.c_str(), "pp") == 0)
+    Is_pp = true;
+
+  if (Is_pp)
+      fprintf(stderr,"\n PROTON PROTON SELECTED \n \n");
   
   //Config File
   FILE* config = fopen("../Corr_config.yaml", "r");
@@ -330,56 +337,64 @@ int main(int argc, char *argv[])
   //Purity Handling
 
   //Following purities for pT range: 12.5,13.2,14.4,15.8
-  int  N_pT_Ranges = 9;
-  float pT_Ranges[9] = {12,13.46,15.09,16.92,18.97,21.28,23.86,30,40};
-  float purities[8] = {0};
-  float purity_Uncertainties[8] = {0};
+  int  N_pT_Ranges = 5;
+  float pT_Ranges[5] = {12.0,15.0,20.0,25.0,40.0};
+  float purities[4] = {0};
+  float purity_Uncertainties[4] = {0};
   float Cluster_Purity = 0;
   float Cluster_Purity_Uncertainty = 0;
 
-  if (strcmp(shower_shape.data(), "DNN") == 0){
-    purities[0] = 0.207;
-    purities[1] = 0.255;
-    purities[2] = 0.326; 
-    purities[3] = 0.372;
-    purities[4] = 0.447;
-    purities[5] = 0.502;
-    purities[6] = 0.533; //Extrapolating last bin
-    purities[7] = 0.533;
+  // if (strcmp(shower_shape.data(), "DNN") == 0){
+  //   purities[0] = 0.207;
+  //   purities[1] = 0.255;
+  //   purities[2] = 0.326; 
+  //   purities[3] = 0.372;
+  //   purities[4] = 0.447;
+  //   purities[5] = 0.502;
+  //   purities[6] = 0.533; //Extrapolating last bin
+  //   purities[7] = 0.533;
 
 
-    purity_Uncertainties[0] = 0.030;
-    purity_Uncertainties[1] = 0.037;
-    purity_Uncertainties[2] = 0.042;
-    purity_Uncertainties[3] = 0.050;
-    purity_Uncertainties[4] = 0.056;
-    purity_Uncertainties[5] = 0.062;
-    purity_Uncertainties[6] = 0.058;
-    purity_Uncertainties[7] = 0.058;
+  //   purity_Uncertainties[0] = 0.030;
+  //   purity_Uncertainties[1] = 0.037;
+  //   purity_Uncertainties[2] = 0.042;
+  //   purity_Uncertainties[3] = 0.050;
+  //   purity_Uncertainties[4] = 0.056;
+  //   purity_Uncertainties[5] = 0.062;
+  //   purity_Uncertainties[6] = 0.058;
+  //   purity_Uncertainties[7] = 0.058;
 
+  // }
+
+  if (strcmp(shower_shape.data(), "Lambda") == 0){
+    purities[0] = 0.206;
+    purities[1] = 0.341;
+    purities[2] = 0.471;
+    purities[3] = 0.546;
+
+    purity_Uncertainties[0]= 0.0301;
+    purity_Uncertainties[1]= 0.0305;
+    purity_Uncertainties[2]= 0.0503;
+    purity_Uncertainties[3]= 0.0572;
+
+    if (Is_pp){
+
+      purities[0] = 0.198;
+      purities[1] = 0.318;
+      purities[2] = 0.470;
+      purities[3] = 0.487;
+      
+      purity_Uncertainties[0]= 0.0490;
+      purity_Uncertainties[1]= 0.0400;
+      purity_Uncertainties[2]= 0.0712;
+      purity_Uncertainties[3]= 0.1221;
+      
+
+    }
   }
 
-  else if (strcmp(shower_shape.data(), "Lambda") == 0){
-    purities[0] = 0.207;
-    purities[1] = 0.210;
-    purities[2] = 0.328;
-    purities[3] = 0.367;
-    purities[4] = 0.447;
-    purities[5] = 0.524;
-    purities[6] = 0.509; //Extrapolating last bin
-    purities[7] = 0.509;
-
-    purity_Uncertainties[0]= 0.034;
-    purity_Uncertainties[1]= 0.044;
-    purity_Uncertainties[2]= 0.047;
-    purity_Uncertainties[3]= 0.049;
-    purity_Uncertainties[4]= 0.050;
-    purity_Uncertainties[5]= 0.048;
-    purity_Uncertainties[6]= 0.048;
-    purity_Uncertainties[7]= 0.048;
-
-  }
-
+<<<<<<< HEAD
+=======
   //Track Corrections (Calculated in 1GeV pT bins, used as weights when filling)
 
 
@@ -389,13 +404,24 @@ int main(int argc, char *argv[])
     const float Efficiency = 0.85;
 
     std::array< float,30 > track_pT_Correction = {0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95,1.0,1.1,1.2,1.4,1.6,1.8,2.0,2.2,2.4,2.6,2.8,3.0,3.2,3.6,4.0,5.0,6.0,8.0,10.0,13.0};
+>>>>>>> 5437d17d4038f9e6ccce87e6f8f7e654343be26b
 
+    // float OneMinFakeRate[15] = {0.9821,0.9821,0.9803,0.9751,0.9645,0.9525,0.9278,0.9098,0.8702,0.8593,0.7870,0.7825,0.7624,0.7389,0.6710};
+    // const float Efficiency = 0.85;
+  
+    //Track pT Bins Used for Corrections
+  std::array< float,30 > track_pT_Correction = {0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95,1.0,1.1,1.2,1.4,1.6,1.8,2.0,2.2,2.4,2.6,2.8,3.0,3.2,3.6,4.0,5.0,6.0,8.0,10.0,13};
+  int N_Track_pT_Bins = track_pT_Correction.size()-1;
+  fprintf(stderr,"NUMBER OF TRACK PT BINS IS %i \n \n",N_Track_pT_Bins);
     
+    //p-Pb
+    float Efficiency[29] =  {0.853948, 0.855174, 0.857245, 0.858315, 0.858334, 0.859078, 0.860819, 0.860223, 0.860368, 0.860849, 0.862532, 0.864867, 0.867081, 0.869168, 0.869016, 0.872149, 0.872669, 0.874919, 0.876616, 0.876491, 0.87365, 0.877567, 0.8777, 0.882617, 0.88169, 0.881348, 0.880515, 0.87605, 0.882653};
+    float FakeRate[29] = {0.0184162, 0.0180536, 0.0175808, 0.0177315, 0.017413, 0.0172551, 0.0175637, 0.017715, 0.0172888, 0.0178326, 0.0178794, 0.0179673, 0.0177509, 0.0182945, 0.0181996, 0.0188647, 0.0190429, 0.0202744, 0.0209381, 0.0213728, 0.0237848, 0.0251898, 0.0297774, 0.0350703, 0.0518793, 0.0804111, 0.137953, 0.214123, 0.301459};
+    float Smearing_Correction[15] = {1.007,1.007,0.982,0.957,0.926,0.894,0.853,0.817,0.757,0.681,0.673,0.619,0.469,0.342,0.301};     
 
+    //pp
     float pp_Smearing_Correction[15] = {1.007,1.007,0.982,0.957,0.926,0.894,0.853,0.817,0.757,0.681,0.673,0.619,0.469,0.342,0.301};
-
-    float pp_OneMinFakeRate[29] = {0.9737612009048,0.9749753549695,0.9754202682525,0.975762359798,0.9759317822754,0.9767189510167,0.9753045085818,0.9764504712075,0.9769982919097,0.9763431865722,0.9770880416036,0.9762864634395,0.9770187474787,0.9776180610061,0.9776007458568,0.9761409461498,0.9747156649828,0.9746008384973,0.974934509024,0.9745328258723,0.9728898499161,0.9727150741965,0.9766475800425,0.9678863361478,0.959691952914,0.9388913139701,0.9269436970353,0.86553029716,0.851132690907};
-
+    float pp_FakeRate[29] = {0.0250246, 0.0245797, 0.0242376, 0.0240682, 0.023281, 0.0246955, 0.0235495, 0.0230017, 0.0236568, 0.022912, 0.0237135, 0.0229813, 0.0223819, 0.0223993, 0.0238591, 0.0252843, 0.0253992, 0.0250655, 0.0254672, 0.0271102, 0.0272849, 0.0233524, 0.0321137, 0.040308, 0.0611087, 0.0730563, 0.13447, 0.148867, 0.292818};
     float pp_Efficiency[29] = {0.833835601807,0.836869120598,0.839235246181,0.841083467007,0.843128025532,0.84164339304,0.844368815422,0.843157708645,0.842828392982,0.844945728779,0.846174120903,0.849676072598,0.85161960125,0.851656377316,0.855973064899,0.859771847725,0.856857895851,0.856580495834,0.866534769535,0.862415850163,0.864510595798,0.863728642464,0.871034324169,0.870704054832,0.872091054916,0.867180407047,0.848246216774,0.860869586468,0.887700557709};
     
 
@@ -423,7 +449,10 @@ int main(int argc, char *argv[])
   float N_BKGD_Triggers = 0;
   
   TH1F* Signal_pT_Dist = new TH1F("Signal_pT_Dist","Cluster Pt Spectrum For Isolation (its_04) bins 0.55 < DNN < 0.85",(pT_max-pT_min)*2,pT_min,pT_max);
+  TH1F* Signal_pT_Dist_OnlypTWeight = new TH1F("Signal_pT_Dist_OnlypTWeight","Cluster Pt Spectrum For Isolation (its_04) bins 0.55 < DNN < 0.85",(pT_max-pT_min)*2,pT_min,pT_max);
+  
   TH1F* BKGD_pT_Dist = new TH1F("BKGD_pT_Dist","Cluster Pt Spectrum For Isolation (its_04) bins 0.0 < DNN < 0.3",(pT_max-pT_min)*2,pT_min,pT_max);
+    TH1F* BKGD_pT_Dist_OnlypTWeight = new TH1F("BKGD_pT_Dist_OnlypTWeight","Cluster Pt Spectrum For Isolation (its_04) bins 0.0 < DNN < 0.3",(pT_max-pT_min)*2,pT_min,pT_max);
   TH1F* BKGD_pT_Dist_Weighted = new TH1F("BKGD_pT_Dist_Weighted","Weighted Cluster Pt Spectrum For Isolation (its_04) bins 0.0 < DNN < 0.3",(pT_max-pT_min)*2,pT_min,pT_max);
 
   Signal_pT_Dist->Sumw2();
@@ -873,18 +902,34 @@ int main(int argc, char *argv[])
 
 	  //Apply corrections as weights. 1/Eff, *FakeRate, *SmearingAffect
 
-	    for (int ipt = 0; ipt < 15; ipt++){
-	      if ( (track_pt[itrack] >= ipt) && (track_pt[itrack] < (ipt+1)) ) {
-		track_weight = Smearing_Correction[ipt]*OneMinFakeRate[ipt]/Efficiency;
+	    for (int ipt = 0; ipt < N_Track_pT_Bins; ipt++){
+	      if( (track_pt[itrack] >= track_pT_Correction[ipt]) && (track_pt[itrack] < track_pT_Correction[ipt+1])){
+		track_weight = (1.0-FakeRate[ipt])/Efficiency[ipt];
 	      }
 	    }
+	    
+	  //Smearing used has different binning, will update
+	  for (int ipt = 0; ipt < 15; ipt++){
+	    if ( (track_pt[itrack] >= ipt) && (track_pt[itrack] < (ipt+1)) ) {
+	      track_weight = Smearing_Correction[ipt]*track_weight;
+	    }
+	  }
 
 
+	    
+	  //Different Correction for pp, make sure to reset track weight
 	  if (Is_pp){
+	    
 	    track_weight = 1.0;
+<<<<<<< HEAD
+	    for (int ipt = 0; ipt < N_Track_pT_Bins; ipt++){
+	      if( (track_pt[itrack] >= track_pT_Correction[ipt]) && (track_pt[itrack] < track_pT_Correction[ipt+1])){
+		track_weight = (1.0-pp_FakeRate[ipt])/pp_Efficiency[ipt];
+=======
 	    for (int ipt = 0; ipt < track_pT_Correction.size()-1; ipt++){
 	      if( (track_pt[itrack] >= track_pT_Correction[ipt]) && (track_pt[itrack] < track_pT_Correction[ipt+1])){
 		track_weight = pp_OneMinFakeRate[ipt]/pp_Efficiency[ipt];
+>>>>>>> 5437d17d4038f9e6ccce87e6f8f7e654343be26b
 	      }
 	    }
             for (int ipt = 0; ipt < 15; ipt++){
@@ -893,6 +938,8 @@ int main(int argc, char *argv[])
               }
             }
 	  }
+
+	  //fprintf(stderr,"\n Track weight = %f\n",track_weight);
 	  
 	  //Observables:
 	  Double_t zt = track_pt[itrack]/cluster_pt[n];
