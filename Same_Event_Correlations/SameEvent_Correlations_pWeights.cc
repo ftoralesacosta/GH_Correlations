@@ -393,6 +393,18 @@ int main(int argc, char *argv[])
     }
   }
 
+<<<<<<< HEAD
+=======
+  //Track Corrections (Calculated in 1GeV pT bins, used as weights when filling)
+
+
+    
+    float Smearing_Correction[15] = {1.007,1.007,0.982,0.957,0.926,0.894,0.853,0.817,0.757,0.681,0.673,0.619,0.469,0.342,0.301};
+    float OneMinFakeRate[15] = {0.9821,0.9821,0.9803,0.9751,0.9645,0.9525,0.9278,0.9098,0.8702,0.8593,0.7870,0.7825,0.7624,0.7389,0.6710};
+    const float Efficiency = 0.85;
+
+    std::array< float,30 > track_pT_Correction = {0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95,1.0,1.1,1.2,1.4,1.6,1.8,2.0,2.2,2.4,2.6,2.8,3.0,3.2,3.6,4.0,5.0,6.0,8.0,10.0,13.0};
+>>>>>>> 5437d17d4038f9e6ccce87e6f8f7e654343be26b
 
     // float OneMinFakeRate[15] = {0.9821,0.9821,0.9803,0.9751,0.9645,0.9525,0.9278,0.9098,0.8702,0.8593,0.7870,0.7825,0.7624,0.7389,0.6710};
     // const float Efficiency = 0.85;
@@ -909,9 +921,15 @@ int main(int argc, char *argv[])
 	  if (Is_pp){
 	    
 	    track_weight = 1.0;
+<<<<<<< HEAD
 	    for (int ipt = 0; ipt < N_Track_pT_Bins; ipt++){
 	      if( (track_pt[itrack] >= track_pT_Correction[ipt]) && (track_pt[itrack] < track_pT_Correction[ipt+1])){
 		track_weight = (1.0-pp_FakeRate[ipt])/pp_Efficiency[ipt];
+=======
+	    for (int ipt = 0; ipt < track_pT_Correction.size()-1; ipt++){
+	      if( (track_pt[itrack] >= track_pT_Correction[ipt]) && (track_pt[itrack] < track_pT_Correction[ipt+1])){
+		track_weight = pp_OneMinFakeRate[ipt]/pp_Efficiency[ipt];
+>>>>>>> 5437d17d4038f9e6ccce87e6f8f7e654343be26b
 	      }
 	    }
             for (int ipt = 0; ipt < 15; ipt++){

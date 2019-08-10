@@ -115,6 +115,7 @@ Shower = "LO"
 
 
 #default_string = "zT_Rebin_8_006zT06zTOldBinNewNewPurity8dPhi"
+<<<<<<< HEAD
 
 default_string = "zT_Rebin_8_006zT06zT"
 #description_string = default_string
@@ -122,6 +123,14 @@ default_string = "zT_Rebin_8_006zT06zT"
 #description_string = "zT_Rebin_8_006zT06zTDist1"
 #description_string = "zT_Rebin_8_006zT06zTDist1Better"
 description_string = "zT_Rebin_8_006zT06zTDist1Better8dPhi"
+=======
+default_string = "zT_Rebin_8_006zT06zT"
+description_string = default_string
+
+#description_string = "zT_Rebin_8_006zT06zTpPb"
+#description_string = "zT_Rebin_8_006zT06zTPbp"
+
+>>>>>>> 5437d17d4038f9e6ccce87e6f8f7e654343be26b
 #description_string = "zT_Rebin_7_006zT06zT"
 #description_string = "zT_Rebin_9_006zT06zT"
 #description_string = "pT_Rebin_2_006zT06zTOldBinNewNewPurity"
