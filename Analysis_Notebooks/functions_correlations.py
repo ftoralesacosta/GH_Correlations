@@ -848,8 +848,8 @@ def ProcessData(input_x, input_y, input_yerr,UE_binmin=2, UE_binmax=9,label='dat
     dphi = x[1]-x[0]
     xerr = np.multiply(np.ones(len(x)),dphi/2.0)
     
-    #y = np.divide(input_y, dphi)
-    #yerr = np.divide(input_yerr,dphi)
+    #y = np.divide(input_y, 2*dphi)
+    #yerr = np.divide(input_yerr,2*dphi)
     
     y = np.divide(input_y, 1.0)
     yerr = np.divide(input_yerr,1.0)
@@ -867,12 +867,13 @@ def ProcessData(input_x, input_y, input_yerr,UE_binmin=2, UE_binmax=9,label='dat
         print 'UE_error= {:2.3f} per unit dphi'.format(UE_error)
     
     
-    plt.fill_between(x[UE_binmin:UE_binmax], UE_rate - UE_error, UE_rate+UE_error, alpha=.5,color='grey')
+    ue_band_x = [x[UE_binmin]-dphi/2,x[UE_binmax]+dphi/2]
+    plt.fill_between(ue_band_x, UE_rate - UE_error, UE_rate+UE_error, alpha=.5,color='grey')
     y_sub = np.subtract(y,UE_rate)
     plt.errorbar(x,y_sub,yerr=yerr,xerr=xerr,label=label+" after subtraction",alpha=0.9,color=color,marker='o', linestyle = 'None')
     
-    ue_band_x = [x[UE_binmin]-dphi/2,x[UE_binmax]+dphi/2]
-    plt.fill_between(x[UE_binmin:UE_binmax], 0.0- UE_error, 0.0+UE_error, alpha=.5,color='grey')
+   
+    plt.fill_between(ue_band_x, 0.0- UE_error, 0.0+UE_error, alpha=.5,color='grey')
       
     plt.ylabel('Rate per dphixdeta',fontsize=16)
     plt.xlabel('dphi (rad)',fontsize=16)
@@ -883,7 +884,7 @@ def ProcessData(input_x, input_y, input_yerr,UE_binmin=2, UE_binmax=9,label='dat
     binmax = 4
     
     if (N_dPhi_Bins == 8):
-        binmax = 2
+        binmax = 1
     
     
     #for i in range(1,binmax+1):

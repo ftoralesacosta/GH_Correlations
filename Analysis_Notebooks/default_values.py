@@ -15,7 +15,7 @@ Use_P_Weights = True
 CorrectedP = True  # FALSE FOR HARDPROBES
 Use_MC = False
 pT_Rebin = False
-N_dPhi_Bins = 16
+N_dPhi_Bins = 8
 Ped_Sub_First = False #Important after weight implementation
 Average_UE = False
 Show_Fits = True
@@ -136,14 +136,6 @@ pp_File = '../InputData/%s/pp_SE_L0_Correlation_GMB_Ratio.root'%(description_str
 print pp_File
 Systems = ["pp","p-Pb"]
 Files = [pp_File,pPb_File]
-
-purity = np.asarray([0.208095, 0.339478, 0.483944, 0.509])
-purity_Uncertainty = np.asarray([0.0376517,0.0476880,0.0489686,0.0480000])
-
-#print("purities:")
-#print(purity)
-#print(purity_Uncertainty)
-
 
 
         # RANGE & BINNING:
@@ -286,26 +278,33 @@ for i,dphi in enumerate(dPhi_Bins):
         
     
 def Get_Purity(filename):
-    file = ROOT.TFile(filename)
-    purities = np.zeros(N_pT_Bins)
-    p_uncertainties = np.zeros(N_pT_Bins)
+
+    p_uncertainties = []
+    for iter_file in Files:
+        file = ROOT.TFile(iter_file)
+        purities = np.zeros(N_pT_Bins)
+        p_uncertainties_pTs = np.zeros(N_pT_Bins)
     
-    for ipt in range(N_pT_Bins):
-        purity_histo = file.Get('H_Purities_pT%1.0f_%1.0f' %(pTbins[ipt],pTbins[ipt+1]))
+        for ipt in range(N_pT_Bins):
+            purity_histo = file.Get('H_Purities_pT%1.0f_%1.0f' %(pTbins[ipt],pTbins[ipt+1]))
         #print('H_Purities_pT%1.0f_%1.0f' %(pTbins[ipt],pTbins[ipt+1]))
-        purity_uncertainty_histo = file.Get('H_Purity_Uncertanty_pT%1.0f_%1.0f' %(pTbins[ipt],pTbins[ipt+1]))
-        purities[ipt] = purity_histo.GetMean()
-        p_uncertainties[ipt] = purity_uncertainty_histo.GetMean()
-    
+            purity_uncertainty_histo = file.Get('H_Purity_Uncertanty_pT%1.0f_%1.0f' %(pTbins[ipt],pTbins[ipt+1]))
+            purities[ipt] = purity_histo.GetMean()
+            p_uncertainties_pTs[ipt] = purity_uncertainty_histo.GetMean()
+        
+            p_uncertainties.append(p_uncertainties_pTs) #np array of pt bin purity for each system
     return purities, p_uncertainties
 
-if not(description_string == "05zT_working_old"):
-    purity,purity_Uncertainty = Get_Purity(Files[1])
+
+purity,purity_Uncertainty = Get_Purity(Files)
+purity,p_uncert = Get_Purity(Files)
+purity_Uncertainty = Dict(zip(Systems,p_uncert);
+
 #print(purity)
     
 #print("purities:")
 #print(purity)
-#print(purity_Uncertainty)
+print(purity_Uncertainty)
     
 zT_widths = [(j-i)/2 for i, j in zip(zTbins[zT_offset:-1], zTbins[zT_offset+1:])]
 zT_widths = np.asarray(zT_widths)

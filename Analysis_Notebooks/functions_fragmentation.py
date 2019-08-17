@@ -719,7 +719,7 @@ def Compare_pp_pPB_Avg_Ratio_lists(save_name,strings,string_descrp_list,colors,S
     
 def Compare_pp_pPB_Avg_lists(save_name,strings,string_descrp_list,colors):
         
-    plt.figure(figsize=(8,8)) 
+    plt.figure(figsize=(8,7)) 
     shapes = ["o","x","s"]
     
     for (string,string_descr,colr) in zip(strings,string_descrp_list,colors):
@@ -734,20 +734,32 @@ def Compare_pp_pPB_Avg_lists(save_name,strings,string_descrp_list,colors):
             zT_centers = (Zbins[1:] + Zbins[:-1]) / 2
             zT_widths = [(j-i)/2 for i, j in zip(Zbins[:-1], Zbins[1:])]
         
+            if ((string != default_string) and SYS=="pp"):
+                continue
+                
+            if((string == default_string) and SYS=="p-Pb"):
+                continue
+        
             plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT]+0.2, FF[:NzT-ZT_OFF_PLOT],xerr=zT_widths[:NzT-ZT_OFF_PLOT],
-                yerr=FF_Errors[:NzT-ZT_OFF_PLOT],linewidth=1, fmt=shape,color=colr,capsize=1,label="%s (%s)"%(string_descr,SYS))
+                yerr=FF_Errors[:NzT-ZT_OFF_PLOT],linewidth=1, fmt=shape,color=colr,capsize=1,label="%s"%(string_descr))
+        
+            #plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT]+0.2, FF[:NzT-ZT_OFF_PLOT],xerr=zT_widths[:NzT-ZT_OFF_PLOT],
+            #    yerr=FF_Errors[:NzT-ZT_OFF_PLOT],linewidth=1, fmt=shape,color=colr,capsize=1,label="%s (%s)"%(string_descr,SYS))
 
             plt.yscale('log')                                                                                                                                                                                                                                                              
-            plt.ylabel(r"$\frac{1}{N_{\mathrm{\gamma}}}\frac{\mathrm{d}N}{\mathrm{d}z_{\mathrm{T}} \mathrm{d}\Delta\eta}$",fontsize=20)
             plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^\mathrm{h}/p_\mathrm{T}^\mathrm{\gamma}$",fontsize=20)
-            #plt.xlim(xmin = 0.1,xmax=0.7)
-            plt.ylim(ymin = 0.01,ymax=20)
+            plt.yscale('log')                             
+            plt.ylabel(r"$\frac{1}{N_{\mathrm{\gamma}}}\frac{\mathrm{d}N}{\mathrm{d}z_{\mathrm{T}}\mathrm{d}\Delta\phi\mathrm{d}\Delta\eta}$",fontsize=24)
+            plt.ylim(0.037,25)
+            plt.yticks(fontsize=16)
+            plt.xticks(fontsize=16)
+            #plt.xlim(0,0.65)
             
     leg = plt.legend(numpoints=1,frameon=False)
     leg.set_title("ALICE Work in Progress\n  $\sqrt{s_{\mathrm{_{NN}}}} = $ 5 TeV")
     plt.setp(leg.get_title(),fontsize=18)
 
-    plt.title(r'Integrated $\mathrm{\gamma}$-Hadron Correlation: $2\pi/3 < \Delta\varphi < \pi, |\Delta\eta| < %1.1f$ '%(eta_max),fontdict = {'fontsize' : 19})
+    plt.title(r'Integrated $\mathrm{\gamma}$-Hadron Correlation: $%s < \Delta\varphi < \pi$ '%(Phi_String),fontdict = {'fontsize' : 19})
     plt.gcf()
     plt.savefig('pics/%s/%s/FF_Averages_%s.pdf'%(Shower,default_string,save_name),bbox_inches='tight')
     plt.show()
