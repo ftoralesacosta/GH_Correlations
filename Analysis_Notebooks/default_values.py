@@ -295,10 +295,8 @@ def Get_Purity(filename):
             p_uncertainties.append(p_uncertainties_pTs) #np array of pt bin purity for each system
     return purities, p_uncertainties
 
-
-purity,purity_Uncertainty = Get_Purity(Files)
 purity,p_uncert = Get_Purity(Files)
-purity_Uncertainty = Dict(zip(Systems,p_uncert);
+purity_Uncertainty = Dict(zip(Systems,p_uncert))
 
 #print(purity)
     
