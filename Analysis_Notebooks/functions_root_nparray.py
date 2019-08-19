@@ -204,6 +204,7 @@ def Plot_UB():
                 #print(Sig_Z_Value/phi_width)
                 #print(Sig_Z_Error/phi_width)
 
+
                 print("%1.2f - %1.2f & %1.3f $\pm$ %1.3f & %1.3f $\pm$ %1.3f & %1.3f $\pm$ %1.3f\\\\"
                       %(zTbins[izt],zTbins[izt+1],Sig_Z_Value,Sig_Z_Error,S_LE,S_LE_Error,abs(Sig_Z_Value-S_LE), math.sqrt(Sig_Z_Error**2 + S_LE_Error**2) ))
 

@@ -280,30 +280,31 @@ for i,dphi in enumerate(dPhi_Bins):
 def Get_Purity(filename):
 
     p_uncertainties = []
+    purities = []
     for iter_file in Files:
         file = ROOT.TFile(iter_file)
-        purities = np.zeros(N_pT_Bins)
+        purities_pTs = np.zeros(N_pT_Bins)
         p_uncertainties_pTs = np.zeros(N_pT_Bins)
     
         for ipt in range(N_pT_Bins):
             purity_histo = file.Get('H_Purities_pT%1.0f_%1.0f' %(pTbins[ipt],pTbins[ipt+1]))
-        #print('H_Purities_pT%1.0f_%1.0f' %(pTbins[ipt],pTbins[ipt+1]))
+            purities_pTs[ipt] = purity_histo.GetMean()
+            
             purity_uncertainty_histo = file.Get('H_Purity_Uncertanty_pT%1.0f_%1.0f' %(pTbins[ipt],pTbins[ipt+1]))
-            purities[ipt] = purity_histo.GetMean()
             p_uncertainties_pTs[ipt] = purity_uncertainty_histo.GetMean()
         
+            purities.append(purities_pTs)
             p_uncertainties.append(p_uncertainties_pTs) #np array of pt bin purity for each system
+
     return purities, p_uncertainties
 
-purity,p_uncert = Get_Purity(Files)
-purity_Uncertainty = Dict(zip(Systems,p_uncert))
+p,p_uncert = Get_Purity(Files)
+purity = dict(zip(Systems,p))
+purity_Uncertainty = dict(zip(Systems,p_uncert))
 
-#print(purity)
-    
-#print("purities:")
-#print(purity)
-print(purity_Uncertainty)
-    
+print(purity.keys())
+print(np.asarray(purity_Uncertainty.values())/np.asarray(purity.values()))
+
 zT_widths = [(j-i)/2 for i, j in zip(zTbins[zT_offset:-1], zTbins[zT_offset+1:])]
 zT_widths = np.asarray(zT_widths)
 zT_centers = (zTbins[1+zT_offset:] + zTbins[zT_offset:-1]) / 2

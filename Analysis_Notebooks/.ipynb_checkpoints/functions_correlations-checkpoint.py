@@ -906,7 +906,7 @@ def ProcessData(input_x, input_y, input_yerr,UE_binmin=2, UE_binmax=9,label='dat
 
     plt.fill_between(ue_band_x, 0.0- UE_error, 0.0+UE_error, alpha=.6,color='grey')
     
-    integ_band_x = [x[-binmax]-dphi/2,x[-1]]
+    integ_band_x = [x[-binmax]-dphi/2,x[-1]+dphi/2]
     plt.fill_between(integ_band_x, combination - total_error, combination+total_error, alpha=.6,color=color)
     #plt.fill_between(x[-binmax:], combination - combination_error, combination+combination_error, alpha=.5)
     
