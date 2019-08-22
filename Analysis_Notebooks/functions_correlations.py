@@ -162,9 +162,9 @@ def Plot_Sub_UB_Overlay(Dict):
                     yerr=Dict["%s_CSR_Errors"%(SYS)][ipt][ztb],fmt='bo',ecolor="blue",label='Signal Region (stat. error)')
 
                 #ax.plot(delta_phi_centers,Dict["%s_CBR"%(SYS)][ipt][ztb],'ro',color="red",ms=10) #Scale UE Error by purity!
-                b_plot = ax.errorbar(delta_phi_centers,Dict["%s_CBR"%(SYS)][ipt][ztb],xerr=phi_width,
-                    yerr=Dict["%s_CBR_Errors"%(SYS)][ipt][ztb],fmt='ro',ecolor="red",label='Background Region (stat. error)')
-                #b_plot, = ax.plot([],[],' ')
+                #b_plot = ax.errorbar(delta_phi_centers,Dict["%s_CBR"%(SYS)][ipt][ztb],xerr=phi_width,
+                #    yerr=Dict["%s_CBR_Errors"%(SYS)][ipt][ztb],fmt='ro',ecolor="red",label='Background Region (stat. error)')
+                b_plot, = ax.plot([],[],' ')
 
                 #UE_Band = ax.fill_between(ue_error_bar,-Dict["%s_Uncorr_Error"%(SYS)][ipt][ztb][0],Dict["%s_Uncorr_Error"%(SYS)][ipt][ztb][0],facecolor="purple",alpha=0.35) 
                 #plt.axhline(y=0,color='gray',linestyle='--',linewidth=1.3,alpha=0.8)
@@ -699,21 +699,23 @@ def LaTeX_Results_Summary(FF_Dict):
 
         print("                        LaTeX Table")
 
-        
-        pp_stat_min = np.amin(FF_Dict["pp_FF_Errors"]/FF_Dict["pp_FF"])*100
-        pp_stat_max = np.amax(FF_Dict["pp_FF_Errors"]/FF_Dict["pp_FF"])*100
-        pPb_stat_min = np.amin(FF_Dict["p-Pb_FF_Errors"]/FF_Dict["p-Pb_FF"])*100
-        pPb_stat_max = np.amax(FF_Dict["p-Pb_FF_Errors"]/FF_Dict["p-Pb_FF"])*100
+        i=4
+        j=len(FF_Dict["pp_FF_Errors"][0])        
 
-        pp_purity_min = np.amin(FF_Dict["pp_purity_FF_Errors"]/FF_Dict["pp_FF"])*100
-        pp_purity_max = np.amax(FF_Dict["pp_purity_FF_Errors"]/FF_Dict["pp_FF"])*100
-        pPb_purity_min = np.amin(FF_Dict["p-Pb_purity_FF_Errors"]/FF_Dict["p-Pb_FF"])*100
-        pPb_purity_max = np.amax(FF_Dict["p-Pb_purity_FF_Errors"]/FF_Dict["p-Pb_FF"])*100
+        pp_stat_min = np.amin(FF_Dict["pp_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
+        pp_stat_max = np.amax(FF_Dict["pp_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
+        pPb_stat_min = np.amin(FF_Dict["p-Pb_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
+        pPb_stat_max = np.amax(FF_Dict["p-Pb_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
+
+        pp_purity_min = np.amin(FF_Dict["pp_purity_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
+        pp_purity_max = np.amax(FF_Dict["pp_purity_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
+        pPb_purity_min = np.amin(FF_Dict["p-Pb_purity_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
+        pPb_purity_max = np.amax(FF_Dict["p-Pb_purity_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
         
-        pp_ue_min = np.amin(FF_Dict["pp_UE_FF_Errors"]/FF_Dict["pp_FF"])*100
-        pp_ue_max = np.amax(FF_Dict["pp_UE_FF_Errors"]/FF_Dict["pp_FF"])*100
-        pPb_ue_min = np.amin(FF_Dict["p-Pb_UE_FF_Errors"]/FF_Dict["p-Pb_FF"])*100
-        pPb_ue_max = np.amax(FF_Dict["p-Pb_UE_FF_Errors"]/FF_Dict["p-Pb_FF"])*100
+        pp_ue_min = np.amin(FF_Dict["pp_UE_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
+        pp_ue_max = np.amax(FF_Dict["pp_UE_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
+        pPb_ue_min = np.amin(FF_Dict["p-Pb_UE_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
+        pPb_ue_max = np.amax(FF_Dict["p-Pb_UE_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
 
         print("Source   &  pp data & p--Pb~data  \\\\")
         print("Statistical Uncertainty & {0}\%-{1}\% & {2}\%-{3}\% \\\\".format(int(pp_stat_min+0.5),

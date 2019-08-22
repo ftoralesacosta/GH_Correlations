@@ -323,15 +323,18 @@ def Plot_pp_pPb_Avg_FF(Comb_Dict):
 
         print("                        LaTeX Table")
 
-        pp_stat_min = np.amin(Comb_Dict["pp_Combined_FF_Errors"]/Comb_Dict["pp_Combined_FF"])*100
-        pp_stat_max = np.amax(Comb_Dict["pp_Combined_FF_Errors"]/Comb_Dict["pp_Combined_FF"])*100
-        pPb_stat_min = np.amin(Comb_Dict["p-Pb_Combined_FF_Errors"]/Comb_Dict["p-Pb_Combined_FF"])*100
-        pPb_stat_max = np.amax(Comb_Dict["p-Pb_Combined_FF_Errors"]/Comb_Dict["p-Pb_Combined_FF"])*100
+        i = 0
+        j = len(Comb_Dict["pp_Combined_FF_Errors"])
 
-        pp_purity_min = np.amin(Comb_Dict["pp_purity_Uncertainty"]/Comb_Dict["pp_Combined_FF"])*100
-        pp_purity_max = np.amax(Comb_Dict["pp_purity_Uncertainty"]/Comb_Dict["pp_Combined_FF"])*100
-        pPb_purity_min = np.amin(Comb_Dict["p-Pb_purity_Uncertainty"]/Comb_Dict["p-Pb_Combined_FF"])*100
-        pPb_purity_max = np.amax(Comb_Dict["p-Pb_purity_Uncertainty"]/Comb_Dict["p-Pb_Combined_FF"])*100
+        pp_stat_min = np.amin(Comb_Dict["pp_Combined_FF_Errors"][i:j]/Comb_Dict["pp_Combined_FF"][i:j])*100
+        pp_stat_max = np.amax(Comb_Dict["pp_Combined_FF_Errors"][i:j]/Comb_Dict["pp_Combined_FF"][i:j])*100
+        pPb_stat_min = np.amin(Comb_Dict["p-Pb_Combined_FF_Errors"][i:j]/Comb_Dict["p-Pb_Combined_FF"][i:j])*100
+        pPb_stat_max = np.amax(Comb_Dict["p-Pb_Combined_FF_Errors"][i:j]/Comb_Dict["p-Pb_Combined_FF"][i:j])*100
+
+        pp_purity_min = np.amin(Comb_Dict["pp_purity_Uncertainty"][i:j]/Comb_Dict["pp_Combined_FF"][i:j])*100
+        pp_purity_max = np.amax(Comb_Dict["pp_purity_Uncertainty"][i:j]/Comb_Dict["pp_Combined_FF"][i:j])*100
+        pPb_purity_min = np.amin(Comb_Dict["p-Pb_purity_Uncertainty"][i:j]/Comb_Dict["p-Pb_Combined_FF"][i:j])*100
+        pPb_purity_max = np.amax(Comb_Dict["p-Pb_purity_Uncertainty"][i:j]/Comb_Dict["p-Pb_Combined_FF"][i:j])*100
 
         print("Source   &  pp data & \pPb~data  \\\\")
         print("Statistical Uncertainty & {0}\%-{1}\% & {2}\%-{3}\% \\\\".format(int(pp_stat_min+0.5),

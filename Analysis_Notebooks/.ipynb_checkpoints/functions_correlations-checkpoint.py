@@ -134,8 +134,8 @@ def Plot_Sub_UB_Overlay(Dict):
             
             fig = plt.figure(figsize=(24,12))
             if (NzT >=7 and NzT <=9):
-                #fig = plt.figure(figsize=(35,16))
-                fig = plt.figure(figsize=(20,35))
+                fig = plt.figure(figsize=(35,16))
+                #fig = plt.figure(figsize=(20,35))
             if (NzT >=10 and NzT<=12):
                 fig = plt.figure(figsize=(22,24))
             if (NzT >12):
@@ -149,7 +149,8 @@ def Plot_Sub_UB_Overlay(Dict):
                 elif (NzT ==6):
                     ax = fig.add_subplot(2,3,izt+1)
                 elif (NzT >=7 and NzT <=9):
-                    ax = fig.add_subplot(4,2,izt+1)
+                    #ax = fig.add_subplot(4,2,izt+1)
+                    ax = fig.add_subplot(2,4,izt+1)
                 elif (NzT >9 and NzT <=12):
                     ax = fig.add_subplot(4,3,izt+1)
                 elif (NzT >12):
@@ -160,9 +161,10 @@ def Plot_Sub_UB_Overlay(Dict):
                 s_plot = ax.errorbar(delta_phi_centers,Dict["%s_CSR"%(SYS)][ipt][ztb],xerr=phi_width,
                     yerr=Dict["%s_CSR_Errors"%(SYS)][ipt][ztb],fmt='bo',ecolor="blue",label='Signal Region (stat. error)')
 
-                ax.plot(delta_phi_centers,Dict["%s_CBR"%(SYS)][ipt][ztb]*(1-purity[ipt]),'ro',color="red",ms=10) #Scale UE Error by purity!
-                b_plot = ax.errorbar(delta_phi_centers,Dict["%s_CBR"%(SYS)][ipt][ztb]*(1-purity[ipt]),xerr=phi_width,
-                    yerr=Dict["%s_CBR_Errors"%(SYS)][ipt][ztb]*(1-purity[ipt]),fmt='ro',ecolor="red",label='Background Region (stat. error)')
+                #ax.plot(delta_phi_centers,Dict["%s_CBR"%(SYS)][ipt][ztb],'ro',color="red",ms=10) #Scale UE Error by purity!
+                #b_plot = ax.errorbar(delta_phi_centers,Dict["%s_CBR"%(SYS)][ipt][ztb],xerr=phi_width,
+                #    yerr=Dict["%s_CBR_Errors"%(SYS)][ipt][ztb],fmt='ro',ecolor="red",label='Background Region (stat. error)')
+                b_plot, = ax.plot([],[],' ')
 
                 #UE_Band = ax.fill_between(ue_error_bar,-Dict["%s_Uncorr_Error"%(SYS)][ipt][ztb][0],Dict["%s_Uncorr_Error"%(SYS)][ipt][ztb][0],facecolor="purple",alpha=0.35) 
                 #plt.axhline(y=0,color='gray',linestyle='--',linewidth=1.3,alpha=0.8)
@@ -171,7 +173,7 @@ def Plot_Sub_UB_Overlay(Dict):
                 plt.xlabel(r'|$\Delta \varphi$|',fontsize=fsize+4)
                 plt.xticks(fontsize=(fsize))
                 plt.xlim((0.39269908169872414,3.14159))
-                plt.ylabel(r'$1/N_{\mathrm{trig}} \: \: \mathrm{d}N/\mathrm{d}\Delta\eta$',fontsize=fsize+2)
+                plt.ylabel(r'$1/N_{\mathrm{trig}} \: \: \mathrm{d}^2N/\mathrm{d}\Delta\varphi\mathrm{d}\Delta\eta$',fontsize=fsize+2)
                 #plt.ylim((0,1.2*max(Sig_LE_Phi_Array)))
                 empt, = ax.plot([], [], ' ')
                 empt2, = ax.plot([],[],' ')
@@ -232,8 +234,8 @@ def Plot_pp_pPb_Cs(Dict):
         #plt.figure(figsize=(10,7))
         fig = plt.figure(figsize=(24,12))
         if (NzT >=7 and NzT <=9):
-            #fig = plt.figure(figsize=(35,16))
-            fig = plt.figure(figsize=(20,35))
+            fig = plt.figure(figsize=(40,20)) #horizontal
+            #fig = plt.figure(figsize=(20,35)) #vertical
         if (NzT >=10 and NzT<=12):
             fig = plt.figure(figsize=(22,24))
         if (NzT >12):
@@ -247,7 +249,8 @@ def Plot_pp_pPb_Cs(Dict):
             elif (NzT ==6):
                 ax = fig.add_subplot(2,3,izt+1)
             elif (NzT >=7 and NzT <=9):
-                ax = fig.add_subplot(4,2,izt+1)
+                #ax = fig.add_subplot(4,2,izt+1)
+                ax = fig.add_subplot(2,4,izt+1)
             elif (NzT >9 and NzT <=12):
                 ax = fig.add_subplot(4,3,izt+1)
             elif (NzT >12):
@@ -642,7 +645,7 @@ def Get_Fragmentation(Dict,N_Phi_Intgl=N_Phi_Integrate,Use_Avg_Cs=False):
         
         
         for ipt in range(len(Dict["%s_CSR"%(SYS)])): 
-            temp_purity_Errors.append(temp_FF[ipt]*(purity_Uncertainty[ipt]/purity[ipt]))  # abs. FF purity uncertainty
+            temp_purity_Errors.append(temp_FF[ipt]*(purity_Uncertainty[SYS][ipt]/purity[SYS][ipt]))  # abs. FF purity uncertainty
             
             
         if (Use_Avg_Cs):
