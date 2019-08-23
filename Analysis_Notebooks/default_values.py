@@ -301,6 +301,7 @@ def Get_Purity(filename):
 p,p_uncert = Get_Purity(Files)
 purity = dict(zip(Systems,p))
 purity_Uncertainty = dict(zip(Systems,p_uncert))
+Rel_pUncert = dict((k, float(purity_Uncertainty[k]) / purity[k]) for k in purity_Uncertainty)
 
 print(purity.keys())
 print(np.asarray(purity_Uncertainty.values())/np.asarray(purity.values()))
