@@ -496,8 +496,10 @@ def Save_Avg_Cs_npy(Corr):
 def Compare_Cs_Averages(save_name,strings,string_descrp_list,colors):
     
     #shapes = ["o","x","s"]
+    fig = plt.figure(figsize=(22,18))
+        
     for SYS in Systems:
-        fig = plt.figure(figsize=(22,18))
+
         
         for (string,string_descr,colr) in zip(strings,string_descrp_list,colors):
             
@@ -516,7 +518,13 @@ def Compare_Cs_Averages(save_name,strings,string_descrp_list,colors):
    
                 N_Phi = len(CS_Avg[izt])
                 dPhi_Centers = [i*math.pi/N_Phi+math.pi/N_Phi/2 for i in range(0,N_Phi)] #skip first dPhi bin to avoid Isolation
+           
+                if ((string != default_string) and SYS=="pp"):
+                    continue
                 
+                #if((string == default_string) and SYS=="p-Pb"):
+                #    continue
+     
                 plt.errorbar(dPhi_Centers,CS_Avg[izt],xerr=phi_width,yerr=CS_Avg_Err[izt],fmt='o',color = colr,capsize=4,markersize=11,label = "average %s"%(string_descr))
                 
                 plt.xlim((0.39269908169872414,3.14159))
@@ -699,7 +707,7 @@ def LaTeX_Results_Summary(FF_Dict):
 
         print("                        LaTeX Table")
 
-        i=4
+        i=0
         j=len(FF_Dict["pp_FF_Errors"][0])        
 
         pp_stat_min = np.amin(FF_Dict["pp_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
