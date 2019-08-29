@@ -26,22 +26,6 @@ Float_t Get_Purity_ErrFunction(Float_t pT_GeV, std::string deviation,bool Is_pp=
 
   Float_t purity_val = 0;
 
-  //Non-platue assumption
-  // Float_t par[3] = {0.548247710,
-  //                   8.794543375,
-  //                   12.7423900};
-
-  //Old
-   // Float_t par[3] = {0.54225742923,
-   //                   8.09242373515,
-   //                   11.8085154181};
-
-  //pp
-  // Float_t par[3] = { 0.500229283252 ,
-  // 		     9.01692090267 ,
-  // 		     11.3732998386 }
-  
-  //p-Pb
   Float_t par[3] = {0.549684905516,
 		     8.44338685256,
 		    13.3454091464};
@@ -1033,8 +1017,8 @@ int main(int argc, char *argv[])
   hweight.Write();
 
   Signal_pT_Dist->Write();
-  BKGD_pT_Dist->Scale(1.0/(hweight.Integral(1,40))); //Divide by sum of weights
   BKGD_pT_Dist->Write();
+  BKGD_pT_Dist_Weighted->Scale(1.0/(hweight.Integral(1,40))); //Divide by sum of weights
   BKGD_pT_Dist_Weighted->Write();
 
   for (int ipt = 0; ipt<nptbins; ipt++)
@@ -1079,7 +1063,7 @@ int main(int argc, char *argv[])
       IsoCorr[izt+ipt*nztbins]->Write();
     }
     for (int izt = 0; izt<nztbins; izt++){
-      BKGD_IsoCorr[izt+ipt*nztbins]->Write();
+      BKGD_IsoCorr[izt+ipt*nztbins]->Write(); //Not divided by sum of weights here. py notebooks divide by # entries -> sum of weights. See Bkd trigger histo
     }
     for (int izt = 0; izt<nztbins; izt++){
       BKGD_IsoCorr_UW[izt+ipt*nztbins]->Write();
