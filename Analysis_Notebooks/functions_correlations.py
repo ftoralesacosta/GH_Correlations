@@ -352,6 +352,7 @@ def Plot_pp_pPb_Cs_Individual(Dict):
             plt.xlabel(r'|$\Delta \varphi$|',fontsize=28)
             plt.xticks(fontsize=18)
             plt.xlim((0.39269908169872414,3.14159))
+            #plt.xlim((0,3.14159))
 
             plt.ylabel(r'$1/N_{\gamma} \: \: \mathrm{d}N/\mathrm{d}\Delta \eta \Delta \varphi$',fontsize=28)
             plt.yticks(fontsize=18)
@@ -527,7 +528,8 @@ def Compare_Cs_Averages(save_name,strings,string_descrp_list,colors):
 
                 plt.errorbar(dPhi_Centers,CS_Avg[izt],xerr=phi_width,yerr=CS_Avg_Err[izt],fmt='o',color = colr,capsize=4,markersize=11,label = "average %s"%(string_descr))
                 #plt.errorbar(dPhi_Centers,CS_Avg[izt],xerr=phi_width,yerr=CS_Avg_Err[izt],fmt='o',color = colr,capsize=4,markersize=11,label = "average %s %s"%(string_descr,SYS))
-                plt.xlim((0.39269908169872414,3.14159))
+                #plt.xlim((0.39269908169872414,3.14159))
+                plt.xlim((0,3.14159))
                 
                 #Labels
                 if (izt>2):

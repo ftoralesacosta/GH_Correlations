@@ -741,11 +741,11 @@ def Compare_pp_pPB_Avg_lists(save_name,strings,string_descrp_list,colors):
             zT_centers = (Zbins[1:] + Zbins[:-1]) / 2
             zT_widths = [(j-i)/2 for i, j in zip(Zbins[:-1], Zbins[1:])]
         
-           # if ((string != default_string) and SYS=="pp"):
-           #     continue
+            if ((string != default_string) and SYS=="pp"):
+                continue
                 
-           # if((string == default_string) and SYS=="p-Pb"):
-           #     continue
+            if((string == default_string) and SYS=="p-Pb"):
+                continue
         
             if colr == "red":
                 plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT]+0.02, FF[:NzT-ZT_OFF_PLOT],xerr=zT_widths[:NzT-ZT_OFF_PLOT],
