@@ -739,7 +739,7 @@ int main(int argc, char *argv[])
 	
 	if (strcmp(shower_shape.data(),"Lambda")== 0) {
 
-	  Signal = ((cluster_lambda_square[n][0] > 0.05) && (cluster_lambda_square[n][0] < Lambda0_cut));
+	  Signal = ((cluster_lambda_square[n][0] > 0.1) && (cluster_lambda_square[n][0] < Lambda0_cut));
 	  //Background =  (cluster_lambda_square[n][0] > Lambda0_cut);
 	  //Background =  ((cluster_lambda_square[n][0] > 0.4) && (cluster_lambda_square[n][0] < 1.0)); //DOES NOT WORK!!!!
 	  Background =  ((cluster_lambda_square[n][0] > 0.4));
@@ -862,7 +862,7 @@ int main(int argc, char *argv[])
 	Isolated = (isolation<iso_max);
 
 	if (strcmp(shower_shape.data(),"Lambda")== 0) {
-	  Signal = ((cluster_lambda_square[n][0] > 0.05) && (cluster_lambda_square[n][0] < Lambda0_cut));	  
+	  Signal = ((cluster_lambda_square[n][0] > 0.1) && (cluster_lambda_square[n][0] < Lambda0_cut));	  
 	  Background = (cluster_lambda_square[n][0] > Lambda0_cut);
 	}
 	
