@@ -496,10 +496,10 @@ def Save_Avg_Cs_npy(Corr):
 def Compare_Cs_Averages(save_name,strings,string_descrp_list,colors):
     
     #shapes = ["o","x","s"]
-    fig = plt.figure(figsize=(22,18))
         
     for SYS in Systems:
 
+        fig = plt.figure(figsize=(22,18))
         
         for (string,string_descr,colr) in zip(strings,string_descrp_list,colors):
             
@@ -517,16 +517,16 @@ def Compare_Cs_Averages(save_name,strings,string_descrp_list,colors):
                     ax = fig.add_subplot(3,3,izt+1)
    
                 N_Phi = len(CS_Avg[izt])
-                dPhi_Centers = [i*math.pi/N_Phi+math.pi/N_Phi/2 for i in range(0,N_Phi)] #skip first dPhi bin to avoid Isolation
-           
-                if ((string != default_string) and SYS=="pp"):
-                    continue
+                dPhi_Centers = [i*math.pi/N_Phi+math.pi/N_Phi/2 for i in range(0,N_Phi)]
+                            
+                #if ((string != default_string) and SYS=="pp"):
+                #    continue
                 
                 #if((string == default_string) and SYS=="p-Pb"):
                 #    continue
-     
+
                 plt.errorbar(dPhi_Centers,CS_Avg[izt],xerr=phi_width,yerr=CS_Avg_Err[izt],fmt='o',color = colr,capsize=4,markersize=11,label = "average %s"%(string_descr))
-                
+                #plt.errorbar(dPhi_Centers,CS_Avg[izt],xerr=phi_width,yerr=CS_Avg_Err[izt],fmt='o',color = colr,capsize=4,markersize=11,label = "average %s %s"%(string_descr,SYS))
                 plt.xlim((0.39269908169872414,3.14159))
                 
                 #Labels
@@ -539,8 +539,8 @@ def Compare_Cs_Averages(save_name,strings,string_descrp_list,colors):
                 
                 leg = plt.legend(numpoints=1,frameon=False,loc="best")
                 leg.set_title("%s :%1.2f < $z_\mathrm{T}$ < %1.2f"%(SYS,zbins[izt],zbins[izt+1]))
-                plt.setp(leg.get_title(),fontsize=18)
-                fig.savefig('pics/%s/%s/Cs_Averages_%s.pdf'%(Shower,default_string,save_name),bbox_inches='tight')
+        plt.setp(leg.get_title(),fontsize=18)
+        fig.savefig('pics/%s/%s/Cs_Averages_%s_%s.pdf'%(Shower,default_string,SYS,save_name),bbox_inches='tight')
                     
             
 def Compare_Cs_pTBins():

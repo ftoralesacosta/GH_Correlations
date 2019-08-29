@@ -122,6 +122,7 @@ description_string = default_string
 #description_string = "zT_Rebin_8_006zT06zTPbp"
 
 #description_string = "zT_Rebin_7_006zT06zT"
+description_string = "zT_Rebin_8_006zT06zT16dPhi"
 #description_string = "zT_Rebin_9_006zT06zT"
 #description_string = "pT_Rebin_2_006zT06zTOldBinNewNewPurity"
 #description_string = "zT_Rebin_8_006zT06zTOldBinNewNewPurity_Small_Zyam"
@@ -156,6 +157,9 @@ eta_max = 1.19 #Range of Signal Correlations
 #dPhi
 if ("8dPhi" in description_string):
     N_dPhi_Bins = 8
+    
+if ("16dPhi" in description_string):
+    N_dPhi_Bins = 16
     
 dPhi_Bins = [i*math.pi/N_dPhi_Bins for i in range(0,N_dPhi_Bins+1)]
 dPhi_Width = dPhi_Bins[1]-dPhi_Bins[0]

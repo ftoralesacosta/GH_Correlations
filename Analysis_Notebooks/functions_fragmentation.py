@@ -692,7 +692,11 @@ def Compare_pp_pPB_Avg_Ratio_lists(save_name,strings,string_descrp_list,colors,S
         if (Show_Fits):
             plt.fill_between(np.arange(0,1.1,0.1), p0+p0e, p0-p0e,color=p0col,alpha=.3)
         
-        plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT], Ratio[:NzT-ZT_OFF_PLOT], yerr=Ratio_Error[:NzT-ZT_OFF_PLOT],xerr=zT_widths[:NzT-ZT_OFF_PLOT],capsize=3, fmt ="o",color=colr,alpha=0.7,ms=6,lw=1,label=string_descr)
+        if  (colr == "red"):
+            plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT], Ratio[:NzT-ZT_OFF_PLOT], yerr=Ratio_Error[:NzT-ZT_OFF_PLOT],xerr=zT_widths[:NzT-ZT_OFF_PLOT],capsize=3, fmt ="o",color=colr,alpha=0.7,ms=6,lw=1,label=string_descr)
+
+        else:
+            plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT]+0.02, Ratio[:NzT-ZT_OFF_PLOT], yerr=Ratio_Error[:NzT-ZT_OFF_PLOT],xerr=zT_widths[:NzT-ZT_OFF_PLOT],capsize=3, fmt ="o",color=colr,alpha=0.7,ms=6,lw=1,label=string_descr)
 
     empt4, = plt.plot([], [],' ',label=r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[0],pTbins[N_pT_Bins]))
     
@@ -737,14 +741,18 @@ def Compare_pp_pPB_Avg_lists(save_name,strings,string_descrp_list,colors):
             zT_centers = (Zbins[1:] + Zbins[:-1]) / 2
             zT_widths = [(j-i)/2 for i, j in zip(Zbins[:-1], Zbins[1:])]
         
-            if ((string != default_string) and SYS=="pp"):
-                continue
+           # if ((string != default_string) and SYS=="pp"):
+           #     continue
                 
-            if((string == default_string) and SYS=="p-Pb"):
-                continue
+           # if((string == default_string) and SYS=="p-Pb"):
+           #     continue
         
-            plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT]+0.2, FF[:NzT-ZT_OFF_PLOT],xerr=zT_widths[:NzT-ZT_OFF_PLOT],
-                yerr=FF_Errors[:NzT-ZT_OFF_PLOT],linewidth=1, fmt=shape,color=colr,capsize=1,label="%s"%(string_descr))
+            if colr == "red":
+                plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT]+0.02, FF[:NzT-ZT_OFF_PLOT],xerr=zT_widths[:NzT-ZT_OFF_PLOT],
+                             yerr=FF_Errors[:NzT-ZT_OFF_PLOT],linewidth=1, fmt=shape,color=colr,alpha=0.5,capsize=1,label="%s"%(string_descr))
+            else:
+                plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT], FF[:NzT-ZT_OFF_PLOT],xerr=zT_widths[:NzT-ZT_OFF_PLOT],
+                             yerr=FF_Errors[:NzT-ZT_OFF_PLOT],linewidth=1, fmt=shape,color=colr,alpha=0.5,capsize=1,label="%s"%(string_descr))
         
             #plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT]+0.2, FF[:NzT-ZT_OFF_PLOT],xerr=zT_widths[:NzT-ZT_OFF_PLOT],
             #    yerr=FF_Errors[:NzT-ZT_OFF_PLOT],linewidth=1, fmt=shape,color=colr,capsize=1,label="%s (%s)"%(string_descr,SYS))
