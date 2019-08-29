@@ -10,11 +10,11 @@ Eta_max:                      0.67
 Cluster_min:                  2
 Cluster_dist_to_bad_channel:  1
 Cluster_N_Local_Maxima:       3.0
-EcrossoverE_min:              0.05
+Cluster_Time:		      20 #ns
+EcrossoverE_min:              0.03
 iso_max:                      1.5
 noniso_min:                   5.0
 noniso_max:                   10.0
-#deta_max:                     0.6 #depricated
 N_Phi_Bins:                   16
 N_Eta_Bins:                   14
 Track_pT_Min:		      0.5

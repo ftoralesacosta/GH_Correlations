@@ -89,6 +89,7 @@ int main(int argc, char *argv[])
   double Cluster_min = 0;
   float Cluster_DtoBad = 0;
   UChar_t Cluster_NLocal_Max = 0;
+  double cluster_time = 0;
   double EcrossoverE_min = 0;
   float track_pT_min = 0.0;
   float track_pT_max = 0.0;
@@ -97,6 +98,7 @@ int main(int argc, char *argv[])
   double noniso_min = 0;
   double noniso_max = 0;
   //double deta_max = 0;
+
   isolationDet determiner = CLUSTER_ISO_ITS_04;
   int n_eta_bins = 0;
   int n_phi_bins = 0;  
@@ -179,6 +181,11 @@ int main(int argc, char *argv[])
         Cluster_NLocal_Max = atof(value);
 	std::cout << "Cluster_NLocal_Max: "<< Cluster_NLocal_Max << std::endl;}
 
+      else if (strcmp(key, "Cluster_Time") == 0){
+        cluster_time = atof(value);
+	std::cout << "Cluster_Time: "<< cluster_time << std::endl;}
+
+      
       else if (strcmp(key, "EcrossoverE_min") == 0) {
           EcrossoverE_min = atof(value);
           std::cout << "EcrossoverE_min; " << EcrossoverE_min << std::endl; }
@@ -618,6 +625,7 @@ int main(int argc, char *argv[])
     Float_t cluster_pt[NTRACK_MAX];
     Float_t cluster_eta[NTRACK_MAX];
     Float_t cluster_phi[NTRACK_MAX]; 
+    Float_t cluster_tof[NTRACK_MAX];
     Float_t cluster_iso_tpc_04[NTRACK_MAX];
     Float_t cluster_iso_its_04[NTRACK_MAX];
     Float_t cluster_frixione_tpc_04_02[NTRACK_MAX];
@@ -673,6 +681,7 @@ int main(int argc, char *argv[])
     _tree_event->SetBranchAddress("cluster_pt", cluster_pt);
     _tree_event->SetBranchAddress("cluster_eta", cluster_eta);
     _tree_event->SetBranchAddress("cluster_phi", cluster_phi);
+    _tree_event->SetBranchAddress("cluster_tof", cluster_tof);
     _tree_event->SetBranchAddress("cluster_s_nphoton", cluster_s_nphoton);
     _tree_event->SetBranchAddress("cluster_mc_truth_index", cluster_mc_truth_index);
     _tree_event->SetBranchAddress("cluster_lambda_square", cluster_lambda_square);
@@ -711,11 +720,12 @@ int main(int argc, char *argv[])
       for (ULong64_t n = 0; n < ncluster; n++) {
 	if( not(cluster_pt[n]>pT_min and cluster_pt[n]<pT_max)) continue;   //select pt of photons
 	if( not(TMath::Abs(cluster_eta[n])<Eta_max)) continue;              //cut edges of detector
-	if( not(cluster_ncell[n]>Cluster_min)) continue;                    //removes clusters with 1 or 2 cells
+	if( not(cluster_ncell[n]>=Cluster_min)) continue;                    //removes clusters with 1 or 2 cells
 	if( not(cluster_e_cross[n]/cluster_e[n]>EcrossoverE_min)) continue; //removes "spiky" clusters
 	if( not(cluster_distance_to_bad_channel[n]>=Cluster_DtoBad)) continue; //removes clusters near bad channels
 	if( not(cluster_nlocal_maxima[n] < 3)) continue; //require to have at most 2 local maxima.
-
+	if (not(abs(cluster_tof[n]) < cluster_time)) continue;
+	
 	float isolation;
 	if (determiner == CLUSTER_ISO_TPC_04) isolation = cluster_iso_tpc_04[n];
 	else if (determiner == CLUSTER_ISO_ITS_04) isolation = cluster_iso_its_04[n];
@@ -729,7 +739,7 @@ int main(int argc, char *argv[])
 	
 	if (strcmp(shower_shape.data(),"Lambda")== 0) {
 
-	  Signal = ((cluster_lambda_square[n][0] > 0.05) && (cluster_lambda_square[n][0] < Lambda0_cut));	  
+	  Signal = ((cluster_lambda_square[n][0] > 0.05) && (cluster_lambda_square[n][0] < Lambda0_cut));
 	  //Background =  (cluster_lambda_square[n][0] > Lambda0_cut);
 	  //Background =  ((cluster_lambda_square[n][0] > 0.4) && (cluster_lambda_square[n][0] < 1.0)); //DOES NOT WORK!!!!
 	  Background =  ((cluster_lambda_square[n][0] > 0.4));
@@ -836,12 +846,13 @@ int main(int argc, char *argv[])
       for (ULong64_t n = 0; n < ncluster; n++) {
 	if( not(cluster_pt[n]>pT_min and cluster_pt[n]<pT_max)) continue;   //select pt of photons
 	if( not(TMath::Abs(cluster_eta[n])<Eta_max)) continue;              //cut edges of detector
-	if( not(cluster_ncell[n]>Cluster_min)) continue;                    //removes clusters with 1 or 2 cells
+	if( not(cluster_ncell[n]>=Cluster_min)) continue;                    //removes clusters with 1 or 2 cells
 	if( not(cluster_e_cross[n]/cluster_e[n]>EcrossoverE_min)) continue; //removes "spiky" clusters
 	if( not(cluster_distance_to_bad_channel[n]>=Cluster_DtoBad)) continue; //removes clusters near bad channels
 	//	if( not(cluster_nlocal_maxima[n] < Cluster_NLocal_Max)) continue; //require to have at most 2 local maxima.
 	if( not(cluster_nlocal_maxima[n] < 3)) continue; //require to have at most 2 local maxima.
-
+	if (not(abs(cluster_tof[n]) < cluster_time)) continue;
+	
 	float isolation;
 	if (determiner == CLUSTER_ISO_TPC_04) isolation = cluster_iso_tpc_04[n];
 	else if (determiner == CLUSTER_ISO_ITS_04) isolation = cluster_iso_its_04[n];
@@ -851,7 +862,7 @@ int main(int argc, char *argv[])
 	Isolated = (isolation<iso_max);
 
 	if (strcmp(shower_shape.data(),"Lambda")== 0) {
-	  Signal = (cluster_lambda_square[n][0] < Lambda0_cut);
+	  Signal = ((cluster_lambda_square[n][0] > 0.05) && (cluster_lambda_square[n][0] < Lambda0_cut));	  
 	  Background = (cluster_lambda_square[n][0] > Lambda0_cut);
 	}
 	
