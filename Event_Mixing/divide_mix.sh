@@ -3,7 +3,8 @@
 module load root
 make Divide_Same_Mix
 
-for data in {"13d","13e","13f","17q"}
+#for data in {"13d","13e","13f","17q"}
+for data in {"13d","13e","13f","17q_wSDD"}
 #for data in {"13d"}
 do
     echo "${1}${data}_SE_L0_Correlation.root"

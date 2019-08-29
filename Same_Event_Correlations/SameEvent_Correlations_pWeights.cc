@@ -26,14 +26,14 @@ Float_t Get_Purity_ErrFunction(Float_t pT_GeV, std::string deviation,bool Is_pp=
 
   Float_t purity_val = 0;
 
-  Float_t par[3] = {0.549684905516,
-		     8.44338685256,
-		    13.3454091464};
+  Float_t par[3] = {0.549446083201,
+		    8.4480099355,
+		    13.3318839731};
 		    
   if (Is_pp){
-	     par[0] = 0.500229283252;
-	     par[1] = 9.016920902665;
-	     par[2] = 11.373299838596;
+               par[0] = 0.494980730653;
+	       par[1] = 9.11278738517;
+	       par[2] = 11.0498381421;
   }
 
   if (strcmp(deviation.data(),"Plus")==0){
@@ -373,7 +373,7 @@ int main(int argc, char *argv[])
       purity_Uncertainties[2]= 0.0712;
       purity_Uncertainties[3]= 0.1221;
       
-
+      //Given by Stuti August 6 2019
     }
   }
 
@@ -702,8 +702,8 @@ int main(int argc, char *argv[])
     //WEIGHTING and CLUSTER SPECTRA LOOP
 
     fprintf(stderr,"Looping to determine weights and pT spectra \n");
-    //for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
-      for(Long64_t ievent = 0; ievent < 1000 ; ievent++){
+    for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
+    //for(Long64_t ievent = 0; ievent < 1000 ; ievent++){
       _tree_event->GetEntry(ievent);
       fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, ievent, nentries);
 
@@ -928,7 +928,7 @@ int main(int argc, char *argv[])
 	    for (int ipt = 0; ipt < N_Track_pT_Bins; ipt++){
 	      if( (track_pt[itrack] >= track_pT_Correction[ipt]) && (track_pt[itrack] < track_pT_Correction[ipt+1])){
 		track_weight = pPb_Smearing_Correction[ipt]*(1.0-pPb_FakeRate[ipt])/pPb_Efficiency[ipt];
-		fprintf(stderr,"\n %d: Low Edge=%f, High Edge=%f, Smear=%f, FakeRake=%f, Efficiency=%f\n",__LINE__,track_pT_Correction[ipt],track_pT_Correction[ipt+1],pPb_Smearing_Correction[ipt],pPb_FakeRate[ipt],pPb_Efficiency[ipt]);
+		//fprintf(stderr,"\n %d: Low Edge=%f, High Edge=%f, Smear=%f, FakeRake=%f, Efficiency=%f\n",__LINE__,track_pT_Correction[ipt],track_pT_Correction[ipt+1],pPb_Smearing_Correction[ipt],pPb_FakeRate[ipt],pPb_Efficiency[ipt]);
 	      }
 	    }
 	
