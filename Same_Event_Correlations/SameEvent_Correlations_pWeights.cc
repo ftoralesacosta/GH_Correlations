@@ -56,7 +56,8 @@ Float_t Get_Purity_ErrFunction(Float_t pT_GeV, std::string deviation,bool Is_pp=
 
 int main(int argc, char *argv[])
 {
-  if (argc < 2) {
+  if (argc < 3) {
+    fprintf(stderr,"Run Syntax: [command] [dataset] ['pp' or 'pPb']");
     exit(EXIT_FAILURE);
   }
   int dummyc = 1;
@@ -710,6 +711,14 @@ int main(int argc, char *argv[])
 
     //WEIGHTING and CLUSTER SPECTRA LOOP
 
+    fprintf(stderr,"%d: CLUSTER CUT SUMMARY",__LINE__);
+    fprintf(stderr,"%d: pT_max =  %f \n ",__LINE__,pT_max);
+    fprintf(stderr,"%d: %f \n ",__LINE__,Eta_max);
+    fprintf(stderr,"%d: %f \n ",__LINE__,Cluster_min);
+    fprintf(stderr,"%d: %f \n ",__LINE__,EcrossoverE_min);
+    fprintf(stderr,"%d: %f \n ",__LINE__,Cluster_DtoBad);
+    fprintf(stderr,"%d: %f \n ",__LINE__,cluster_time);
+    
     fprintf(stderr,"Looping to determine weights and pT spectra \n");
     for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
     //for(Long64_t ievent = 0; ievent < 1000 ; ievent++){
