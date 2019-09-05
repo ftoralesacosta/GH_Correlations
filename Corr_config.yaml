@@ -1,20 +1,18 @@
 pT_min:			      12
 pT_max:                       40
-DNN_min:                      0.55
-DNN_max:                      0.85
-DNN_BKGD:		      0.5
+
 Lambda0_cut:                  0.3
-EMax_EClus_max:               0.7
-EMax_EClus_min:               0.6
+
 Eta_max:                      0.67
 Cluster_min:                  2
 Cluster_dist_to_bad_channel:  1
 Cluster_N_Local_Maxima:       3.0
 Cluster_Time:		      20 #ns
-EcrossoverE_min:              0.03
+EcrossoverE_min:              0.05
 iso_max:                      1.5
 noniso_min:                   5.0
 noniso_max:                   10.0
+
 N_Phi_Bins:                   16
 N_Eta_Bins:                   14
 Track_pT_Min:		      0.5
