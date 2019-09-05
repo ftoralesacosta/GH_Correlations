@@ -19,7 +19,7 @@
 
 const int MAX_INPUT_LENGTH = 200;
 
-enum isolationDet {CLUSTER_ISO_TPC_04, CLUSTER_ISO_ITS_04, CLUSTER_FRIXIONE_TPC_04_02, CLUSTER_FRIXIONE_ITS_04_02};
+enum isolationDet {CLUSTER_ISO_TPC_04, CLUSTER_ISO_ITS_04,CLUSTER_ISO_ITS_04_SUB ,CLUSTER_FRIXIONE_TPC_04_02, CLUSTER_FRIXIONE_ITS_04_02};
 
 
 Float_t Get_Purity_ErrFunction(Float_t pT_GeV, std::string deviation,bool Is_pp=false) {
@@ -278,6 +278,11 @@ int main(int argc, char *argv[])
               determiner = CLUSTER_ISO_ITS_04;
               std::cout << "Isolation Variable: cluster_iso_its_04" << std::endl; }
 
+          else if (strcmp(value, "cluster_iso_its_04_sub") == 0){
+              determiner = CLUSTER_ISO_ITS_04_SUB;
+              std::cout << "Isolation Variable: cluster_iso_its_04_sub" << std::endl; }
+
+	  
           else if (strcmp(value, "cluster_frixione_tpc_04_02") == 0){
               determiner = CLUSTER_FRIXIONE_TPC_04_02;
               std::cout << "Isolation Variable: cluster_frixione_tpc_04_02" << std::endl; }
@@ -604,8 +609,13 @@ int main(int argc, char *argv[])
       }
     }  
 
-    //Tracks
+    //Events
+
+    Bool_t is_pileup_from_spd_5_08;
     Double_t primary_vertex[3];
+    Float_t ue_estimate_its_const;
+    
+    //Tracks
     UInt_t ntrack;
     Float_t track_e[NTRACK_MAX];
     Float_t track_pt[NTRACK_MAX];
@@ -628,6 +638,8 @@ int main(int argc, char *argv[])
     Float_t cluster_phi[NTRACK_MAX]; 
     Float_t cluster_tof[NTRACK_MAX];
     Float_t cluster_iso_tpc_04[NTRACK_MAX];
+    Float_t cluster_iso_its_04_ue[NTRACK_MAX];
+  
     Float_t cluster_iso_its_04[NTRACK_MAX];
     Float_t cluster_frixione_tpc_04_02[NTRACK_MAX];
     Float_t cluster_frixione_its_04_02[NTRACK_MAX];
@@ -659,9 +671,13 @@ int main(int argc, char *argv[])
      
     // Set the branch addresses of the branches in the TTrees
     _tree_event->SetBranchStatus("*mc*", 0);
-  
-    //track Addresses
+
+    //event Addresses
     _tree_event->SetBranchAddress("primary_vertex", primary_vertex);
+    _tree_event->SetBranchAddress("is_pileup_from_spd_5_08", &is_pileup_from_spd_5_08);
+    _tree_event->SetBranchAddress("ue_estimate_its_const", &ue_estimate_its_const);
+
+    //track Addresses
     _tree_event->SetBranchAddress("ntrack", &ntrack);
     _tree_event->SetBranchAddress("track_e", track_e);
     _tree_event->SetBranchAddress("track_pt", track_pt);
@@ -688,6 +704,8 @@ int main(int argc, char *argv[])
     _tree_event->SetBranchAddress("cluster_lambda_square", cluster_lambda_square);
     _tree_event->SetBranchAddress("cluster_iso_tpc_04",cluster_iso_tpc_04);
     _tree_event->SetBranchAddress("cluster_iso_its_04",cluster_iso_its_04);
+    _tree_event->SetBranchAddress("cluster_iso_its_04_ue",cluster_iso_its_04_ue);
+	
     _tree_event->SetBranchAddress("cluster_frixione_tpc_04_02",cluster_frixione_tpc_04_02);
     _tree_event->SetBranchAddress("cluster_frixione_its_04_02",cluster_frixione_its_04_02);
     _tree_event->SetBranchAddress("cluster_distance_to_bad_channel", cluster_distance_to_bad_channel);
@@ -711,7 +729,7 @@ int main(int argc, char *argv[])
 
     //WEIGHTING and CLUSTER SPECTRA LOOP
 
-    fprintf(stderr,"%d: CLUSTER CUT SUMMARY",__LINE__);
+    fprintf(stderr,"%d: CLUSTER CUT SUMMARY \n ",__LINE__);
     fprintf(stderr,"%d: pT_max =  %f \n ",__LINE__,pT_max);
     fprintf(stderr,"%d: %f \n ",__LINE__,Eta_max);
     fprintf(stderr,"%d: %f \n ",__LINE__,Cluster_min);
@@ -721,10 +739,17 @@ int main(int argc, char *argv[])
     
     fprintf(stderr,"Looping to determine weights and pT spectra \n");
     for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
-    //for(Long64_t ievent = 0; ievent < 1000 ; ievent++){
+    //for(Long64_t ievent = 0; ievent < 10000 ; ievent++){
       _tree_event->GetEntry(ievent);
       fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, ievent, nentries);
 
+      if(TMath::Abs(primary_vertex[2])>10) continue;
+      if(primary_vertex[2]==0.00) continue;
+
+      //fputs(is_pileup_from_spd_5_08 ? "true" : "false", stdout);
+      if(is_pileup_from_spd_5_08) continue;
+
+      
       bool first_cluster = true;
       for (ULong64_t n = 0; n < ncluster; n++) {
 	if( not(cluster_pt[n]>pT_min and cluster_pt[n]<pT_max)) continue;   //select pt of photons
@@ -739,7 +764,12 @@ int main(int argc, char *argv[])
 	if (determiner == CLUSTER_ISO_TPC_04) isolation = cluster_iso_tpc_04[n];
 	else if (determiner == CLUSTER_ISO_ITS_04) isolation = cluster_iso_its_04[n];
 	else if (determiner == CLUSTER_FRIXIONE_TPC_04_02) isolation = cluster_frixione_tpc_04_02[n];
+	else if (determiner == CLUSTER_ISO_ITS_04_SUB) isolation =  cluster_iso_its_04[n] + cluster_iso_its_04_ue[n] + ue_estimate_its_const*0.4*0.4*3.1416;
 	else isolation = cluster_frixione_its_04_02[n];
+
+	// fprintf(stderr,"\n ue constant = %f \n",ue_estimate_its_const);
+	// fprintf(stderr,"iso UE = %f \n",cluster_iso_its_04_ue[n]);
+	// fprintf(stderr,"isolation = %f \n \n",isolation);
 	
 	Isolated = (isolation<iso_max);
 
@@ -748,7 +778,7 @@ int main(int argc, char *argv[])
 	
 	if (strcmp(shower_shape.data(),"Lambda")== 0) {
 
-	  Signal = ((cluster_lambda_square[n][0] > 0.1) && (cluster_lambda_square[n][0] < Lambda0_cut));
+	  Signal = ((cluster_lambda_square[n][0] > 0.1) and (cluster_lambda_square[n][0] < Lambda0_cut));
 	  //Background =  (cluster_lambda_square[n][0] > Lambda0_cut);
 	  //Background =  ((cluster_lambda_square[n][0] > 0.4) && (cluster_lambda_square[n][0] < 1.0)); //DOES NOT WORK!!!!
 	  Background =  ((cluster_lambda_square[n][0] > 0.4));
@@ -840,6 +870,8 @@ int main(int argc, char *argv[])
 
     hweight.Divide(&hBR);
 
+    std::cout<<"Clusters Passed Iosalation and Shower Shape: "<<N_Signal_Triggers<<std::endl;
+    
     //MAIN CORRELATION LOOP
 
     fprintf(stderr,"\n Looping for main correlation functions \n");
@@ -847,6 +879,10 @@ int main(int argc, char *argv[])
       
       _tree_event->GetEntry(ievent);
       fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, ievent, nentries);
+
+      if(TMath::Abs(primary_vertex[2])>10) continue;
+      if(primary_vertex[2]==0.00) continue;
+      if(is_pileup_from_spd_5_08) continue;
 
       Float_t purity_weight = 0;
       Float_t BR_purity_weight = 0;
@@ -866,6 +902,7 @@ int main(int argc, char *argv[])
 	if (determiner == CLUSTER_ISO_TPC_04) isolation = cluster_iso_tpc_04[n];
 	else if (determiner == CLUSTER_ISO_ITS_04) isolation = cluster_iso_its_04[n];
 	else if (determiner == CLUSTER_FRIXIONE_TPC_04_02) isolation = cluster_frixione_tpc_04_02[n];
+	else if (determiner == CLUSTER_ISO_ITS_04_SUB) isolation =  cluster_iso_its_04[n] + cluster_iso_its_04_ue[n] + ue_estimate_its_const*0.4*0.4*3.1416;
 	else isolation = cluster_frixione_its_04_02[n];
 	
 	Isolated = (isolation<iso_max);
@@ -1026,8 +1063,6 @@ int main(int argc, char *argv[])
     fout = new TFile(Form("%s_SE_EMax_Correlation.root",rawname.data()),"RECREATE");
   else
     fout = new TFile(Form("%s_SE_Correlation.root",rawname.data()),"RECREATE");
-
-  std::cout<<"Clusters Passed Iosalation and Shower Shape: "<<N_Signal_Triggers<<std::endl;
 			  
   h_purity.Write("purities");
 
