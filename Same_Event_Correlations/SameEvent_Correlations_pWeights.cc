@@ -731,11 +731,11 @@ int main(int argc, char *argv[])
 
     fprintf(stderr,"%d: CLUSTER CUT SUMMARY \n ",__LINE__);
     fprintf(stderr,"%d: pT_max =  %f \n ",__LINE__,pT_max);
-    fprintf(stderr,"%d: %f \n ",__LINE__,Eta_max);
-    fprintf(stderr,"%d: %f \n ",__LINE__,Cluster_min);
-    fprintf(stderr,"%d: %f \n ",__LINE__,EcrossoverE_min);
-    fprintf(stderr,"%d: %f \n ",__LINE__,Cluster_DtoBad);
-    fprintf(stderr,"%d: %f \n ",__LINE__,cluster_time);
+    fprintf(stderr,"%d: eta max = %f \n ",__LINE__,Eta_max);
+    fprintf(stderr,"%d: ncell min = %f \n ",__LINE__,Cluster_min);
+    fprintf(stderr,"%d: Ecross/E = %f \n ",__LINE__,EcrossoverE_min);
+    fprintf(stderr,"%d: Dist. bad channel = %f \n ",__LINE__,Cluster_DtoBad);
+    fprintf(stderr,"%d: cluster tof = %f \n ",__LINE__,cluster_time);
     
     fprintf(stderr,"Looping to determine weights and pT spectra \n");
     for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
@@ -743,12 +743,10 @@ int main(int argc, char *argv[])
       _tree_event->GetEntry(ievent);
       fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, ievent, nentries);
 
+      //event selection
       if(TMath::Abs(primary_vertex[2])>10) continue;
       if(primary_vertex[2]==0.00) continue;
-
-      //fputs(is_pileup_from_spd_5_08 ? "true" : "false", stdout);
       if(is_pileup_from_spd_5_08) continue;
-
       
       bool first_cluster = true;
       for (ULong64_t n = 0; n < ncluster; n++) {
@@ -757,14 +755,14 @@ int main(int argc, char *argv[])
 	if( not(cluster_ncell[n]>=Cluster_min)) continue;                    //removes clusters with 1 or 2 cells
 	if( not(cluster_e_cross[n]/cluster_e[n]>EcrossoverE_min)) continue; //removes "spiky" clusters
 	if( not(cluster_distance_to_bad_channel[n]>=Cluster_DtoBad)) continue; //removes clusters near bad channels
-	if( not(cluster_nlocal_maxima[n] < 3)) continue; //require to have at most 2 local maxima.
+	//if( not(cluster_nlocal_maxima[n] < 3)) continue; //require to have at most 2 local maxima.
 	if (not(abs(cluster_tof[n]) < cluster_time)) continue;
 	
 	float isolation;
 	if (determiner == CLUSTER_ISO_TPC_04) isolation = cluster_iso_tpc_04[n];
 	else if (determiner == CLUSTER_ISO_ITS_04) isolation = cluster_iso_its_04[n];
 	else if (determiner == CLUSTER_FRIXIONE_TPC_04_02) isolation = cluster_frixione_tpc_04_02[n];
-	else if (determiner == CLUSTER_ISO_ITS_04_SUB) isolation =  cluster_iso_its_04[n] + cluster_iso_its_04_ue[n] + ue_estimate_its_const*0.4*0.4*3.1416;
+	else if (determiner == CLUSTER_ISO_ITS_04_SUB) isolation =  cluster_iso_its_04[n] + cluster_iso_its_04_ue[n] - ue_estimate_its_const*0.4*0.4*3.1416;
 	else isolation = cluster_frixione_its_04_02[n];
 
 	// fprintf(stderr,"\n ue constant = %f \n",ue_estimate_its_const);
@@ -869,17 +867,19 @@ int main(int argc, char *argv[])
     } //Events
 
     hweight.Divide(&hBR);
-
+    
     std::cout<<"Clusters Passed Iosalation and Shower Shape: "<<N_Signal_Triggers<<std::endl;
     
     //MAIN CORRELATION LOOP
-
+    N_Signal_Triggers = 0;
+    
     fprintf(stderr,"\n Looping for main correlation functions \n");
     for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
       
       _tree_event->GetEntry(ievent);
       fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, ievent, nentries);
 
+      //event selection
       if(TMath::Abs(primary_vertex[2])>10) continue;
       if(primary_vertex[2]==0.00) continue;
       if(is_pileup_from_spd_5_08) continue;
@@ -895,14 +895,14 @@ int main(int argc, char *argv[])
 	if( not(cluster_e_cross[n]/cluster_e[n]>EcrossoverE_min)) continue; //removes "spiky" clusters
 	if( not(cluster_distance_to_bad_channel[n]>=Cluster_DtoBad)) continue; //removes clusters near bad channels
 	//	if( not(cluster_nlocal_maxima[n] < Cluster_NLocal_Max)) continue; //require to have at most 2 local maxima.
-	if( not(cluster_nlocal_maxima[n] < 3)) continue; //require to have at most 2 local maxima.
+	//if( not(cluster_nlocal_maxima[n] < 3)) continue; //require to have at most 2 local maxima.
 	if (not(abs(cluster_tof[n]) < cluster_time)) continue;
 	
 	float isolation;
 	if (determiner == CLUSTER_ISO_TPC_04) isolation = cluster_iso_tpc_04[n];
 	else if (determiner == CLUSTER_ISO_ITS_04) isolation = cluster_iso_its_04[n];
 	else if (determiner == CLUSTER_FRIXIONE_TPC_04_02) isolation = cluster_frixione_tpc_04_02[n];
-	else if (determiner == CLUSTER_ISO_ITS_04_SUB) isolation =  cluster_iso_its_04[n] + cluster_iso_its_04_ue[n] + ue_estimate_its_const*0.4*0.4*3.1416;
+	else if (determiner == CLUSTER_ISO_ITS_04_SUB) isolation =  cluster_iso_its_04[n] + cluster_iso_its_04_ue[n] - ue_estimate_its_const*0.4*0.4*3.1416;
 	else isolation = cluster_frixione_its_04_02[n];
 	
 	Isolated = (isolation<iso_max);
@@ -947,6 +947,8 @@ int main(int argc, char *argv[])
 	  }
 
 	if (Signal and Isolated){
+
+	  N_Signal_Triggers += 1;
 	  purity_weight = 1.0/Get_Purity_ErrFunction(cluster_pt[n],purity_deviation,Is_pp);
 	  for (int ipt = 0; ipt < nptbins; ipt++){
 	    if (cluster_pt[n] >= ptbins[ipt] && cluster_pt[n] < ptbins[ipt+1]){
@@ -1044,7 +1046,7 @@ int main(int argc, char *argv[])
       }//for nclusters
     } //for nevents  
     //}//end loop over samples
-
+    std::cout<<"Clusters Passed Iosalation and Shower Shape: "<<N_Signal_Triggers<<std::endl;
   // Write to fout
   
   //TFile* fout = new TFile(Form("fout_Corr_config%s.root", opened_files.c_str()),"RECREATE");
