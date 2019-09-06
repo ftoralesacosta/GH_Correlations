@@ -744,9 +744,9 @@ int main(int argc, char *argv[])
       fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, ievent, nentries);
 
       //event selection
-      if(TMath::Abs(primary_vertex[2])>10) continue;
-      if(primary_vertex[2]==0.00) continue;
-      if(is_pileup_from_spd_5_08) continue;
+      // if(TMath::Abs(primary_vertex[2])>10) continue;
+      // if(primary_vertex[2]==0.00) continue;
+      // if(is_pileup_from_spd_5_08) continue;
       
       bool first_cluster = true;
       for (ULong64_t n = 0; n < ncluster; n++) {
@@ -756,7 +756,7 @@ int main(int argc, char *argv[])
 	if( not(cluster_e_cross[n]/cluster_e[n]>EcrossoverE_min)) continue; //removes "spiky" clusters
 	if( not(cluster_distance_to_bad_channel[n]>=Cluster_DtoBad)) continue; //removes clusters near bad channels
 	//if( not(cluster_nlocal_maxima[n] < 3)) continue; //require to have at most 2 local maxima.
-	if (not(abs(cluster_tof[n]) < cluster_time)) continue;
+	//if (not(abs(cluster_tof[n]) < cluster_time)) continue;
 	
 	float isolation;
 	if (determiner == CLUSTER_ISO_TPC_04) isolation = cluster_iso_tpc_04[n];
@@ -880,9 +880,9 @@ int main(int argc, char *argv[])
       fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, ievent, nentries);
 
       //event selection
-      if(TMath::Abs(primary_vertex[2])>10) continue;
-      if(primary_vertex[2]==0.00) continue;
-      if(is_pileup_from_spd_5_08) continue;
+      // if(TMath::Abs(primary_vertex[2])>10) continue;
+      // if(primary_vertex[2]==0.00) continue;
+      // if(is_pileup_from_spd_5_08) continue;
 
       Float_t purity_weight = 0;
       Float_t BR_purity_weight = 0;
@@ -896,7 +896,7 @@ int main(int argc, char *argv[])
 	if( not(cluster_distance_to_bad_channel[n]>=Cluster_DtoBad)) continue; //removes clusters near bad channels
 	//	if( not(cluster_nlocal_maxima[n] < Cluster_NLocal_Max)) continue; //require to have at most 2 local maxima.
 	//if( not(cluster_nlocal_maxima[n] < 3)) continue; //require to have at most 2 local maxima.
-	if (not(abs(cluster_tof[n]) < cluster_time)) continue;
+	//if (not(abs(cluster_tof[n]) < cluster_time)) continue;
 	
 	float isolation;
 	if (determiner == CLUSTER_ISO_TPC_04) isolation = cluster_iso_tpc_04[n];
