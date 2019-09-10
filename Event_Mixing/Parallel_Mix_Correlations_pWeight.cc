@@ -30,8 +30,7 @@
 
 const int MAX_INPUT_LENGTH = 200;
 
-enum isolationDet {CLUSTER_ISO_TPC_04, CLUSTER_ISO_ITS_04, CLUSTER_FRIXIONE_TPC_04_02, CLUSTER_FRIXIONE_ITS_04_02};
-
+enum isolationDet {CLUSTER_ISO_TPC_04, CLUSTER_ISO_ITS_04, CLUSTER_ISO_ITS_04_SUB, CLUSTER_ISO_TPC_04_SUB, CLUSTER_FRIXIONE_TPC_04_02, CLUSTER_FRIXIONE_ITS_04_02};
 using namespace H5;
 
 //int main(int argc, const char rootfilename, const char hdf5filename, const char *mixing_start, const char *mixing_end)
@@ -290,7 +289,15 @@ int main(int argc ,char *argv[])
               determiner = CLUSTER_ISO_ITS_04;
               std::cout << "Isolation Variable: cluster_iso_its_04" << std::endl; }
 
-          else if (strcmp(value, "cluster_frixione_tpc_04_02") == 0){
+          else if (strcmp(value, "cluster_iso_its_04_sub") == 0){
+              determiner = CLUSTER_ISO_ITS_04_SUB;
+              std::cout << "Isolation Variable: cluster_iso_its_04_sub" << std::endl; }
+
+          else if (strcmp(value, "cluster_iso_tpc_04_sub") == 0){
+              determiner = CLUSTER_ISO_TPC_04_SUB;
+              std::cout << "Isolation Variable: cluster_iso_tpc_04_sub" << std::endl; }
+
+	  else if (strcmp(value, "cluster_frixione_tpc_04_02") == 0){
               determiner = CLUSTER_FRIXIONE_TPC_04_02;
               std::cout << "Isolation Variable: cluster_frixione_tpc_04_02" << std::endl; }
 
@@ -415,7 +422,9 @@ int main(int argc ,char *argv[])
     //variables
     Double_t primary_vertex[3];
     Float_t multiplicity_v0[64];
-
+    Float_t ue_estimate_its_const;
+    Float_t ue_estimate_tpc_const;
+    
     UInt_t ntrack;
     Float_t track_e[NTRACK_MAX];
     Float_t track_pt[NTRACK_MAX];
@@ -442,6 +451,9 @@ int main(int argc ,char *argv[])
     Float_t cluster_distance_to_bad_channel[NTRACK_MAX];
     UChar_t cluster_nlocal_maxima[NTRACK_MAX];
 
+    Float_t cluster_iso_its_04_ue[NTRACK_MAX];
+    Float_t cluster_iso_tpc_04_ue[NTRACK_MAX];
+    
     fprintf(stderr,"Initializing Mixing Branch to %i ME",nmix);
     Long64_t mix_events[300];
 
@@ -465,6 +477,9 @@ int main(int argc ,char *argv[])
   
     _tree_event->SetBranchAddress("primary_vertex", primary_vertex);
     _tree_event->SetBranchAddress("multiplicity_v0", multiplicity_v0);
+    _tree_event->SetBranchAddress("ue_estimate_its_const", &ue_estimate_its_const);
+    _tree_event->SetBranchAddress("ue_estimate_tpc_const", &ue_estimate_tpc_const);
+    
     _tree_event->SetBranchAddress("ntrack", &ntrack);
     _tree_event->SetBranchAddress("track_e", track_e);
     _tree_event->SetBranchAddress("track_pt", track_pt);
@@ -488,6 +503,9 @@ int main(int argc ,char *argv[])
     _tree_event->SetBranchAddress("cluster_distance_to_bad_channel", cluster_distance_to_bad_channel);
     _tree_event->SetBranchAddress("cluster_nlocal_maxima", cluster_nlocal_maxima);
 
+    _tree_event->SetBranchAddress("cluster_iso_its_04_ue",cluster_iso_its_04_ue);
+    _tree_event->SetBranchAddress("cluster_iso_tpc_04_ue",cluster_iso_tpc_04_ue);
+    
     _tree_event->SetBranchAddress("cluster_ncell", cluster_ncell);
     _tree_event->SetBranchAddress("cluster_cell_id_max", cluster_cell_id_max);
     _tree_event->SetBranchAddress("cell_e", cell_e);
@@ -645,7 +663,8 @@ int main(int argc ,char *argv[])
 
     Float_t purity_weight_sum[nptbins] = {0};
     Float_t BR_purity_weight_sum[nptbins] = {0};
-
+    bool TPC_Iso_Flag = false;
+    
     //MAIN LOOP
     auto event_begin = std::chrono::steady_clock::now();
     for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
@@ -677,8 +696,15 @@ int main(int argc ,char *argv[])
         float isolation;
         if (determiner == CLUSTER_ISO_TPC_04) isolation = cluster_iso_tpc_04[n];
         else if (determiner == CLUSTER_ISO_ITS_04) isolation = cluster_iso_its_04[n];
-        else if (determiner == CLUSTER_FRIXIONE_TPC_04_02) isolation = cluster_frixione_tpc_04_02[n];
-        else isolation = cluster_frixione_its_04_02[n];
+        else if (determiner == CLUSTER_ISO_ITS_04_SUB) isolation = cluster_iso_its_04[n]
+                                                         + cluster_iso_its_04_ue[n]
+                                                         - ue_estimate_its_const*3.1416*0.4*0.4;
+
+        else if (determiner == CLUSTER_ISO_TPC_04_SUB) {
+          isolation = cluster_iso_tpc_04[n] + cluster_iso_tpc_04_ue[n]
+            - ue_estimate_tpc_const*3.1416*0.4*0.4;
+          TPC_Iso_Flag = true;
+        }
 
 	Bool_t Signal = false;
         Bool_t Background = false;
