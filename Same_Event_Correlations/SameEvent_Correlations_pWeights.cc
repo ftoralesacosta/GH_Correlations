@@ -51,11 +51,11 @@ Float_t Get_Purity_ErrFunction(Float_t pT_GeV, std::string deviation,bool Is_pp,
   }
 		    
   if (Is_pp){
-    fprintf(stderr,"\n");
-    fprintf(stderr,"\n PP SELECTED");
-	     par[0] = 0.500229283252;
-	     par[1] = 9.016920902665;
-	     par[2] = 11.373299838596;
+    // fprintf(stderr,"\n");
+    // fprintf(stderr,"\n PP SELECTED \n");
+    par[0] = 0.500229283252;
+    par[1] = 9.016920902665;
+    par[2] = 11.373299838596;
   }
   //order of conditionals ensures pp always overwrights TPC purity
   
@@ -72,7 +72,7 @@ Float_t Get_Purity_ErrFunction(Float_t pT_GeV, std::string deviation,bool Is_pp,
   }
 
   purity_val = par[0]*TMath::Erf((pT_GeV-par[1])/par[2]);
-  //fprintf(stderr,"\n %d: Purity from Errf = %f \n",__LINE__,purity_val);
+  fprintf(stderr,"\n %d: Cluster pT = %f, Purity = %f \n",__LINE__,pT_GeV,purity_val);
   return purity_val;
 }
 
@@ -771,7 +771,7 @@ int main(int argc, char *argv[])
 
     fprintf(stderr,"Looping to determine weights and pT spectra \n");
     for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
-    //for(Long64_t ievent = 0; ievent < 10000 ; ievent++){
+    //for(Long64_t ievent = 0; ievent < 1000 ; ievent++){
       _tree_event->GetEntry(ievent);
       fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, ievent, nentries);
 
