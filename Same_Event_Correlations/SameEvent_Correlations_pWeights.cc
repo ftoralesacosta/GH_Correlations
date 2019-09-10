@@ -22,21 +22,37 @@ const int MAX_INPUT_LENGTH = 200;
 enum isolationDet {CLUSTER_ISO_TPC_04, CLUSTER_ISO_ITS_04, CLUSTER_ISO_ITS_04_SUB, CLUSTER_ISO_TPC_04_SUB, CLUSTER_FRIXIONE_TPC_04_02, CLUSTER_FRIXIONE_ITS_04_02};
 
 
-Float_t Get_Purity_ErrFunction(Float_t pT_GeV, std::string deviation,bool Is_pp=false, bool Use_TPC=false) {
+Float_t Get_Purity_ErrFunction(Float_t pT_GeV, std::string deviation,bool Is_pp, bool Use_TPC) {
 
+  // fprintf(stderr,"\n USE TPC FLAG = ");
+  // fputs(Use_TPC ? "true \n" : "false \n", stdout);
+
+  // fprintf(stderr,"\n Proton-Proton FLAG = ");
+  // fputs(Is_pp ? "true \n" : "false \n", stdout);
+  
   Float_t purity_val = 0;
 
   Float_t par[3] = {0.549684905516,
 		     8.44338685256,
 		    13.3454091464};
 
+  //purity_val = par[0]*TMath::Erf((pT_GeV-par[1])/par[2]);
+  //fprintf(stderr,"\n %d: Purity ITS = %f",__LINE__,purity_val);
+  
   if(Use_TPC){ //pPb
     par[0] = 0.569429959156;
     par[1] = 8.1906528936;
     par[2] = 11.8993694765;
+
+    // purity_val = par[0]*TMath::Erf((pT_GeV-par[1])/par[2]);
+    // fprintf(stderr,"\n %d: Purity TPC = %f",__LINE__,purity_val);
+    // fprintf(stderr,"\n %d: Purity TPC = %f",__LINE__,purity_val);
+
   }
 		    
   if (Is_pp){
+    fprintf(stderr,"\n");
+    fprintf(stderr,"\n PP SELECTED");
 	     par[0] = 0.500229283252;
 	     par[1] = 9.016920902665;
 	     par[2] = 11.373299838596;
@@ -755,7 +771,7 @@ int main(int argc, char *argv[])
 
     fprintf(stderr,"Looping to determine weights and pT spectra \n");
     for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
-    //for(Long64_t ievent = 0; ievent < 1000 ; ievent++){
+    //for(Long64_t ievent = 0; ievent < 10000 ; ievent++){
       _tree_event->GetEntry(ievent);
       fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, ievent, nentries);
 
@@ -894,12 +910,15 @@ int main(int argc, char *argv[])
     } //Events
 
     hweight.Divide(&hBR);
+    std::cout<<"Clusters Passed Iosalation and Shower Shape: "<<N_Signal_Triggers<<std::endl;
+    N_Signal_Triggers = 0; //helps check 2 loops have same cluster criteria
 
+    
     //MAIN CORRELATION LOOP
 
     fprintf(stderr,"\n Looping for main correlation functions \n");
     for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
-      
+    //for(Long64_t ievent = 0; ievent < 10000 ; ievent++){     
       _tree_event->GetEntry(ievent);
       fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, ievent, nentries);
 
@@ -926,10 +945,10 @@ int main(int argc, char *argv[])
 	else if (determiner == CLUSTER_ISO_ITS_04) isolation = cluster_iso_its_04[n];
 	else if (determiner == CLUSTER_ISO_ITS_04_SUB)
 	  isolation = cluster_iso_its_04[n] + cluster_iso_its_04_ue[n]- ue_estimate_its_const*3.1416*0.4*0.4;
-	  
 	else if (determiner == CLUSTER_ISO_TPC_04_SUB) {
 
 	  TPC_Iso_Flag = true;
+
 	  isolation = cluster_iso_tpc_04[n] + cluster_iso_tpc_04_ue[n] - ue_estimate_tpc_const*3.1416*0.4*0.4;
 	  //fprintf(stderr,"\n %d: Isolation = %f \n",__LINE__,isolation);
 	  
@@ -983,6 +1002,7 @@ int main(int argc, char *argv[])
 	  }
 
 	if (Signal and Isolated){
+	  N_Signal_Triggers += 1;
 	  purity_weight = 1.0/Get_Purity_ErrFunction(cluster_pt[n],purity_deviation,Is_pp,TPC_Iso_Flag);
 	  for (int ipt = 0; ipt < nptbins; ipt++){
 	    if (cluster_pt[n] >= ptbins[ipt] && cluster_pt[n] < ptbins[ipt+1]){
