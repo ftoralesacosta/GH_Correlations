@@ -72,7 +72,7 @@ Float_t Get_Purity_ErrFunction(Float_t pT_GeV, std::string deviation,bool Is_pp,
   }
 
   purity_val = par[0]*TMath::Erf((pT_GeV-par[1])/par[2]);
-  fprintf(stderr,"\n %d: Cluster pT = %f, Purity = %f \n",__LINE__,pT_GeV,purity_val);
+  //fprintf(stderr,"\n %d: Cluster pT = %f, Purity = %f \n",__LINE__,pT_GeV,purity_val);
   return purity_val;
 }
 
@@ -128,6 +128,8 @@ int main(int argc, char *argv[])
   std::string shower_shape = "DNN";
   std::string purity_deviation = "None";
 
+  bool TPC_Iso_Flag = false;
+  
   // Zt bins
   //FIXME: Will have to likely set nztbins first, then initialize array
   int nztbins = 7;
@@ -305,7 +307,8 @@ int main(int argc, char *argv[])
 
 	  else if (strcmp(value, "cluster_iso_tpc_04_sub") == 0){
               determiner = CLUSTER_ISO_TPC_04_SUB;
-              std::cout << "Isolation Variable: cluster_iso_tpc_04_sub" << std::endl; }
+	      TPC_Iso_Flag = true;
+	      std::cout << "Isolation Variable: cluster_iso_tpc_04_sub" << std::endl; }
 	  
           else if (strcmp(value, "cluster_frixione_tpc_04_02") == 0){
               determiner = CLUSTER_FRIXIONE_TPC_04_02;
@@ -415,28 +418,14 @@ int main(int argc, char *argv[])
   }
 
 
-  // float OneMinFakeRate[15] = {0.9821,0.9821,0.9803,0.9751,0.9645,0.9525,0.9278,0.9098,0.8702,0.8593,0.7870,0.7825,0.7624,0.7389,0.6710};
-  // const float Efficiency = 0.85;
-  // float Smearing_Correction[15] = {1.007,1.007,0.982,0.957,0.926,0.894,0.853,0.817,0.757,0.681,0.673,0.619,0.469,0.342,0. 301};
-  //
-  // Track pT Bins Used for Corrections
-  // std::array< float,31 > track_pT_Correction = {0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95,1.0,1.1,1.2,1.4,1.6,1.8,2.0,2.2,2.4,2.6,2.8,3.0,3.2,3.6,4.0,5.0,6.0,8.0,10.0,13,20};
 
-    //p-Pb
-    // float Efficiency[29] =  {0.853948, 0.855174, 0.857245, 0.858315, 0.858334, 0.859078, 0.860819, 0.860223, 0.860368, 0.860849, 0.862532, 0.864867, 0.867081, 0.869168, 0.869016, 0.872149, 0.872669, 0.874919, 0.876616, 0.876491, 0.87365, 0.877567, 0.8777, 0.882617, 0.88169, 0.881348, 0.880515, 0.87605, 0.882653};
-
-    // float FakeRate[29] = {0.0184162, 0.0180536, 0.0175808, 0.0177315, 0.017413, 0.0172551, 0.0175637, 0.017715, 0.0172888, 0.0178326, 0.0178794, 0.0179673, 0.0177509, 0.0182945, 0.0181996, 0.0188647, 0.0190429, 0.0202744, 0.0209381, 0.0213728, 0.0237848, 0.0251898, 0.0297774, 0.0350703, 0.0518793, 0.0804111, 0.137953, 0.214123, 0.301459};
-    
-    // float Smearing_Correction[29] = {1.00998, 1.00622, 1.00519, 1.00425, 1.00182, 0.99553, 0.992115, 0.991085, 0.989869, 0.988516, 0.987711, 0.989906, 0.990167, 0.994517, 0.994247, 0.99273, 0.983717, 0.986158, 0.978648, 0.986939, 0.963266, 0.959108, 0.945863, 0.923434, 0.896206, 0.86263, 0.71868, 0.629909, 0.425061};
-
-
-  std::array< float,38 > track_pT_Correction = {0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50,
+  std::array< float,38 > track_pT_Correction_bins = {0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50,
 						0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90,
 						0.95, 1.00, 1.10, 1.20, 1.40, 1.60, 1.80, 2.00,
 						2.20, 2.40, 2.60, 2.80, 3.00, 3.20, 3.60, 4.00,
 						5.00, 6.00, 8.00, 10.0, 13.0, 20.0};
 
-  int N_Track_pT_Bins = track_pT_Correction.size()-1;
+  int N_Track_pT_Bins = track_pT_Correction_bins.size()-1;
   fprintf(stderr,"NUMBER OF TRACK PT BINS IS %i \n \n",N_Track_pT_Bins);
     
 
@@ -457,19 +446,67 @@ int main(int argc, char *argv[])
   float pPb_Smearing_Correction[37] = {0.894311, 0.994658, 1.00122, 1.0087, 1.00914, 1.01009, 1.00939, 1.01073, 1.00998, 1.00622, 1.00519, 1.00425, 1.00182, 0.99553, 0.992115, 0.991085, 0.989869, 0.988516, 0.987711, 0.989906, 0.990167, 0.994517, 0.994247, 0.99273, 0.983717, 0.986158, 0.978648, 0.986939, 0.963266, 0.959108, 0.945863, 0.923434, 0.896206, 0.86263, 0.71868, 0.629909, 0.425061};
   
 
-  // float pp_Efficiency[29] = {0.833835601807,0.836869120598,0.839235246181,0.841083467007,0.843128025532,
-  // 			     0.84164339304,0.844368815422,0.843157708645,0.842828392982,0.844945728779,
-  // 			     0.846174120903,0.849676072598,0.85161960125,0.851656377316,0.855973064899,
-  // 			     0.859771847725,0.856857895851,0.856580495834,0.866534769535,0.862415850163,
-  // 			     0.864510595798,0.863728642464,0.871034324169,0.870704054832,0.872091054916,
-  // 			     0.867180407047,0.848246216774,0.860869586468,0.887700557709};
 
-       // float pp_FakeRate[29] = {0.0250246, 0.0245797, 0.0242376, 0.0240682, 0.023281, 0.0246955, 0.0235495, 0.0230017, 0.0236568, 0.022912, 0.0237135, 0.0229813, 0.0223819, 0.0223993, 0.0238591, 0.0252843, 0.0253992, 0.0250655, 0.0254672, 0.0271102, 0.0272849, 0.0233524, 0.0321137, 0.040308, 0.0611087, 0.0730563, 0.13447, 0.148867, 0.292818};
+    std::array< float,51 > TPC_track_pT_Correction_bins = {0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5,
+							   0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9,
+							   0.95, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6,
+							   1.7, 1.8, 1.9, 2, 2.2, 2.4, 2.6, 2.8,
+							   3, 3.2, 3.4, 3.6, 3.8, 4, 4.5, 5,
+							   5.5, 6, 6.5, 7, 8, 9, 10, 11, 12, 13, 14};
+
+    int N_TPC_Track_pT_Bins = TPC_track_pT_Correction_bins.size()-1;
+
+    float TPC_pPb_Efficiency[N_TPC_Track_pT_Bins] = {0.5867693424, 0.6911254525,0.7336804867, 0.7650601268,
+						     0.7925264239, 0.8127673268,0.8275696635, 0.8387191296,
+						     0.8461661935, 0.8519890308,0.85583359, 0.8587060571,
+						     0.8605732322, 0.8621085882,0.8631671667, 0.8642088175,
+						     0.8647749424, 0.8643072844,0.8677230477, 0.8718497753,
+						     0.8744822741, 0.8703474402,0.8715935946, 0.8735370636,
+						     0.8726101518, 0.8705785275,0.8655129671, 0.8545784354,
+						     0.8449353576, 0.8368939161,0.8319132924, 0.8291873336,
+						     0.8325293064, 0.834860146,0.8377019167, 0.8426615,
+						     0.8430748582, 0.8475763798,0.856606245, 0.8528164625,
+						     0.8603565693, 0.8575622439,0.8744791746, 0.8765413761,
+						     0.8653901219, 0.8669821024,0.8549746871, 0.8416666389,
+						     0.8819277287, 0.8582089543};
+
+    float TPC_pPb_FakeRate[N_TPC_Track_pT_Bins] = {0.02952835709, 0.02360016666,
+					     0.02065094374, 0.01941830292,0.01874902286, 0.01761478558,
+					     0.01669583283, 0.01596949063,0.01551650651, 0.01526045054,
+					     0.01498838048, 0.01479246933,0.01460200734, 0.01449344773,
+					     0.01432006247, 0.0139457956,0.01425391622, 0.01395579707,
+					     0.0137891043, 0.01371407881,0.013224978, 0.01300536282,
+					     0.01288809255, 0.01266333833,0.01300011016, 0.01260772068,
+					     0.01240321435, 0.01243534964,0.01235494018, 0.01211020909,
+					     0.01210790593, 0.01196851861,0.01157244854, 0.01151115727,
+					     0.0119260475, 0.01144340821,0.01208098885, 0.0112716658,
+					     0.01107564662, 0.01196976099,0.01059919689, 0.01005556993,
+					     0.01106236875, 0.01042175572,0.009913654998, 0.01078320108,
+					     0.01424501464, 0.01892744564,0.008196720853, 0.007968127728};
+
+    float TPC_pPb_Smearing_Correction[N_TPC_Track_pT_Bins] =  {0.9633022736,1.000103796,0.9990538363,0.9980777293,
+							       0.9992338076,1.00126975,1.002764827,1.003955855,
+							       1.00396996,1.004819844,1.004234793,1.003327841,
+							       1.004936572,1.004297549,1.004503464,1.004763271,
+							       1.006574166,1.003742764,1.003480562,1.003139268,
+							       1.00315121,1.003883008,1.003246503,1.002383757,
+							       1.003722925,1.002248603,1.003694197,1.003056597,
+							       1.004307807,1.003282579,1.005886125,1.0035825,
+							       1.001216322,1.00245251,0.9995267124,0.9980988593,
+							       1.000157233,0.9919125185,0.9941652735,0.9886572324,
+							       0.9887442842,0.9957731115,0.9868730408,0.9894348482,
+							       0.997693575,0.9665885111,0.9941176471,0.9983525535,
+							       1.045714286,0.9426229508};
 
     
-    // float pp_Smearing_Correction[29] = {1.00905, 1.00653, 1.00859, 1.00616, 0.997317, 1.00387, 0.993037, 1.00025, 0.994664, 0.99143, 1.00412, 0.994017, 0.989386, 0.995787, 0.987843, 0.990099, 0.972225, 0.997532, 0.975834, 0.971739, 0.939599, 0.951686, 0.971399, 0.904032, 0.915311, 0.897727, 0.670429, 0.666667, 0.512195};
-
   //pp
+
+  std::array< float,38 > pp_track_pT_Correction_bins = {0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50,
+                                                0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90,
+                                                0.95, 1.00, 1.10, 1.20, 1.40, 1.60, 1.80, 2.00,
+                                                2.20, 2.40, 2.60, 2.80, 3.00, 3.20, 3.60, 4.00,
+                                                5.00, 6.00, 8.00, 10.0, 13.0, 20.0};
+
   float pp_Efficiency[37] = {0.686749, 0.774554, 0.791098, 0.806701, 0.815491, 0.824043, 0.83069, 0.833836,
 			     0.836869, 0.839235, 0.841083, 0.843128, 0.841643, 0.844369, 0.843158, 0.842828,
 			     0.844946, 0.846174, 0.849676, 0.85162, 0.851656, 0.855973, 0.859772, 0.856858,
@@ -748,7 +785,6 @@ int main(int argc, char *argv[])
 
 
     //IMPORTANT BOOLEAN VARIABLES
-    Bool_t TPC_Iso_Flag = false;
     Bool_t Signal = false;
     Bool_t Background = false;
     Bool_t Isolated = false;
@@ -771,14 +807,14 @@ int main(int argc, char *argv[])
 
     fprintf(stderr,"Looping to determine weights and pT spectra \n");
     for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
-    //for(Long64_t ievent = 0; ievent < 1000 ; ievent++){
+      //for(Long64_t ievent = 0; ievent < 1000 ; ievent++){
       _tree_event->GetEntry(ievent);
       fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, ievent, nentries);
 
       //Event selection
       if(TMath::Abs(primary_vertex[2])>10) continue;
       if(primary_vertex[2]==0.00) continue;
-      // if(is_pileup_from_spd_5_08) continue;
+      if(is_pileup_from_spd_5_08) continue;
       
       bool first_cluster = true;
       for (ULong64_t n = 0; n < ncluster; n++) {
@@ -798,8 +834,6 @@ int main(int argc, char *argv[])
 	
 	else if (determiner == CLUSTER_ISO_TPC_04_SUB) {
 
-	  TPC_Iso_Flag = true;
-	  
 	  isolation = cluster_iso_tpc_04[n] + cluster_iso_tpc_04_ue[n] - ue_estimate_tpc_const*3.1416*0.4*0.4;	  
 	    
 	  if (Is_pp) //pp does not use TPC (17q)
@@ -918,7 +952,7 @@ int main(int argc, char *argv[])
 
     fprintf(stderr,"\n Looping for main correlation functions \n");
     for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
-    //for(Long64_t ievent = 0; ievent < 10000 ; ievent++){     
+      //for(Long64_t ievent = 0; ievent < 10000 ; ievent++){     
       _tree_event->GetEntry(ievent);
       fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, ievent, nentries);
 
@@ -929,7 +963,7 @@ int main(int argc, char *argv[])
       //Event Selection
       if(TMath::Abs(primary_vertex[2])>10) continue;
       if(primary_vertex[2]==0.00) continue;
-      //if(is_pileup_from_spd_5_08) continue;
+      if(is_pileup_from_spd_5_08) continue;
     
       for (ULong64_t n = 0; n < ncluster; n++) {
 	if( not(cluster_pt[n]>pT_min and cluster_pt[n]<pT_max)) continue;   //select pt of photons
@@ -946,8 +980,6 @@ int main(int argc, char *argv[])
 	else if (determiner == CLUSTER_ISO_ITS_04_SUB)
 	  isolation = cluster_iso_its_04[n] + cluster_iso_its_04_ue[n]- ue_estimate_its_const*3.1416*0.4*0.4;
 	else if (determiner == CLUSTER_ISO_TPC_04_SUB) {
-
-	  TPC_Iso_Flag = true;
 
 	  isolation = cluster_iso_tpc_04[n] + cluster_iso_tpc_04_ue[n] - ue_estimate_tpc_const*3.1416*0.4*0.4;
 	  //fprintf(stderr,"\n %d: Isolation = %f \n",__LINE__,isolation);
@@ -1039,21 +1071,27 @@ int main(int argc, char *argv[])
 	  //Apply corrections as weights. 1/Eff, *FakeRate, *SmearingAffect
 
 	    for (int ipt = 0; ipt < N_Track_pT_Bins; ipt++){
-	      if( (track_pt[itrack] >= track_pT_Correction[ipt]) && (track_pt[itrack] < track_pT_Correction[ipt+1])){
+	      if( (track_pt[itrack] >= track_pT_Correction_bins[ipt]) && (track_pt[itrack] < track_pT_Correction_bins[ipt+1])){
 		track_weight = pPb_Smearing_Correction[ipt]*(1.0-pPb_FakeRate[ipt])/pPb_Efficiency[ipt];
 		//fprintf(stderr,"\n %d: Low Edge=%f, High Edge=%f, Smear=%f, FakeRake=%f, Efficiency=%f\n",__LINE__,track_pT_Correction[ipt],track_pT_Correction[ipt+1],pPb_Smearing_Correction[ipt],pPb_FakeRate[ipt],pPb_Efficiency[ipt]);
 	      }
 	    }
 	
-
+	    if (TPC_Iso_Flag){
+	      for (int ipt = 0; ipt < N_TPC_Track_pT_Bins; ipt++){
+		if( (track_pt[itrack] >= TPC_track_pT_Correction_bins[ipt]) && (track_pt[itrack] < TPC_track_pT_Correction_bins[ipt+1])){
+		  track_weight = TPC_pPb_Smearing_Correction[ipt]*(1.0-TPC_pPb_FakeRate[ipt])/TPC_pPb_Efficiency[ipt];
+		  //fprintf(stderr,"\n %d: Low Edge=%f, High Edge=%f, Smear=%f, FakeRake=%f, Efficiency=%f\n",__LINE__,TPC_track_pT_Correction_bins[ipt],TPC_track_pT_Correction_bins[ipt+1],TPC_pPb_Smearing_Correction[ipt],TPC_pPb_FakeRate[ipt],TPC_pPb_Efficiency[ipt]);
+		}
+	      }
+	    }
 	    
-	  //Different Correction for pp, make sure to reset track weight
 	  if (Is_pp){
 	    
 	    track_weight = 1.0;
 
 	    for (int ipt = 0; ipt < N_Track_pT_Bins; ipt++){
-	      if( (track_pt[itrack] >= track_pT_Correction[ipt]) && (track_pt[itrack] < track_pT_Correction[ipt+1])){
+	      if( (track_pt[itrack] >= pp_track_pT_Correction_bins[ipt]) && (track_pt[itrack] < pp_track_pT_Correction_bins[ipt+1])){
 		track_weight = pp_Smearing_Correction[ipt]*(1.0-pp_FakeRate[ipt])/pp_Efficiency[ipt];
 	      }
 	    }

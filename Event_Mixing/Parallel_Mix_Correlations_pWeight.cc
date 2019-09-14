@@ -97,8 +97,10 @@ int main(int argc ,char *argv[])
   std::string file_str = argv[2];
   const H5std_string hdf5_file_name(file_str.c_str());
   TString hdf5_file = (TString)argv[2];
+  fprintf(stderr,"%d: HDF5 File = ",__LINE__);
   fprintf(stderr,hdf5_file);
-
+  std::cout<<std::endl;
+  
   size_t mix_start = stoull(std::string(argv[3]));
   size_t mix_end = stoull(std::string(argv[4]));
 
@@ -518,9 +520,11 @@ int main(int argc ,char *argv[])
     //Using low level hdf5 API
     //open hdf5: Define size of data from file, explicitly allocate memory in hdf5 space and array size
 
-    const std::string track_ds_name("track");
+  
     //H5File h5_file( hdf5_file_name, H5F_ACC_RDONLY );
     H5File h5_file( file_str.c_str(), H5F_ACC_RDONLY );
+
+    const std::string track_ds_name("track");
     DataSet track_dataset = h5_file.openDataSet( track_ds_name.c_str());
     DataSpace track_dataspace = track_dataset.getSpace();
     
@@ -563,8 +567,10 @@ int main(int argc ,char *argv[])
     fprintf(stderr, "\n%s:%d: maximum tracks:%i maximum clusters:%i\n", __FILE__, __LINE__, ntrack_max,ncluster_max);
 
     //Define array hyperslab will be read into
-    const hsize_t block_size = eventdims[0];
+    const hsize_t block_size = eventdims[0]/2;
     //const Long64_t block_size = 2000;
+    
+    float test_array[5700425][609][20];
     float track_data_out[block_size][ntrack_max][NTrack_Vars];
     float cluster_data_out[block_size][ncluster_max][NCluster_Vars];
     float event_data_out[block_size][NEvent_Vars];
