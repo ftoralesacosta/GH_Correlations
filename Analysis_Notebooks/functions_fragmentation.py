@@ -741,21 +741,25 @@ def Compare_pp_pPB_Avg_lists(save_name,strings,string_descrp_list,colors):
             zT_centers = (Zbins[1:] + Zbins[:-1]) / 2
             zT_widths = [(j-i)/2 for i, j in zip(Zbins[:-1], Zbins[1:])]
         
-            if ((string != default_string) and SYS=="pp"):
-                continue
+        
+            #if (SYS=="pp"):
+            #    continue
+            #if ((string != default_string) and SYS=="pp"):
+            #    continue
                 
-            if((string == default_string) and SYS=="p-Pb"):
-                continue
+            #if((string == default_string) and SYS=="p-Pb"):
+            #    continue
         
             if colr == "red":
-                plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT]+0.02, FF[:NzT-ZT_OFF_PLOT],xerr=zT_widths[:NzT-ZT_OFF_PLOT],
-                             yerr=FF_Errors[:NzT-ZT_OFF_PLOT],linewidth=1, fmt=shape,color=colr,alpha=0.5,capsize=1,label="%s"%(string_descr))
-            else:
+            #    plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT]+0.02, FF[:NzT-ZT_OFF_PLOT],xerr=zT_widths[:NzT-ZT_OFF_PLOT],
+            #                 yerr=FF_Errors[:NzT-ZT_OFF_PLOT],linewidth=1, fmt=shape,color=colr,alpha=0.5,capsize=1,label="%s"%(string_descr))
+            
                 plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT], FF[:NzT-ZT_OFF_PLOT],xerr=zT_widths[:NzT-ZT_OFF_PLOT],
-                             yerr=FF_Errors[:NzT-ZT_OFF_PLOT],linewidth=1, fmt=shape,color=colr,alpha=0.5,capsize=1,label="%s"%(string_descr))
+                        yerr=FF_Errors[:NzT-ZT_OFF_PLOT],linewidth=1, fmt=shape,color=colr,capsize=1,label="%s (%s)"%(string_descr,SYS))
         
-            #plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT]+0.2, FF[:NzT-ZT_OFF_PLOT],xerr=zT_widths[:NzT-ZT_OFF_PLOT],
-            #    yerr=FF_Errors[:NzT-ZT_OFF_PLOT],linewidth=1, fmt=shape,color=colr,capsize=1,label="%s (%s)"%(string_descr,SYS))
+            else:
+                plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT]+0.02, FF[:NzT-ZT_OFF_PLOT],xerr=zT_widths[:NzT-ZT_OFF_PLOT],
+                        yerr=FF_Errors[:NzT-ZT_OFF_PLOT],linewidth=1, fmt=shape,color=colr,capsize=1,label="%s (%s)"%(string_descr,SYS))
 
             plt.yscale('log')                                                                                                                                                                                                                                                              
             plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^\mathrm{h}/p_\mathrm{T}^\mathrm{\gamma}$",fontsize=20)
@@ -772,7 +776,7 @@ def Compare_pp_pPB_Avg_lists(save_name,strings,string_descrp_list,colors):
 
     plt.title(r'Integrated $\mathrm{\gamma}$-Hadron Correlation: $%s < \Delta\varphi < \pi$ '%(Phi_String),fontdict = {'fontsize' : 19})
     plt.gcf()
-    plt.savefig('pics/%s/%s/FF_Averages_%s.pdf'%(Shower,default_string,save_name),bbox_inches='tight')
+    plt.savefig('pics/%s/%s/FF_Averages_%s.pdf'%(Shower,description_string,save_name),bbox_inches='tight')
     plt.show()
 
     print("                Central Values:")

@@ -161,10 +161,10 @@ def Plot_Sub_UB_Overlay(Dict):
                 s_plot = ax.errorbar(delta_phi_centers,Dict["%s_CSR"%(SYS)][ipt][ztb],xerr=phi_width,
                     yerr=Dict["%s_CSR_Errors"%(SYS)][ipt][ztb],fmt='bo',ecolor="blue",label='Signal Region (stat. error)')
 
-                #ax.plot(delta_phi_centers,Dict["%s_CBR"%(SYS)][ipt][ztb],'ro',color="red",ms=10) #Scale UE Error by purity!
-                #b_plot = ax.errorbar(delta_phi_centers,Dict["%s_CBR"%(SYS)][ipt][ztb],xerr=phi_width,
-                #    yerr=Dict["%s_CBR_Errors"%(SYS)][ipt][ztb],fmt='ro',ecolor="red",label='Background Region (stat. error)')
-                b_plot, = ax.plot([],[],' ')
+                ax.plot(delta_phi_centers,Dict["%s_CBR"%(SYS)][ipt][ztb],'ro',color="red",ms=10) #Scale UE Error by purity!
+                b_plot = ax.errorbar(delta_phi_centers,Dict["%s_CBR"%(SYS)][ipt][ztb],xerr=phi_width,
+                    yerr=Dict["%s_CBR_Errors"%(SYS)][ipt][ztb],fmt='ro',ecolor="red",label='Background Region (stat. error)')
+                #b_plot, = ax.plot([],[],' ')
 
                 #UE_Band = ax.fill_between(ue_error_bar,-Dict["%s_Uncorr_Error"%(SYS)][ipt][ztb][0],Dict["%s_Uncorr_Error"%(SYS)][ipt][ztb][0],facecolor="purple",alpha=0.35) 
                 #plt.axhline(y=0,color='gray',linestyle='--',linewidth=1.3,alpha=0.8)
@@ -352,6 +352,7 @@ def Plot_pp_pPb_Cs_Individual(Dict):
             plt.xlabel(r'|$\Delta \varphi$|',fontsize=28)
             plt.xticks(fontsize=18)
             plt.xlim((0.39269908169872414,3.14159))
+            #plt.xlim((0,3.14159))
 
             plt.ylabel(r'$1/N_{\gamma} \: \: \mathrm{d}N/\mathrm{d}\Delta \eta \Delta \varphi$',fontsize=28)
             plt.yticks(fontsize=18)
@@ -496,7 +497,9 @@ def Save_Avg_Cs_npy(Corr):
 def Compare_Cs_Averages(save_name,strings,string_descrp_list,colors):
     
     #shapes = ["o","x","s"]
+        
     for SYS in Systems:
+
         fig = plt.figure(figsize=(22,18))
         
         for (string,string_descr,colr) in zip(strings,string_descrp_list,colors):
@@ -515,11 +518,18 @@ def Compare_Cs_Averages(save_name,strings,string_descrp_list,colors):
                     ax = fig.add_subplot(3,3,izt+1)
    
                 N_Phi = len(CS_Avg[izt])
-                dPhi_Centers = [i*math.pi/N_Phi+math.pi/N_Phi/2 for i in range(0,N_Phi)] #skip first dPhi bin to avoid Isolation
+                dPhi_Centers = [i*math.pi/N_Phi+math.pi/N_Phi/2 for i in range(0,N_Phi)]
+                            
+                #if ((string != default_string) and SYS=="pp"):
+                #    continue
                 
+                #if((string == default_string) and SYS=="p-Pb"):
+                #    continue
+
                 plt.errorbar(dPhi_Centers,CS_Avg[izt],xerr=phi_width,yerr=CS_Avg_Err[izt],fmt='o',color = colr,capsize=4,markersize=11,label = "average %s"%(string_descr))
-                
-                plt.xlim((0.39269908169872414,3.14159))
+                #plt.errorbar(dPhi_Centers,CS_Avg[izt],xerr=phi_width,yerr=CS_Avg_Err[izt],fmt='o',color = colr,capsize=4,markersize=11,label = "average %s %s"%(string_descr,SYS))
+                #plt.xlim((0.39269908169872414,3.14159))
+                plt.xlim((0,3.14159))
                 
                 #Labels
                 if (izt>2):
@@ -531,8 +541,8 @@ def Compare_Cs_Averages(save_name,strings,string_descrp_list,colors):
                 
                 leg = plt.legend(numpoints=1,frameon=False,loc="best")
                 leg.set_title("%s :%1.2f < $z_\mathrm{T}$ < %1.2f"%(SYS,zbins[izt],zbins[izt+1]))
-                plt.setp(leg.get_title(),fontsize=18)
-                fig.savefig('pics/%s/%s/Cs_Averages_%s.pdf'%(Shower,default_string,save_name),bbox_inches='tight')
+        plt.setp(leg.get_title(),fontsize=18)
+        fig.savefig('pics/%s/%s/Cs_Averages_%s_%s.pdf'%(Shower,default_string,SYS,save_name),bbox_inches='tight')
                     
             
 def Compare_Cs_pTBins():
@@ -699,21 +709,23 @@ def LaTeX_Results_Summary(FF_Dict):
 
         print("                        LaTeX Table")
 
-        
-        pp_stat_min = np.amin(FF_Dict["pp_FF_Errors"]/FF_Dict["pp_FF"])*100
-        pp_stat_max = np.amax(FF_Dict["pp_FF_Errors"]/FF_Dict["pp_FF"])*100
-        pPb_stat_min = np.amin(FF_Dict["p-Pb_FF_Errors"]/FF_Dict["p-Pb_FF"])*100
-        pPb_stat_max = np.amax(FF_Dict["p-Pb_FF_Errors"]/FF_Dict["p-Pb_FF"])*100
+        i=0
+        j=len(FF_Dict["pp_FF_Errors"][0])        
 
-        pp_purity_min = np.amin(FF_Dict["pp_purity_FF_Errors"]/FF_Dict["pp_FF"])*100
-        pp_purity_max = np.amax(FF_Dict["pp_purity_FF_Errors"]/FF_Dict["pp_FF"])*100
-        pPb_purity_min = np.amin(FF_Dict["p-Pb_purity_FF_Errors"]/FF_Dict["p-Pb_FF"])*100
-        pPb_purity_max = np.amax(FF_Dict["p-Pb_purity_FF_Errors"]/FF_Dict["p-Pb_FF"])*100
+        pp_stat_min = np.amin(FF_Dict["pp_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
+        pp_stat_max = np.amax(FF_Dict["pp_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
+        pPb_stat_min = np.amin(FF_Dict["p-Pb_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
+        pPb_stat_max = np.amax(FF_Dict["p-Pb_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
+
+        pp_purity_min = np.amin(FF_Dict["pp_purity_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
+        pp_purity_max = np.amax(FF_Dict["pp_purity_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
+        pPb_purity_min = np.amin(FF_Dict["p-Pb_purity_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
+        pPb_purity_max = np.amax(FF_Dict["p-Pb_purity_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
         
-        pp_ue_min = np.amin(FF_Dict["pp_UE_FF_Errors"]/FF_Dict["pp_FF"])*100
-        pp_ue_max = np.amax(FF_Dict["pp_UE_FF_Errors"]/FF_Dict["pp_FF"])*100
-        pPb_ue_min = np.amin(FF_Dict["p-Pb_UE_FF_Errors"]/FF_Dict["p-Pb_FF"])*100
-        pPb_ue_max = np.amax(FF_Dict["p-Pb_UE_FF_Errors"]/FF_Dict["p-Pb_FF"])*100
+        pp_ue_min = np.amin(FF_Dict["pp_UE_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
+        pp_ue_max = np.amax(FF_Dict["pp_UE_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
+        pPb_ue_min = np.amin(FF_Dict["p-Pb_UE_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
+        pPb_ue_max = np.amax(FF_Dict["p-Pb_UE_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
 
         print("Source   &  pp data & p--Pb~data  \\\\")
         print("Statistical Uncertainty & {0}\%-{1}\% & {2}\%-{3}\% \\\\".format(int(pp_stat_min+0.5),
@@ -726,7 +738,7 @@ def LaTeX_Results_Summary(FF_Dict):
         print("UE & {0}\%-{1}\% & {2}\%-{3}\% \\\\".format(int(pp_ue_min+0.5),
             int(pp_ue_max+0.5),int(pPb_ue_min+0.5),int(pPb_ue_max+0.5)) )
         
-        print("Tracking Efficiency &  5\% & 5\%  \\\\ ")
+        print("Tracking Efficiency &  5.6\% & 5.6\%  \\\\ ")
     
 def LaTeX_Systematics(FF_Dict):
 
@@ -774,8 +786,8 @@ def LaTeX_Ratio_Systematics(FF_Dict):
                     #print("{0} - {1} & {2}\% & {3}\% & {4}\% & 7\%\\\\".format(zTbins[izt], 
                     #zTbins[izt+1],int(stat_rel[ipt][izt]+0.5),int(UE_rel[ipt][izt]+0.5),int(purity_rel[ipt][izt]+0.5)))
                     
-                    print("%1.2f - %1.2f &"%(zTbins[izt],zTbins[izt+1])),
-                    print("{0}\% & {1}\% & {2}\% & 7\%\\\\".format(int(stat_rel[ipt][izt]+0.5),int(UE_rel[ipt][izt]+0.5),int(purity_rel[ipt][izt]+0.5)))
+                    print("%1.2f--%1.2f &"%(zTbins[izt],zTbins[izt+1])),
+                    print("{0}\% & {1}\% & {2}\% & 8\% & 5\%\\\\".format(int(stat_rel[ipt][izt]+0.5),int(UE_rel[ipt][izt]+0.5),int(purity_rel[ipt][izt]+0.5)))
     
 def Plot_FF(FF_Dict):
     
