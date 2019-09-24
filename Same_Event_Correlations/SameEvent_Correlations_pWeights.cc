@@ -807,7 +807,7 @@ int main(int argc, char *argv[])
 
     fprintf(stderr,"Looping to determine weights and pT spectra \n");
     for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
-    //for(Long64_t ievent = 0; ievent < 1000 ; ievent++){
+      //for(Long64_t ievent = 0; ievent < 1000 ; ievent++){
       _tree_event->GetEntry(ievent);
       fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, ievent, nentries);
 
