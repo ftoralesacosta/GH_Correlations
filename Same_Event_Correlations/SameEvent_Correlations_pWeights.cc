@@ -807,14 +807,14 @@ int main(int argc, char *argv[])
 
     fprintf(stderr,"Looping to determine weights and pT spectra \n");
     for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
-      //for(Long64_t ievent = 0; ievent < 1000 ; ievent++){
+    //for(Long64_t ievent = 0; ievent < 1000 ; ievent++){
       _tree_event->GetEntry(ievent);
       fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, ievent, nentries);
 
       //Event selection
       if(TMath::Abs(primary_vertex[2])>10) continue;
       if(primary_vertex[2]==0.00) continue;
-      if(is_pileup_from_spd_5_08) continue;
+      //if(is_pileup_from_spd_5_08) continue;
       
       bool first_cluster = true;
       for (ULong64_t n = 0; n < ncluster; n++) {
@@ -831,19 +831,13 @@ int main(int argc, char *argv[])
 	else if (determiner == CLUSTER_ISO_ITS_04) isolation = cluster_iso_its_04[n];
 	else if (determiner == CLUSTER_ISO_ITS_04_SUB) 
 	  isolation = cluster_iso_its_04[n] + cluster_iso_its_04_ue[n] - ue_estimate_its_const*3.1416*0.4*0.4;
-	
 	else if (determiner == CLUSTER_ISO_TPC_04_SUB) {
-
 	  isolation = cluster_iso_tpc_04[n] + cluster_iso_tpc_04_ue[n] - ue_estimate_tpc_const*3.1416*0.4*0.4;	  
-	    
-	  if (Is_pp) //pp does not use TPC (17q)
-	    {
-	      isolation = cluster_iso_its_04[n] + cluster_iso_its_04_ue[n]- ue_estimate_its_const*3.1416*0.4*0.4;
-	    }
+	  if (Is_pp)
+	    isolation = cluster_iso_its_04[n] + cluster_iso_its_04_ue[n]- ue_estimate_its_const*3.1416*0.4*0.4;
+	    //pp does not use TPC (17q)
 	}
-
 	else if (determiner == CLUSTER_FRIXIONE_TPC_04_02) isolation = cluster_frixione_tpc_04_02[n];
-
 	else isolation = cluster_frixione_its_04_02[n];
 	
 	Isolated = (isolation<iso_max);
@@ -963,8 +957,9 @@ int main(int argc, char *argv[])
       //Event Selection
       if(TMath::Abs(primary_vertex[2])>10) continue;
       if(primary_vertex[2]==0.00) continue;
-      if(is_pileup_from_spd_5_08) continue;
+      //if(is_pileup_from_spd_5_08) continue;
     
+
       for (ULong64_t n = 0; n < ncluster; n++) {
 	if( not(cluster_pt[n]>pT_min and cluster_pt[n]<pT_max)) continue;   //select pt of photons
 	if( not(TMath::Abs(cluster_eta[n])<Eta_max)) continue;              //cut edges of detector
@@ -977,30 +972,24 @@ int main(int argc, char *argv[])
 	float isolation;
 	if (determiner == CLUSTER_ISO_TPC_04) isolation = cluster_iso_tpc_04[n];
 	else if (determiner == CLUSTER_ISO_ITS_04) isolation = cluster_iso_its_04[n];
-	else if (determiner == CLUSTER_ISO_ITS_04_SUB)
-	  isolation = cluster_iso_its_04[n] + cluster_iso_its_04_ue[n]- ue_estimate_its_const*3.1416*0.4*0.4;
+	else if (determiner == CLUSTER_ISO_ITS_04_SUB) 
+	  isolation = cluster_iso_its_04[n] + cluster_iso_its_04_ue[n] - ue_estimate_its_const*3.1416*0.4*0.4;
 	else if (determiner == CLUSTER_ISO_TPC_04_SUB) {
-
-	  isolation = cluster_iso_tpc_04[n] + cluster_iso_tpc_04_ue[n] - ue_estimate_tpc_const*3.1416*0.4*0.4;
-	  //fprintf(stderr,"\n %d: Isolation = %f \n",__LINE__,isolation);
-	  
-	    if (Is_pp) //pp does not use TPC (17q)
-	      isolation = cluster_iso_its_04[n] + cluster_iso_its_04_ue[n]- ue_estimate_its_const*3.1416*0.4*0.4;
+	  isolation = cluster_iso_tpc_04[n] + cluster_iso_tpc_04_ue[n] - ue_estimate_tpc_const*3.1416*0.4*0.4;	  
+	  if (Is_pp)
+	    isolation = cluster_iso_its_04[n] + cluster_iso_its_04_ue[n]- ue_estimate_its_const*3.1416*0.4*0.4;
+	    //pp does not use TPC (17q)
 	}
-	  
 	else if (determiner == CLUSTER_FRIXIONE_TPC_04_02) isolation = cluster_frixione_tpc_04_02[n];
 	else isolation = cluster_frixione_its_04_02[n];
 	
 	Isolated = (isolation<iso_max);
-
 	if (strcmp(shower_shape.data(),"Lambda")== 0) {
 	  Signal = ((cluster_lambda_square[n][0] > 0.1) and (cluster_lambda_square[n][0] < Lambda0_cut));
-	  //Signal = (cluster_lambda_square[n][0] < Lambda0_cut);
 	  Background = (cluster_lambda_square[n][0] > Lambda0_cut);
 	}
 	
 	else if (strcmp(shower_shape.data(),"DNN")==0){
-
 	  Signal = ( (cluster_s_nphoton[n][1] > DNN_min) && (cluster_s_nphoton[n][1]<DNN_max));
 	  Background = (cluster_s_nphoton[n][1] > 0.0 && cluster_s_nphoton[n][1] < DNN_Bkgd);
 	}
@@ -1045,6 +1034,7 @@ int main(int argc, char *argv[])
 	}
 
 	//Track Loop
+
 	for (ULong64_t itrack = 0; itrack < ntrack; itrack++) {            
  	  if(track_pt[itrack] < track_pT_min) continue; //500 MeV Tracks or 1GeV Tracks
  	  if(track_pt[itrack] > track_pT_max) continue;
@@ -1097,8 +1087,9 @@ int main(int argc, char *argv[])
 	    }
 	  }//pp
 	
-	  //fprintf(stderr,"\n Track weight = %f\n",track_weight);
+	  //fprintf(stderr,"\n Track pT = %f, Track weight = %f\n",track_pt[itrack],track_weight);
 	  
+		  
 	  //Observables:
 	  Double_t zt = track_pt[itrack]/cluster_pt[n];
 	  Float_t DeltaPhi = TMath::Abs(TVector2::Phi_mpi_pi(cluster_phi[n] - track_phi[itrack]));

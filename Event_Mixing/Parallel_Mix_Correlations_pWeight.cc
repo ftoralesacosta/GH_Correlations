@@ -95,7 +95,7 @@ int main(int argc ,char *argv[])
   std::cout << "Opening: " << (TString)argv[1] << std::endl;
 
   std::string file_str = argv[2];
-  const H5std_string hdf5_file_name(file_str.c_str());
+  const H5std_string hdf5_file_name(file_str.c_str()); //explicitly requires c_string
   TString hdf5_file = (TString)argv[2];
   fprintf(stderr,"%d: HDF5 File = ",__LINE__);
   fprintf(stderr,hdf5_file);
@@ -567,7 +567,16 @@ int main(int argc ,char *argv[])
     fprintf(stderr, "\n%s:%d: maximum tracks:%i maximum clusters:%i\n", __FILE__, __LINE__, ntrack_max,ncluster_max);
 
     //Define array hyperslab will be read into
-    const hsize_t block_size = eventdims[0]/2;
+    hsize_t block_size = eventdims[0];
+
+    if(strstr(root_file,"13f") !=NULL){
+      block_size = eventdims[0]/2; //FIXME: RAM on cori recently reduced.
+      fprintf(stderr,"%d: USING Half block size for 13f (block size = %d)\n",__LINE__,block_size);
+    }
+    
+    // if (strcmp("13f",basic_name)==0){
+
+    // }
     //const Long64_t block_size = 2000;
     
     float test_array[5700425][609][20];
