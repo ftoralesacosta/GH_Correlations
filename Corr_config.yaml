@@ -38,5 +38,4 @@ Cluster_isolation_determinant: cluster_iso_its_04_sub
 #Cluster_isolation_determinant: cluster_iso_tpc_04_sub
 #Cluster_isolation_determinant: cluster_iso_its_04
 
-#Shower_Shape:                 DNN
 Shower_Shape:		       Lambda
