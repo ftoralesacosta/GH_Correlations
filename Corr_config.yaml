@@ -13,6 +13,8 @@ iso_max:                      1.5
 noniso_min:                   5.0
 noniso_max:                   10.0
 
+do_pileup_cut:		      true
+
 N_Phi_Bins:                   16
 N_Eta_Bins:                   14
 Track_pT_Min:		      0.5
