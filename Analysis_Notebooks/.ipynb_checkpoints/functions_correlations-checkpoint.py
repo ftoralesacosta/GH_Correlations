@@ -188,6 +188,72 @@ def Plot_Sub_UB_Overlay(Dict):
                 plt.setp(leg.get_title(),fontsize=20)
             fig.savefig('pics/%s/%s/%s_SR_BR_Overlay_pT_%i.pdf'%(Shower,description_string,SYS,ipt))
 
+def Plot_Sub_UB_SR(Dict):
+    #NOTE: UB Errors already propagated!
+    fsize = 20
+    for SYS,ifile in zip(Systems,Files):
+        
+        sys_color = 'red' #pp
+        if (SYS == "p-Pb"):
+            sys_color = 'blue'
+        elif(SYS == "MC"):
+             sys_color = 'green'
+
+        for ipt in range (N_pT_Bins):
+            
+            fig = plt.figure(figsize=(24,12))
+            if (NzT >=7 and NzT <=9):
+                fig = plt.figure(figsize=(35,16))
+                #fig = plt.figure(figsize=(20,35))
+            if (NzT >=10 and NzT<=12):
+                fig = plt.figure(figsize=(22,24))
+            if (NzT >12):
+                fig = plt.figure(figsize=(22,30))
+
+            for izt in range (NzT-ZT_OFF_PLOT):
+                ztb = izt
+                if (NzT ==4):
+                    ax = fig.add_subplot(2,2,izt+1)
+
+                elif (NzT ==6):
+                    ax = fig.add_subplot(2,3,izt+1)
+                elif (NzT >=7 and NzT <=9):
+                    #ax = fig.add_subplot(4,2,izt+1)
+                    ax = fig.add_subplot(2,4,izt+1)
+                elif (NzT >9 and NzT <=12):
+                    ax = fig.add_subplot(4,3,izt+1)
+                elif (NzT >12):
+                    ax = fig.add_subplot(5,3,izt+1)
+
+
+                ax.plot(delta_phi_centers,Dict["%s_CSR"%(SYS)][ipt][ztb],'bo',color="blue",ms=10)
+                s_plot = ax.errorbar(delta_phi_centers,Dict["%s_CSR"%(SYS)][ipt][ztb],xerr=phi_width,
+                    yerr=Dict["%s_CSR_Errors"%(SYS)][ipt][ztb],fmt='bo',ecolor="blue",label='Signal Region (stat. error)')
+
+                #UE_Band = ax.fill_between(ue_error_bar,-Dict["%s_Uncorr_Error"%(SYS)][ipt][ztb][0],Dict["%s_Uncorr_Error"%(SYS)][ipt][ztb][0],facecolor="purple",alpha=0.35) 
+                #plt.axhline(y=0,color='gray',linestyle='--',linewidth=1.3,alpha=0.8)
+
+
+                plt.xlabel(r'|$\Delta \varphi$|',fontsize=fsize+4)
+                plt.xticks(fontsize=(fsize))
+                plt.xlim((0.39269908169872414,3.14159))
+                plt.ylabel(r'$1/N_{\mathrm{trig}} \: \: \mathrm{d}^2N/\mathrm{d}\Delta\varphi\mathrm{d}\Delta\eta$',fontsize=fsize+2)
+                #plt.ylim((0,1.2*max(Sig_LE_Phi_Array)))
+                empt, = ax.plot([], [], ' ')
+                empt2, = ax.plot([],[],' ')
+                plt.yticks(fontsize=20)
+
+                leg = ax.legend([s_plot,empt,empt2],['Shower Sig Region (stat. error)',r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]),r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],
+                    loc='best',title = "Alice %s 5 TeV",fontsize=20,frameon=False,numpoints=1)
+                if (SYS == 'pp'):
+                    leg.set_title("ALICE Work in Progress, $\sqrt{s}=$5 TeV %s"%(SYS))
+                else:
+                    leg.set_title("ALICE Work in Progress, $\sqrt{s_{\mathrm{_{NN}}}}=$5 TeV %s"%(SYS))                
+                plt.setp(leg.get_title(),fontsize=20)
+            fig.savefig('pics/%s/%s/%s_SR_pT_%i.pdf'%(Shower,description_string,SYS,ipt))
+
+            
+            
 def Correlated_Subtraction_Weights(Dict):   
     for SYS in Systems:
         for ipt in range (N_pT_Bins):
@@ -351,8 +417,8 @@ def Plot_pp_pPb_Cs_Individual(Dict):
 
             plt.xlabel(r'|$\Delta \varphi$|',fontsize=28)
             plt.xticks(fontsize=18)
-            plt.xlim((0.39269908169872414,3.14159))
-            #plt.xlim((0,3.14159))
+            #plt.xlim((0.39269908169872414,3.14159))
+            plt.xlim((0,3.14159))
 
             plt.ylabel(r'$1/N_{\gamma} \: \: \mathrm{d}N/\mathrm{d}\Delta \eta \Delta \varphi$',fontsize=28)
             plt.yticks(fontsize=18)
@@ -710,36 +776,91 @@ def LaTeX_Results_Summary(FF_Dict):
         print("                        LaTeX Table")
 
         i=0
-        j=len(FF_Dict["pp_FF_Errors"][0])        
+        j=len(FF_Dict["pp_FF_Errors"][0])/1        
+        print(i)
+        print(j)
+        pp_stat_min_low = np.amin(FF_Dict["pp_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
+        pp_stat_max_low = np.amax(FF_Dict["pp_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
+        pPb_stat_min_low = np.amin(FF_Dict["p-Pb_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
+        pPb_stat_max_low = np.amax(FF_Dict["p-Pb_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
 
-        pp_stat_min = np.amin(FF_Dict["pp_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
-        pp_stat_max = np.amax(FF_Dict["pp_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
-        pPb_stat_min = np.amin(FF_Dict["p-Pb_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
-        pPb_stat_max = np.amax(FF_Dict["p-Pb_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
-
-        pp_purity_min = np.amin(FF_Dict["pp_purity_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
-        pp_purity_max = np.amax(FF_Dict["pp_purity_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
-        pPb_purity_min = np.amin(FF_Dict["p-Pb_purity_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
-        pPb_purity_max = np.amax(FF_Dict["p-Pb_purity_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
+        pp_purity_min_low = np.amin(FF_Dict["pp_purity_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
+        pp_purity_max_low = np.amax(FF_Dict["pp_purity_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
+        pPb_purity_min_low = np.amin(FF_Dict["p-Pb_purity_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
+        pPb_purity_max_low = np.amax(FF_Dict["p-Pb_purity_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
         
-        pp_ue_min = np.amin(FF_Dict["pp_UE_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
-        pp_ue_max = np.amax(FF_Dict["pp_UE_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
-        pPb_ue_min = np.amin(FF_Dict["p-Pb_UE_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
-        pPb_ue_max = np.amax(FF_Dict["p-Pb_UE_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
+        pp_ue_min_low = np.amin(FF_Dict["pp_UE_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
+        pp_ue_max_low = np.amax(FF_Dict["pp_UE_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
+        pPb_ue_min_low = np.amin(FF_Dict["p-Pb_UE_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
+        pPb_ue_max_low = np.amax(FF_Dict["p-Pb_UE_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
+
+        i=len(FF_Dict["pp_FF_Errors"][0])/2 +1
+        j = len(FF_Dict["pp_FF_Errors"][0])
+
+        print(i)
+        print(j)
+
+        pp_stat_min_high = np.amin(FF_Dict["pp_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
+        pp_stat_max_high = np.amax(FF_Dict["pp_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
+        pPb_stat_min_high = np.amin(FF_Dict["p-Pb_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
+        pPb_stat_max_high = np.amax(FF_Dict["p-Pb_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
+
+        pp_purity_min_high = np.amin(FF_Dict["pp_purity_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
+        pp_purity_max_high = np.amax(FF_Dict["pp_purity_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
+        pPb_purity_min_high = np.amin(FF_Dict["p-Pb_purity_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
+        pPb_purity_max_high = np.amax(FF_Dict["p-Pb_purity_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
+
+        pp_ue_min_high = np.amin(FF_Dict["pp_UE_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
+        pp_ue_max_high = np.amax(FF_Dict["pp_UE_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
+        pPb_ue_min_high = np.amin(FF_Dict["p-Pb_UE_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
+        pPb_ue_max_high = np.amax(FF_Dict["p-Pb_UE_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
 
         print("Source   &  pp data & p--Pb~data  \\\\")
-        print("Statistical Uncertainty & {0}\%-{1}\% & {2}\%-{3}\% \\\\".format(int(pp_stat_min+0.5),
-                            int(pp_stat_max+0.5),int(pPb_stat_min+0.5),int(pPb_stat_max+0.5)) )
+        print("Statistical Uncertainty & {0}\%-{1}\% & {2}\%-{3}\% & {4}\%-{5}\% & {6}\%-{7}\% \\\\".format(int(pp_stat_min_low+0.5),
+                            int(pp_stat_max_low+0.5),int(pp_stat_min_high+0.5),int(pp_stat_max_high+0.5),
+                            int(pPb_stat_min_low+0.5),int(pPb_stat_max_low+0.5),int(pPb_stat_min_high+0.5),int(pPb_stat_max_high+0.5)) )
         print("\hline")
 
-        print("Purity & {0}\%-{1}\% & {2}\%-{3}\% \\\\".format(int(pp_purity_min+0.5),
-            int(pp_purity_max+0.5),int(pPb_purity_min+0.5),int(pPb_purity_max+0.5)) )
+        print("Purity & {0}\%-{1}\% & {2}\%-{3}\% & {4}\%-{5}\% & {6}\%-{7}\% \\\\".format(int(pp_purity_min_low+0.5),
+                            int(pp_purity_max_low+0.5),int(pp_purity_min_high+0.5),int(pp_purity_max_high+0.5),
+                            int(pPb_purity_min_low+0.5),int(pPb_purity_max_low+0.5),int(pPb_purity_min_high+0.5),int(pPb_purity_max_high+0.5)) )
 
-        print("UE & {0}\%-{1}\% & {2}\%-{3}\% \\\\".format(int(pp_ue_min+0.5),
-            int(pp_ue_max+0.5),int(pPb_ue_min+0.5),int(pPb_ue_max+0.5)) )
-        
+        print("UE & {0}\%-{1}\% & {2}\%-{3}\% & {4}\%-{5}\% & {6}\%-{7}\% \\\\".format(int(pp_ue_min_low+0.5),
+                            int(pp_ue_max_low+0.5),int(pp_ue_min_high+0.5),int(pp_ue_max_high+0.5),
+                            int(pPb_ue_min_low+0.5),int(pPb_ue_max_low+0.5),int(pPb_ue_min_high+0.5),int(pPb_ue_max_high+0.5)) )
+
         print("Tracking Efficiency &  5.6\% & 5.6\%  \\\\ ")
     
+
+        pp_sys_min_low = np.sqrt(pp_purity_min_low**2 +pp_ue_min_low**2 + 5.6**2 +1)
+        pp_sys_min_high = np.sqrt(pp_purity_min_high**2 +pp_ue_min_high**2 + 5.6**2 +1)
+        pp_sys_max_low = np.sqrt(pp_purity_max_low**2 +pp_ue_max_low**2 + 5.6**2 +1)
+        pp_sys_max_high = np.sqrt(pp_purity_max_high**2 +pp_ue_max_high**2 + 5.6**2 +1)
+
+        pPb_sys_min_low = np.sqrt(pPb_purity_min_low**2 +pPb_ue_min_low**2 + 5.6**2 +1)
+        pPb_sys_min_high = np.sqrt(pPb_purity_min_high**2 +pPb_ue_min_high**2 + 5.6**2 +1)
+        pPb_sys_max_low = np.sqrt(pPb_purity_max_low**2 +pPb_ue_max_low**2 + 5.6**2 +1)
+        pPb_sys_max_high = np.sqrt(pPb_purity_max_high**2 +pPb_ue_max_high**2 + 5.6**2 +1)
+
+        pp_total_min_low = np.sqrt(pp_stat_min_low**2 + pp_sys_min_low**2)
+        pp_total_min_high = np.sqrt(pp_stat_min_high**2 + pp_sys_min_high**2)
+        pp_total_max_low = np.sqrt(pp_stat_max_low**2 + pp_sys_max_low**2)
+        pp_total_max_high = np.sqrt(pp_stat_max_high**2 + pp_sys_max_high**2)
+
+
+        pPb_total_min_low = np.sqrt(pPb_stat_min_low**2 + pPb_sys_min_low**2)
+        pPb_total_min_high = np.sqrt(pPb_stat_min_high**2 + pPb_sys_min_high**2)
+        pPb_total_max_low = np.sqrt(pPb_stat_max_low**2 + pPb_sys_max_low**2)
+        pPb_total_max_high = np.sqrt(pPb_stat_max_high**2 + pPb_sys_max_high**2)
+
+        print("Total Sys & {0}\%-{1}\% & {2}\%-{3}\% & {4}\%-{5}\% & {6}\%-{7}\% \\\\".format(int(pp_sys_min_low+0.5),
+                            int(pp_sys_max_low+0.5),int(pp_sys_min_high+0.5),int(pp_sys_max_high+0.5),
+                            int(pPb_sys_min_low+0.5),int(pPb_sys_max_low+0.5),int(pPb_sys_min_high+0.5),int(pPb_sys_max_high+0.5)) )
+
+        print("Total Uncertainty & {0}\%-{1}\% & {2}\%-{3}\% & {4}\%-{5}\% & {6}\%-{7}\% \\\\".format(int(pp_total_min_low+0.5),
+                            int(pp_total_max_low+0.5),int(pp_total_min_high+0.5),int(pp_total_max_high+0.5),
+                            int(pPb_total_min_low+0.5),int(pPb_total_max_low+0.5),int(pPb_total_min_high+0.5),int(pPb_total_max_high+0.5)) )
+
 def LaTeX_Systematics(FF_Dict):
 
         

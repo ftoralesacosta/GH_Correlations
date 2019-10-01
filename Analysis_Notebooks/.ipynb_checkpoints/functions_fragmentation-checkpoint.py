@@ -389,6 +389,7 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
         #Systematics
         Efficiency_Uncertainty = 0.056*Comb_Dict["%s_Combined_FF"%(SYS)]
         Sys_Uncertainty = np.sqrt(Efficiency_Uncertainty**2 + Comb_Dict["%s_purity_Uncertainty"%(SYS)]**2)
+        FF_Central = Comb_Dict["%s_Combined_FF"%(SYS)]
         
         #Plots
         plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT], Comb_Dict["%s_Combined_FF"%(SYS)][:NzT-ZT_OFF_PLOT],xerr=zT_widths[:NzT-ZT_OFF_PLOT],
@@ -405,7 +406,9 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
             model,p,chi2dof = Fit_FF_PowerLaw(Comb_Dict,SYS)
             plt.plot(zT_centers[:NzT-ZT_OFF_PLOT], model, sys_col,label=r"%s $\alpha = %1.2f\pm 0.1 \chi^2 = %1.2f$"%(SYS,p,chi2dof))
     
-    plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT],pythia_FF,xerr=zT_widths[:NzT-ZT_OFF_PLOT],fmt='-g',label="Pythia 8.2 Monash")   
+        if (Use_MC):
+            plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT],pythia_FF,xerr=zT_widths[:NzT-ZT_OFF_PLOT],fmt='-g',label="Pythia 8.2 Monash")   
+    
     
     plt.yscale('log')                             
     plt.ylabel(r"$\frac{1}{N_{\mathrm{\gamma}}}\frac{\mathrm{d}N}{\mathrm{d}z_{\mathrm{T}}\mathrm{d}\Delta\phi\mathrm{d}\Delta\eta}$",fontsize=24)
@@ -744,8 +747,8 @@ def Compare_pp_pPB_Avg_lists(save_name,strings,string_descrp_list,colors):
         
             #if (SYS=="pp"):
             #    continue
-            #if ((string != default_string) and SYS=="pp"):
-            #    continue
+            if ((string != default_string) and SYS=="pp"):
+                continue
                 
             #if((string == default_string) and SYS=="p-Pb"):
             #    continue
@@ -783,6 +786,20 @@ def Compare_pp_pPB_Avg_lists(save_name,strings,string_descrp_list,colors):
     
     
 def LaTeX_Table(FF_Dictionary):
+
+    pp_FF = FF_Dictionary["pp_Combined_FF"]
+    pPb_FF = FF_Dictionary["p-Pb_Combined_FF"]
+    pp_Stat = FF_Dictionary["pp_Combined_FF_Errors"]
+    pPb_Stat = FF_Dictionary["p-Pb_Combined_FF_Errors"]
+    pp_sys_Error = (FF_Dictionary["pp_Combined_FF"][:NzT-ZT_OFF_PLOT])*math.sqrt(Rel_pUncert["pp"]**2+0.056**2)
+    pPb_sys_Error = (FF_Dictionary["p-Pb_Combined_FF"][:NzT-ZT_OFF_PLOT])*math.sqrt(Rel_pUncert["p-Pb"]**2+0.056**2)
+
+    print("$z_\mathrm{T}$ Range & pp $\\pm$ Stat. $\\pm$ Sys & p--Pb $\\pm$ Stat. $\\pm$ Sys. \\\\")
+    print("\\hline")
+    for izt,(ppFF,ppStat,ppSys,pPbFF,pPbStat,pPbSys) in enumerate(zip(pp_FF,pp_Stat,pp_sys_Error,pPb_FF,pPb_Stat,pPb_sys_Error)):
+        print("%1.2f--%1.2f & %1.2f$ \\pm$ %1.2f$ \\pm$%1.2f & %1.2f$ \\pm$ %1.2f$ \\pm$%1.2f \\\\"%(zTbins[izt],zTbins[izt+1],ppFF,ppStat,ppSys,pPbFF,pPbStat,pPbSys))
+    
+def LaTeX_Table_Old(FF_Dictionary):
     
     plot = True
     
@@ -815,8 +832,8 @@ def LaTeX_Table(FF_Dictionary):
         string = r" & $%1.2f \pm %1.2f$ & %1.2f"%(p,p_error,chi2dof)
         print(string),
 
-    pp_sys_Error = (FF_Dictionary["pp_Combined_FF"][:NzT-ZT_OFF_PLOT])*math.sqrt(Rel_pUncert["pp"]**2+0.05**2)
-    p_Pb_sys_Error = (FF_Dictionary["p-Pb_Combined_FF"][:NzT-ZT_OFF_PLOT])*math.sqrt(Rel_pUncert["p-Pb"]**2+0.05**2)
+    pp_sys_Error = (FF_Dictionary["pp_Combined_FF"][:NzT-ZT_OFF_PLOT])*math.sqrt(Rel_pUncert["pp"]**2+0.056**2)
+    p_Pb_sys_Error = (FF_Dictionary["p-Pb_Combined_FF"][:NzT-ZT_OFF_PLOT])*math.sqrt(Rel_pUncert["p-Pb"]**2+0.056**2)
     Chi2,NDF,Pval = Get_pp_pPb_List_Chi2(FF_Dictionary["pp_Combined_FF"][:NzT-ZT_OFF_PLOT],
                                              FF_Dictionary["pp_Combined_FF_Errors"][:NzT-ZT_OFF_PLOT],
                                              pp_sys_Error,
@@ -825,6 +842,9 @@ def LaTeX_Table(FF_Dictionary):
                                              p_Pb_sys_Error)
         
     print(" & $%1.2f/%i\ %1.2f $\\\\"%(Chi2,NDF,Pval))
+    
+    
+
     
 def Compare_FF_Integration(ranges,strings):
 
