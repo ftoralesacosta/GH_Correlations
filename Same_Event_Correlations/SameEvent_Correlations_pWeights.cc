@@ -115,6 +115,8 @@ int main(int argc, char *argv[])
   double EcrossoverE_min = 0;
   double cluster_time = 20;
 
+  bool do_pile = false;
+
   float track_pT_min = 0.0;
   float track_pT_max = 0.0;
   int Track_Cut_Bit = 0;
@@ -226,6 +228,11 @@ int main(int argc, char *argv[])
           noniso_max = atof(value);
           std::cout << "noniso_max: " << noniso_max << std::endl; }
 
+      else if (strcmp(key, "do_pileup_cut") == 0) {
+	if (strcmp(value,"true") == 0)
+	  do_pile = true;
+	std::cout << "do_pileup_cut: " << do_pile << std::endl; }
+      
       // else if (strcmp(key, "deta_max") == 0) {
       //     deta_max = atof(value);
       //     std::cout << "deta_max: " << deta_max << std::endl; }
@@ -807,14 +814,15 @@ int main(int argc, char *argv[])
 
     fprintf(stderr,"Looping to determine weights and pT spectra \n");
     for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
-      //for(Long64_t ievent = 0; ievent < 1000 ; ievent++){
+    //for(Long64_t ievent = 0; ievent < 1000 ; ievent++){
       _tree_event->GetEntry(ievent);
       fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, ievent, nentries);
 
       //Event selection
       if(TMath::Abs(primary_vertex[2])>10) continue;
       if(primary_vertex[2]==0.00) continue;
-      //if(is_pileup_from_spd_5_08) continue;
+
+      if(do_pile && is_pileup_from_spd_5_08) continue;
       
       bool first_cluster = true;
       for (ULong64_t n = 0; n < ncluster; n++) {
@@ -957,7 +965,7 @@ int main(int argc, char *argv[])
       //Event Selection
       if(TMath::Abs(primary_vertex[2])>10) continue;
       if(primary_vertex[2]==0.00) continue;
-      //if(is_pileup_from_spd_5_08) continue;
+      if(do_pile && is_pileup_from_spd_5_08) continue;
     
 
       for (ULong64_t n = 0; n < ncluster; n++) {

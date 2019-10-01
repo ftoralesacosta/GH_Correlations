@@ -125,6 +125,9 @@ int main(int argc ,char *argv[])
   float Cluster_DtoBad = 0;
   UChar_t Cluster_NLocal_Max = 0;
   double EcrossoverE_min = 0;
+  double cluster_time = 20;
+  bool do_pile = false;
+  
   float track_pT_min = 0.0;
   float track_pT_max = 0.0;
   int Track_Cut_Bit = 0;
@@ -220,6 +223,15 @@ int main(int argc ,char *argv[])
           deta_max = atof(value);
           std::cout << "deta_max: " << deta_max << std::endl; }
 
+      else if (strcmp(key, "do_pileup_cut") == 0) {
+        if (strcmp(value,"true") == 0)
+          do_pile = true;
+        std::cout << "do_pileup_cut: " << do_pile << std::endl; }
+      
+      else if (strcmp(key, "Cluster_Time") == 0){
+	cluster_time = atof(value);
+        std::cout << "Cluster_Time: "<< cluster_time << std::endl;}
+      
       else if (strcmp(key, "N_Phi_Bins") == 0) {
 	n_phi_bins = atoi(value);
 	std::cout << "Number of Phi Bins: " << n_phi_bins << std::endl; }
@@ -422,6 +434,7 @@ int main(int argc ,char *argv[])
     }
 
     //variables
+    Bool_t is_pileup_from_spd_5_08;
     Double_t primary_vertex[3];
     Float_t multiplicity_v0[64];
     Float_t ue_estimate_its_const;
@@ -453,6 +466,7 @@ int main(int argc ,char *argv[])
     Float_t cluster_distance_to_bad_channel[NTRACK_MAX];
     UChar_t cluster_nlocal_maxima[NTRACK_MAX];
 
+    Float_t cluster_tof[NTRACK_MAX];
     Float_t cluster_iso_its_04_ue[NTRACK_MAX];
     Float_t cluster_iso_tpc_04_ue[NTRACK_MAX];
     
@@ -481,6 +495,7 @@ int main(int argc ,char *argv[])
     _tree_event->SetBranchAddress("multiplicity_v0", multiplicity_v0);
     _tree_event->SetBranchAddress("ue_estimate_its_const", &ue_estimate_its_const);
     _tree_event->SetBranchAddress("ue_estimate_tpc_const", &ue_estimate_tpc_const);
+    _tree_event->SetBranchAddress("is_pileup_from_spd_5_08", &is_pileup_from_spd_5_08);
     
     _tree_event->SetBranchAddress("ntrack", &ntrack);
     _tree_event->SetBranchAddress("track_e", track_e);
@@ -505,6 +520,7 @@ int main(int argc ,char *argv[])
     _tree_event->SetBranchAddress("cluster_distance_to_bad_channel", cluster_distance_to_bad_channel);
     _tree_event->SetBranchAddress("cluster_nlocal_maxima", cluster_nlocal_maxima);
 
+    _tree_event->SetBranchAddress("cluster_tof", cluster_tof);
     _tree_event->SetBranchAddress("cluster_iso_its_04_ue",cluster_iso_its_04_ue);
     _tree_event->SetBranchAddress("cluster_iso_tpc_04_ue",cluster_iso_tpc_04_ue);
     
@@ -693,6 +709,8 @@ int main(int argc ,char *argv[])
       int ME_pass_Counter = 0;
       bool first_cluster = true;
 
+      if(do_pile && is_pileup_from_spd_5_08) continue;
+            
 #pragma omp parallel 
    {   
 #pragma omp for schedule(dynamic,1)
@@ -705,7 +723,7 @@ int main(int argc ,char *argv[])
         if( not(cluster_distance_to_bad_channel[n]>=Cluster_DtoBad)) continue; //removes clusters near bad channels
         //if( not(cluster_nlocal_maxima[n] < Cluster_NLocal_Max)) continue; //require to have at most 2 local maxima.
         if( not(cluster_nlocal_maxima[n] < 3)) continue; //require to have at most 2 local maxima.
-
+	if (not(abs(cluster_tof[n]) < cluster_time)) continue;
 	//fprintf(stderr,"\n%s:%d: Cluster Number: %i  THREAD %i\n", __FILE__, __LINE__, n, omp_get_thread_num());
 
         float isolation;
