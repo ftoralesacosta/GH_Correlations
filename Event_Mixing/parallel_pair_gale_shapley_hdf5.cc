@@ -445,7 +445,7 @@ std::map<size_t,std::vector<Long64_t> > mix_gale_shapley(const char *filename_0,
 	    feature_0_vec.push_back(feature_extract(filename_0, event_start_0, event_end_0,nfeature));
 	    
 	    fprintf(stderr,"\n %d: GAMMA EVENT START=%u || EVENT END=%u",
-		    __LINE__,event_start_0,event_end_0);
+	    	    __LINE__,event_start_0,event_end_0);
 	
 	}
 
@@ -455,10 +455,10 @@ std::map<size_t,std::vector<Long64_t> > mix_gale_shapley(const char *filename_0,
 	  size_t event_start_1 = i * (block_size + remainder_1);
 	  size_t event_end_1 = event_start_1 + block_size;
 	
-	  //feature_1_vec.push_back(feature_extract_hdf5(filename_1, event_start_1, event_end_1,nfeature));
+	  feature_1_vec.push_back(feature_extract_hdf5(filename_1, event_start_1, event_end_1,nfeature));
 
 	  fprintf(stderr,"\n %d: MB EVENT START=%u || EVENT END=%u",
-		  __LINE__,event_start_1,event_end_1);
+	  	  __LINE__,event_start_1,event_end_1);
 	    
 	}
 
