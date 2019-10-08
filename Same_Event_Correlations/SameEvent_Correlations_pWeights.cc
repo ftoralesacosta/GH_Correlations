@@ -569,6 +569,11 @@ int main(int argc, char *argv[])
   float weight_sum[nptbins] = {0};
   Float_t purity_weight_sum[nptbins] = {0};
   Float_t BR_purity_weight_sum[nptbins] = {0};
+
+  //  TH1F track_above_ten("tracks_above_ten","Tracks above 10 GeV/c",)
+  Long64_t tracks_tenGev = 0;
+    
+
   hweight.Sumw2();
   hBR.Sumw2();
   
@@ -1108,13 +1113,16 @@ int main(int argc, char *argv[])
 	    if (cluster_pt[n] >= ptbins[ipt] && cluster_pt[n] < ptbins[ipt+1]){
 	      for(int izt = 0; izt<nztbins ; izt++){
 		if(zt>ztbins[izt] and  zt<ztbins[izt+1]){
-		  if (first_cluster)
-		    h_track_phi_eta[izt+ipt*nztbins]->Fill(track_phi[itrack],track_eta[itrack]);	  
+		  if (first_cluster){
+		    h_track_phi_eta[izt+ipt*nztbins]->Fill(track_phi[itrack],track_eta[itrack]);
+		    if (track_pt[itrack] > 10)
+		    tracks_tenGev += 1;
+		  }
 		  //2 DNN Regions
 
 		  if (Signal and Isolated)
 		    IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta,track_weight*purity_weight);
-		  
+
 		  if (Background and Isolated){
 		    BKGD_IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta,bkg_weight*track_weight*BR_purity_weight);
 		    //not weighted with pT distro
@@ -1158,6 +1166,7 @@ int main(int argc, char *argv[])
     fout = new TFile(Form("%s_SE_Correlation.root",rawname.data()),"RECREATE");
 
   std::cout<<"Clusters Passed Iosalation and Shower Shape: "<<N_Signal_Triggers<<std::endl;
+  fprintf(stderr,"Tracks Above 10 GeV/c = %llu \n",tracks_tenGev);
 			  
   h_purity.Write("purities");
 

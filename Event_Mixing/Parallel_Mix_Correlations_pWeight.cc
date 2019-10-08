@@ -529,6 +529,7 @@ int main(int argc ,char *argv[])
     _tree_event->SetBranchAddress("cell_e", cell_e);
 
     _tree_event->SetBranchAddress("mixed_events", mix_events);
+    //_tree_event->SetBranchAddress("Mix_Events", mix_events);
     //_tree_event->SetBranchAddress("LimitUse_Mixed_Events", Mix_Events);
     
     std::cout << " Total Number of entries in TTree: " << _tree_event->GetEntries() << std::endl;

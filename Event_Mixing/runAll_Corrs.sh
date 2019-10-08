@@ -6,8 +6,11 @@ module load root
 
 n_mix=300
 
-for dataset in {13f,13d,13e,17q} #13f first since troublesome (only uses half block size)
-
+#for dataset in {13f,13d,13e,17q} #13f first since troublesome (only uses half block size)
+#for dataset in {13f_new_skimClusterMinE12,13}
+dataset="13f_new_skimClusterMinE12"
+for i in {1}
+			
 do
     
     for p in {0,4}

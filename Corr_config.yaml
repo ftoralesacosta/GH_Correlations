@@ -18,8 +18,8 @@ do_pileup_cut:		      false
 N_Phi_Bins:                   16
 N_Eta_Bins:                   14
 Track_pT_Min:		      0.5
-#Track_pT_Max:		      10.0
-Track_pT_Max:		      6.0
+Track_pT_Max:		      10.0
+#Track_pT_Max:		      6.0
 Track_Cut_Bit:                16
 #Track_Cut_Bit:                3 #CHECK pp CASE!
 

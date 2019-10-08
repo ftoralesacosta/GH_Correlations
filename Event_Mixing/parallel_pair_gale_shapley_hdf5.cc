@@ -11,6 +11,7 @@
 #include <TSystem.h>
 #include <iostream>
 
+#include <omp.h>
 #include "H5Cpp.h"
 
 //#define HI_TREE "hiEvtAnalyzer/HiTree"
@@ -92,13 +93,16 @@ namespace {
 			hi_tree->GetEntry(i);
 
 			ret.push_back(v[2]);
+
 			if (nfeature >= 2) {
  			        float multp_sum = 0;
 			        for (int k = 0; k < 64; k++) {
 				  multp_sum += multiplicity_v0[k];
 				}
 				ret.push_back(multp_sum);
+				//fprintf(stderr,"%d: z-vertex = %1.2f mp = %f\n",__LINE__,v[2],multp_sum);
 			}
+
 		}
 
 		root_file->Close();
@@ -130,7 +134,7 @@ namespace {
     return ret;
   }
 
-	std::vector<float> feature_extract_hdf5(const char *filename,
+  std::vector<float> feature_extract_hdf5(const char *filename,
 					   const size_t event_start,
 					   const size_t event_end,
 					   const size_t nfeature)
@@ -181,11 +185,12 @@ namespace {
 
 		for (size_t i = event_start; i < event_end; i++) {
 		  float v2 = event_data_out[i][0];
-		  fprintf(stderr,"%s: %d: Event %ui v2 = %f \n",__FILE__,__LINE__,i,v2);
+		  //fprintf(stderr,"%s: %d: Event %ui v2 = %f \n",__FILE__,__LINE__,i,v2);
 		  ret.push_back(v2);
 			if (nfeature >= 2) {
 			  float multp = event_data_out[i][1];
 			  ret.push_back(multp);
+			  fprintf(stderr,"%d: z-vertex = %1.2f mp = %f\n",__LINE__,v2,multp);
 			}
 		}
 		return ret;
@@ -246,8 +251,8 @@ void order_preference(std::vector<std::list<index_t> > &up,
 	const size_t u_size_n = u.size() / n;
 	const size_t v_size_n = v.size() / n;
 
-	// fprintf(stderr, "%s:%d: %lux%lu\n", __FILE__, __LINE__,
-	// 		u_size_n, v_size_n);
+	//fprintf(stderr, "%s:%d: %lux%lu Thread %i\n", __FILE__, __LINE__,
+	//u_size_n, v_size_n, omp_get_thread_num());
 
 	const size_t size_max = std::max(u_size_n, v_size_n);
 
@@ -255,7 +260,8 @@ void order_preference(std::vector<std::list<index_t> > &up,
 
 	for (size_t i = 0; i < u_size_n; i++) {
 		std::vector<std::pair<float, index_t> > l;
-
+		//fprintf(stderr,"\n %d : Thread %i : orderfunction: HERE \n",__LINE__,omp_get_thread_num());
+		
 		for (size_t j = 0; j < v_size_n; j++) {
 			float d = 0;
 
@@ -265,6 +271,7 @@ void order_preference(std::vector<std::list<index_t> > &up,
 			if (d==0) d = 999999; //Avoid pairing identical events
 			l.push_back(std::pair<float, size_t>(d, j));
 		}
+		//fprintf(stderr,"\n %d : Thread %i : orderfunction: HERE \n",__LINE__,omp_get_thread_num());
 		std::sort(l.begin(), l.end(), preference_compare);
 		// up.push_back(std::list<index_t>());
 		for (size_t j = 0; j < l.size(); j++) {
@@ -272,8 +279,9 @@ void order_preference(std::vector<std::list<index_t> > &up,
 				up[i].push_front(l[j].second + k * v_size_n);
 			}
 		}
+		//fprintf(stderr,"\n %d : Thread %i : orderfunction: HERE \n",__LINE__,omp_get_thread_num());
 		up[i].resize(size_max, v_size_n);
-
+		//fprintf(stderr,"\n %d : orderfunction: HERE \n", __LINE__);	
 		// if (i % 100 == 0) {
 		//   fprintf(stderr, "%s:%d: %lu/%lu\n", __FILE__, __LINE__,i, u_size_n);
 		// }
@@ -310,7 +318,8 @@ void order_preference(std::vector<std::list<index_t> > &up,
 		// }
 	}
 
-	//fprintf(stderr, "%s:%d: %s\n", __FILE__, __LINE__, "Order Preference done for this block");
+	fprintf(stderr, "%s:%d: %s\n", __FILE__, __LINE__, "Order Preference done for this block");
+	fprintf(stderr,"\n %d : Thread %i : orderfunction: HERE \n",__LINE__,omp_get_thread_num());
 }
 
 std::vector<index_t> gale_shapley(std::vector<std::list<index_t> > &mp,
@@ -422,7 +431,10 @@ std::map<size_t,std::vector<Long64_t> > mix_gale_shapley(const char *filename_0,
 
 	const size_t nblocks_0 = nevent_0 / block_size; 
 	const size_t nblocks_1 = ((nevent_1 * nduplicate)/
-				 block_size);
+				  block_size);
+
+	// const size_t nblocks_0 = 10;
+	// const size_t nblocks_1 = 10;
 
 	//For even distribution of MB events
 	int remainder_1 = (nevent_1%block_size)/(mixing_end-mixing_start);
@@ -436,8 +448,8 @@ std::map<size_t,std::vector<Long64_t> > mix_gale_shapley(const char *filename_0,
 
 	//for(size_t h = 0; h < nblocks_0; h++){
 
-	std::vector<float> a = feature_extract_hdf5(filename_1, 1, 10,nfeature);
-	for(size_t h = 0; h < 10; h++){
+	//std::vector<float> a = feature_extract_hdf5(filename_1, 1, 10,nfeature);
+	for(size_t h = 0; h < nblocks_0; h++){
 
 	  size_t event_start_0 = h * block_size;
 	  size_t event_end_0 = event_start_0 + block_size;
@@ -457,35 +469,45 @@ std::map<size_t,std::vector<Long64_t> > mix_gale_shapley(const char *filename_0,
 	
 	  feature_1_vec.push_back(feature_extract_hdf5(filename_1, event_start_1, event_end_1,nfeature));
 
-	  fprintf(stderr,"\n %d: MB EVENT START=%u || EVENT END=%u",
+	  fprintf(stderr,"\n %d: MB EVENT START=%u || EVENT END=%u \n",
 	  	  __LINE__,event_start_1,event_end_1);
 	    
 	}
 
-#pragma omp parallel for
+#pragma omp parallel for ordered schedule(dynamic)
 	for(size_t h = 0; h < nblocks_0; h++){
+	  //for(size_t h = 10; h < 20; h++){
 
-	  fprintf(stderr,"%s:%d: %s %lu %s %lu\n",__FILE__,__LINE__,"Block",h,"of",nblocks_0);	   
+	    fprintf(stderr,"%s:%d: %s %lu %s %lu\n",__FILE__,__LINE__,"Block",h,"of",nblocks_0);	   
 
 	  size_t event_start_0 = h * block_size;
 	  std::vector<std::vector<Long64_t> > k;		  
 
+	  //fprintf(stderr,"\n %d : Thread %i HERE \n", __LINE__,omp_get_thread_num());
+	  
 	  for (size_t i = mix_start; i < mix_end; i++) {
 
 			std::vector<float> feature_0_scaled = feature_0_vec[h];
 			std::vector<float> feature_1_scaled = feature_1_vec[i];
-			
+
+			//fprintf(stderr,"\n %d : Thread %i HERE \n", __LINE__,omp_get_thread_num());
+
 			feature_normalize(feature_0_scaled, feature_1_scaled,
 					  nfeature);
-			
+			//fprintf(stderr,"\n %d : Thread %i HERE \n", __LINE__,omp_get_thread_num());
 			std::vector<std::list<index_t> > preference_0;
 			std::vector<std::list<index_t> > preference_1;
-			
+			//fprintf(stderr,"\n %d : Thread %i HERE \n", __LINE__,omp_get_thread_num());
+			//#pragma omp critical
+
 			order_preference(preference_0, preference_1,
 							 feature_0_scaled, feature_1_scaled,
 							 nfeature, nduplicate);
-
+			//containers passed in the function should be threacd private, with the ints being passed as consts.
+			
+			//fprintf(stderr,"\n %d : Thread %i HERE \n", __LINE__,omp_get_thread_num());
 			std::vector <index_t> m;
+
 			m = gale_shapley(preference_0, preference_1);
 
 			const size_t feature_1_size_nfeature = feature_1_vec[i].size() / nfeature;
@@ -570,7 +592,7 @@ void write_root(std::map<size_t,std::vector<Long64_t> > Matches,
 	  ULong64_t nentries = hi_tree->GetEntries();    
 	  Long64_t Mix_Events[n_mix_events];
 
-	  TBranch *MixE = newtree->Branch("Mix_Events", Mix_Events, "&Mix_Events[300]/L");
+	  TBranch *MixE = newtree->Branch("mixed_events", Mix_Events, "&mixed_events[300]/L");
 	  
 	  for (ULong64_t t = 0; t<nentries;t++){ //Event # is key used in map <Matches>
 	  //for (ULong64_t t = 0; t<10000;t++){ //Event # is key used in map <Matches>
@@ -609,6 +631,6 @@ int main(int argc, char *argv[])
 	}
 
 	std::map<size_t,std::vector<Long64_t> >	Matches = mix_gale_shapley(argv[1], argv[2], argv[3], argv[4],argv[5], 2, 1);
-
+	write_txt(Matches,argv[1],"0","300",argv[5]);
 	write_root(Matches,argv[1],argv[5],300);
 }

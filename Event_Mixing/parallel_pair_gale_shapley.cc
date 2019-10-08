@@ -333,7 +333,8 @@ std::map<size_t,std::vector<Long64_t> > mix_gale_shapley(const char *filename_0,
 	    block_size --;
 	  }
 
-	const size_t nblocks_0 = nevent_0 / block_size; 
+	const size_t nblocks_0 = nevent_0 / block_size;
+	//const size_t nblocks_0 = 10;
 	const size_t nblocks_1 = ((nevent_1 * nduplicate)/
 				 block_size);
 
