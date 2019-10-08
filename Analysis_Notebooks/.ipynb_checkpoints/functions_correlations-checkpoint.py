@@ -409,16 +409,17 @@ def Plot_pp_pPb_Cs_Individual(Dict):
 
             pPb = plt.errorbar(delta_phi_centers,Dict["p-Pb_CSR"][ipt][izt],xerr=phi_width,yerr=Dict["p-Pb_CSR_Errors"][ipt][izt],fmt='bo',capsize=4,markersize=11)
             pp = plt.errorbar(delta_phi_centers,Dict["pp_CSR"][ipt][izt],xerr=phi_width,yerr=Dict["pp_CSR_Errors"][ipt][izt],fmt='ro',capsize=4,markersize=11)
-            pyth = plt.errorbar(delta_phi_centers,pythia[izt],pythia_error[izt],fmt="-g",capsize=4)
             
-            if(Use_MC):
-                MC = plt.errorbar(delta_phi_centers,["MC_CSR"][ipt][izt],xerr=phi_width,yerr=["MC_CSR_Errors"][ipt][ztb],fmt='go',capsize=4,markersize=11)
+            if (Use_MC):
+                pyth = plt.errorbar(delta_phi_centers,pythia[izt],pythia_error[izt],fmt="-g",capsize=4)
+            
+            
 
 
             plt.xlabel(r'|$\Delta \varphi$|',fontsize=28)
             plt.xticks(fontsize=18)
-            #plt.xlim((0.39269908169872414,3.14159))
-            plt.xlim((0,3.14159))
+            plt.xlim((0.39269908169872414,3.14159))
+            #plt.xlim((0,3.14159))
 
             plt.ylabel(r'$1/N_{\gamma} \: \: \mathrm{d}N/\mathrm{d}\Delta \eta \Delta \varphi$',fontsize=28)
             plt.yticks(fontsize=18)
@@ -450,15 +451,17 @@ def Plot_pp_pPb_Cs_Individual(Dict):
                     leg = plt.legend([pp,pPb,pyth,Combined_UE],['pp $\sqrt{s}= 5$ TeV (stat. error)',
                     'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)', 'Pythia 8.2 Monash','UB Error'],
                     loc = "upper left",fontsize=20,frameon=False,numpoints=1)
-            else:    
-                if not(Quad_UE):
-                    leg = plt.legend([pp,pPb,pp_UE,pPb_UE],['pp $\sqrt{s}= 5$ TeV (stat. error)',
-                    'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)', 'pp UB Error', 'p-Pb UB Error'],
+            else:
+                    leg = plt.legend([pp,pPb,Combined_UE],['pp $\sqrt{s}= 5$ TeV (stat. error)',
+                    'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)','UB Error'],
                     loc = "upper left",fontsize=20,frameon=False,numpoints=1)
-                else:
-                    leg = plt.legend([pp,pPb,pyth,Combined_UE],['pp $\sqrt{s}= 5$ TeV (stat. error)',
-                    'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)', 'Pythia 8.2 Monash','UB Error'],
-                    loc = "upper left",fontsize=20,frameon=False,numpoints=1)
+            #else:    
+            #    if not(Quad_UE):
+            #        leg = plt.legend([pp,pPb,pp_UE,pPb_UE],['pp $\sqrt{s}= 5$ TeV (stat. error)',
+            #        'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)', 'pp UB Error', 'p-Pb UB Error'],
+            #        loc = "upper left",fontsize=20,frameon=False,numpoints=1)
+            #    else:
+
 
             plt.annotate(r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]), xy=(0.05, 0.56), xycoords='axes fraction', ha='left', va='top', fontsize=22)
             
