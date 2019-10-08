@@ -260,7 +260,6 @@ void order_preference(std::vector<std::list<index_t> > &up,
 
 	for (size_t i = 0; i < u_size_n; i++) {
 		std::vector<std::pair<float, index_t> > l;
-		//fprintf(stderr,"\n %d : Thread %i : orderfunction: HERE \n",__LINE__,omp_get_thread_num());
 		
 		for (size_t j = 0; j < v_size_n; j++) {
 			float d = 0;
@@ -271,7 +270,6 @@ void order_preference(std::vector<std::list<index_t> > &up,
 			if (d==0) d = 999999; //Avoid pairing identical events
 			l.push_back(std::pair<float, size_t>(d, j));
 		}
-		//fprintf(stderr,"\n %d : Thread %i : orderfunction: HERE \n",__LINE__,omp_get_thread_num());
 		std::sort(l.begin(), l.end(), preference_compare);
 		// up.push_back(std::list<index_t>());
 		for (size_t j = 0; j < l.size(); j++) {
@@ -279,9 +277,7 @@ void order_preference(std::vector<std::list<index_t> > &up,
 				up[i].push_front(l[j].second + k * v_size_n);
 			}
 		}
-		//fprintf(stderr,"\n %d : Thread %i : orderfunction: HERE \n",__LINE__,omp_get_thread_num());
 		up[i].resize(size_max, v_size_n);
-		//fprintf(stderr,"\n %d : orderfunction: HERE \n", __LINE__);	
 		// if (i % 100 == 0) {
 		//   fprintf(stderr, "%s:%d: %lu/%lu\n", __FILE__, __LINE__,i, u_size_n);
 		// }
@@ -319,7 +315,7 @@ void order_preference(std::vector<std::list<index_t> > &up,
 	}
 
 	fprintf(stderr, "%s:%d: %s\n", __FILE__, __LINE__, "Order Preference done for this block");
-	fprintf(stderr,"\n %d : Thread %i : orderfunction: HERE \n",__LINE__,omp_get_thread_num());
+	//fprintf(stderr,"\n %d : Thread %i : orderfunction: HERE \n",__LINE__,omp_get_thread_num());
 }
 
 std::vector<index_t> gale_shapley(std::vector<std::list<index_t> > &mp,
@@ -483,29 +479,19 @@ std::map<size_t,std::vector<Long64_t> > mix_gale_shapley(const char *filename_0,
 	  size_t event_start_0 = h * block_size;
 	  std::vector<std::vector<Long64_t> > k;		  
 
-	  //fprintf(stderr,"\n %d : Thread %i HERE \n", __LINE__,omp_get_thread_num());
-	  
 	  for (size_t i = mix_start; i < mix_end; i++) {
 
 			std::vector<float> feature_0_scaled = feature_0_vec[h];
 			std::vector<float> feature_1_scaled = feature_1_vec[i];
 
-			//fprintf(stderr,"\n %d : Thread %i HERE \n", __LINE__,omp_get_thread_num());
-
 			feature_normalize(feature_0_scaled, feature_1_scaled,
 					  nfeature);
-			//fprintf(stderr,"\n %d : Thread %i HERE \n", __LINE__,omp_get_thread_num());
 			std::vector<std::list<index_t> > preference_0;
 			std::vector<std::list<index_t> > preference_1;
-			//fprintf(stderr,"\n %d : Thread %i HERE \n", __LINE__,omp_get_thread_num());
-			//#pragma omp critical
 
 			order_preference(preference_0, preference_1,
 							 feature_0_scaled, feature_1_scaled,
 							 nfeature, nduplicate);
-			//containers passed in the function should be threacd private, with the ints being passed as consts.
-			
-			//fprintf(stderr,"\n %d : Thread %i HERE \n", __LINE__,omp_get_thread_num());
 			std::vector <index_t> m;
 
 			m = gale_shapley(preference_0, preference_1);
