@@ -13,7 +13,7 @@ Shower = "LO"
 Use_Weights = True #BKR pT Weight
 Use_P_Weights = True
 CorrectedP = True  # FALSE FOR HARDPROBES
-Use_MC = False
+Use_MC = True
 pT_Rebin = False
 N_dPhi_Bins = 8
 Ped_Sub_First = False #Important after weight implementation
@@ -153,7 +153,9 @@ description_string = default_string
 #description_string = "zT_Rebin_6_006zT06zTpileCut"
 #description_string = "zT_Rebin_6_006zT06zT8GeV"
 #description_string = "zT_Rebin_8_006zT06zT6GeV"
-description_string = "zT_Rebin_8_006zT06zT8GeV"
+#description_string = "zT_Rebin_8_006zT06zT8GeV"
+description_string = "zT_Rebin_8_006zT06zT13fnew"
+#description_string = "zT_Rebin_8_006zT06zT13fnewONLY"
 
  
 #description_string = "zT_Rebin_7_006zT06zT"
@@ -378,16 +380,6 @@ if (Shower == "NN"):
             purity_Uncertainty = np.asarray([0.09,0.1,0.11,0.11])
         else:
             purity = [0.352546]
-
-MC_File = '../InputData/18b10a_pthat_1_2_SE_NN_Correlation_GMB_Ratio.root'
-
-if(Use_MC):
-    Systems = ["pp","p-Pb","MC"]
-    Files = [pp_File,pPb_File,MC_File]
-    
-for file,SYS in zip(Files,Systems):
-    print("%s File: %s"%(SYS,file))
-    
     
 def Get_pp_pPb_List_Chi2(array1,array1_E,SYS_1,array2,array2_E,SYS_2):
         

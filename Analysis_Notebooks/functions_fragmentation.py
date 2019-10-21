@@ -406,8 +406,8 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
             model,p,chi2dof = Fit_FF_PowerLaw(Comb_Dict,SYS)
             plt.plot(zT_centers[:NzT-ZT_OFF_PLOT], model, sys_col,label=r"%s $\alpha = %1.2f\pm 0.1 \chi^2 = %1.2f$"%(SYS,p,chi2dof))
     
-        if (Use_MC):
-            plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT],pythia_FF,xerr=zT_widths[:NzT-ZT_OFF_PLOT],fmt='-g',label="Pythia 8.2 Monash")   
+    if (Use_MC):
+        plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT],pythia_FF,xerr=zT_widths[:NzT-ZT_OFF_PLOT],fmt='-g',label="Pythia 8.2 Monash")   
     
     
     plt.yscale('log')                             
@@ -650,6 +650,10 @@ def pp_pPB_Avg_Ratio(Comb_Dict,pT_Start):
 
     print(Ratio_Systematic[:NzT-ZT_OFF_PLOT])
     
+    print("\n                 Relative Full Systematic:")
+    
+    print(Ratio_Systematic[:NzT-ZT_OFF_PLOT]/Ratio[:NzT-ZT_OFF_PLOT])
+    
     
     print("\n                LaTeX Table:")
     
@@ -698,7 +702,10 @@ def Compare_pp_pPB_Avg_Ratio_lists(save_name,strings,string_descrp_list,colors,S
         if  (colr == "red"):
             plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT], Ratio[:NzT-ZT_OFF_PLOT], yerr=Ratio_Error[:NzT-ZT_OFF_PLOT],xerr=zT_widths[:NzT-ZT_OFF_PLOT],capsize=3, fmt ="o",color=colr,alpha=0.7,ms=6,lw=1,label=string_descr)
 
-        else:
+        elif colr == "blue":
+            plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT]+0.01, Ratio[:NzT-ZT_OFF_PLOT], yerr=Ratio_Error[:NzT-ZT_OFF_PLOT],xerr=zT_widths[:NzT-ZT_OFF_PLOT],capsize=3, fmt ="o",color=colr,alpha=0.7,ms=6,lw=1,label=string_descr)
+            
+        elif colr == "green":
             plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT]+0.02, Ratio[:NzT-ZT_OFF_PLOT], yerr=Ratio_Error[:NzT-ZT_OFF_PLOT],xerr=zT_widths[:NzT-ZT_OFF_PLOT],capsize=3, fmt ="o",color=colr,alpha=0.7,ms=6,lw=1,label=string_descr)
 
     empt4, = plt.plot([], [],' ',label=r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[0],pTbins[N_pT_Bins]))
@@ -730,7 +737,7 @@ def Compare_pp_pPB_Avg_Ratio_lists(save_name,strings,string_descrp_list,colors,S
 def Compare_pp_pPB_Avg_lists(save_name,strings,string_descrp_list,colors):
         
     plt.figure(figsize=(8,7)) 
-    shapes = ["o","x","s"]
+    shapes = ["x","o","s"]
     
     for (string,string_descr,colr) in zip(strings,string_descrp_list,colors):
         print(string)
@@ -745,10 +752,10 @@ def Compare_pp_pPB_Avg_lists(save_name,strings,string_descrp_list,colors):
             zT_widths = [(j-i)/2 for i, j in zip(Zbins[:-1], Zbins[1:])]
         
         
-            #if (SYS=="pp"):
-            #    continue
-            if ((string != default_string) and SYS=="pp"):
+            if (SYS=="pp"):
                 continue
+            #if ((string != default_string) and SYS=="pp"):
+            #    continue
                 
             #if((string == default_string) and SYS=="p-Pb"):
             #    continue
@@ -760,6 +767,10 @@ def Compare_pp_pPB_Avg_lists(save_name,strings,string_descrp_list,colors):
                 plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT], FF[:NzT-ZT_OFF_PLOT],xerr=zT_widths[:NzT-ZT_OFF_PLOT],
                         yerr=FF_Errors[:NzT-ZT_OFF_PLOT],linewidth=1, fmt=shape,color=colr,capsize=1,label="%s (%s)"%(string_descr,SYS))
         
+            elif colr == "blue":
+                plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT]+0.01, FF[:NzT-ZT_OFF_PLOT],xerr=zT_widths[:NzT-ZT_OFF_PLOT],
+                        yerr=FF_Errors[:NzT-ZT_OFF_PLOT],linewidth=1, fmt=shape,color=colr,capsize=1,label="%s (%s)"%(string_descr,SYS))
+                
             else:
                 plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT]+0.02, FF[:NzT-ZT_OFF_PLOT],xerr=zT_widths[:NzT-ZT_OFF_PLOT],
                         yerr=FF_Errors[:NzT-ZT_OFF_PLOT],linewidth=1, fmt=shape,color=colr,capsize=1,label="%s (%s)"%(string_descr,SYS))
@@ -779,7 +790,7 @@ def Compare_pp_pPB_Avg_lists(save_name,strings,string_descrp_list,colors):
 
     plt.title(r'Integrated $\mathrm{\gamma}$-Hadron Correlation: $%s < \Delta\varphi < \pi$ '%(Phi_String),fontdict = {'fontsize' : 19})
     plt.gcf()
-    plt.savefig('pics/%s/%s/FF_Averages_%s.pdf'%(Shower,description_string,save_name),bbox_inches='tight')
+    plt.savefig('pics/%s/%s/FF_Averages_%s.pdf'%(Shower,default_string,save_name),bbox_inches='tight')
     plt.show()
 
     print("                Central Values:")
@@ -797,7 +808,7 @@ def LaTeX_Table(FF_Dictionary):
     print("$z_\mathrm{T}$ Range & pp $\\pm$ Stat. $\\pm$ Sys & p--Pb $\\pm$ Stat. $\\pm$ Sys. \\\\")
     print("\\hline")
     for izt,(ppFF,ppStat,ppSys,pPbFF,pPbStat,pPbSys) in enumerate(zip(pp_FF,pp_Stat,pp_sys_Error,pPb_FF,pPb_Stat,pPb_sys_Error)):
-        print("%1.2f--%1.2f & %1.2f$ \\pm$ %1.2f$ \\pm$%1.2f & %1.2f$ \\pm$ %1.2f$ \\pm$%1.2f \\\\"%(zTbins[izt],zTbins[izt+1],ppFF,ppStat,ppSys,pPbFF,pPbStat,pPbSys))
+        print("%1.2f--%1.2f & %1.2f$ \\pm$ %1.2f (stat.) $\\pm$%1.2f (sys.) & %1.2f$ \\pm$ %1.2f (stat.) $\\pm$%1.2f (sys.)\\\\"%(zTbins[izt],zTbins[izt+1],ppFF,ppStat,ppSys,pPbFF,pPbStat,pPbSys))
     
 def LaTeX_Table_Old(FF_Dictionary):
     

@@ -779,7 +779,7 @@ def LaTeX_Results_Summary(FF_Dict):
         print("                        LaTeX Table")
 
         i=0
-        j=len(FF_Dict["pp_FF_Errors"][0])/1        
+        j=len(FF_Dict["pp_FF_Errors"][0])/2        
         print(i)
         print(j)
         pp_stat_min_low = np.amin(FF_Dict["pp_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
