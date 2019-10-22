@@ -1271,6 +1271,9 @@ int main(int argc, char *argv[])
 	  //fprintf(stderr,"\n Track pT = %f, Track weight = %f\n",track_pt[itrack],track_weight);
 	  
 		  
+	  //DEBUGGING, FIXME:
+	  track_weight = 1.0;
+
 	  //Observables:
 	  Double_t zt = track_pt[itrack]/cluster_pt[n];
 	  Float_t DeltaPhi = TMath::Abs(TVector2::Phi_mpi_pi(cluster_phi[n] - track_phi[itrack]));
