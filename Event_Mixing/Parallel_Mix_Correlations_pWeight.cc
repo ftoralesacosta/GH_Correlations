@@ -131,6 +131,7 @@ int main(int argc ,char *argv[])
   float track_pT_min = 0.0;
   float track_pT_max = 0.0;
   int Track_Cut_Bit = 0;
+  int track_chi_max = 1;
   double iso_max = 0;
   double noniso_min = 0;
   double noniso_max = 0;
@@ -252,6 +253,11 @@ int main(int argc ,char *argv[])
           Track_Cut_Bit = atoi(value);
           std::cout << "Track Cut Bit: " << Track_Cut_Bit << std::endl; }
 
+      else if (strcmp(key, "Track_Chi_Max") == 0) {
+          track_chi_max = atoi(value);
+          std::cout << "Track Chi Max: " << track_chi_max << std::endl; }
+
+      
       else if (strcmp(key, "Zt_bins") == 0) {
           nztbins = -1;
           for (const char *v = value; *v != ']';) {
@@ -586,10 +592,10 @@ int main(int argc ,char *argv[])
     //Define array hyperslab will be read into
     hsize_t block_size = eventdims[0];
 
-    if(strstr(root_file,"13f") !=NULL){
-      block_size = eventdims[0]/2; //FIXME: RAM on cori recently reduced.
-      fprintf(stderr,"%d: USING Half block size for 13f (block size = %d)\n",__LINE__,block_size);
-    }
+    // if(strstr(root_file,"13f") !=NULL){
+    //   block_size = eventdims[0]/2; //FIXME: RAM on cori recently reduced.
+    //   fprintf(stderr,"%d: USING Half block size for 13f (block size = %d)\n",__LINE__,block_size);
+    // }
     
     // if (strcmp("13f",basic_name)==0){
 
@@ -812,7 +818,7 @@ int main(int argc ,char *argv[])
 	    if (track_data_out[imix][itrack][1] > track_pT_max) continue;
 	    if (abs(track_data_out[imix][itrack][2]) > 0.8) continue;
 	    if (track_data_out[imix][itrack][7] < 4) continue;
-	    if ((track_data_out[imix][itrack][8]/track_data_out[imix][itrack][7]) > 36) continue;
+	    if ((track_data_out[imix][itrack][8]/track_data_out[imix][itrack][7]) > track_chi_max) continue;
 	    if( not(TMath::Abs(track_data_out[imix][itrack][9])<0.0231+0.0315/TMath::Power(track_data_out[imix][itrack][4],1.3 ))) continue;
 	    double dRmin = 0.02;
 	    //veto charged particles from mixed event tracks

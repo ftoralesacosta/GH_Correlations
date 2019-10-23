@@ -1,4 +1,4 @@
- #include <TFile.h>
+#include <TFile.h>
 #include <TTree.h>
 #include <TLorentzVector.h>
 
@@ -76,6 +76,12 @@ Float_t Get_Purity_ErrFunction(Float_t pT_GeV, std::string deviation,bool Is_pp,
   return purity_val;
 }
 
+void Set_Trigger_Mask(std::string dataset, std::vector<ULong64_t> TriggerMask){
+
+  if (dataset.compare("pPb") !=0)
+    fprintf(stderr,"Hello World");
+	       
+}
 
 int main(int argc, char *argv[])
 {
@@ -91,13 +97,29 @@ int main(int argc, char *argv[])
   bool Is_pp = false;
 
 
-  std::string coll_system = argv[2];
-  if (strcmp(coll_system.c_str(), "pp") == 0)
+  std::string dataset = argv[2];
+  if (strcmp(coll_system.c_str(), "17q") == 0)
     Is_pp = true;
 
   if (Is_pp)
       fprintf(stderr,"\n PROTON PROTON SELECTED \n \n");
+
+
+  std::vector<ULong64_t> Trigger_Mask;
+  Set_Trigger_Mask(dataset,Trigger_Mask);
   
+  // char* input_name = argv[1];
+  // char* testName;
+  // int index;
+
+  // testName = strchr(input_name, '.');
+  // index = (int)(testName - input_name);
+  
+  // fprintf(stderr,"%d: Index at . = %i \n",__LINE__,index);
+  // strncpy(testName, input_name, 3);
+  // fprintf(stderr,"%d: FIRST THREE LETTERS TEST = %s \n",__LINE__,TString(testName));
+  // testName[3] = '\0';
+    
   //Config File
   FILE* config = fopen("../Corr_config.yaml", "r");
   double DNN_min = 0;
@@ -120,7 +142,6 @@ int main(int argc, char *argv[])
   float track_pT_min = 0.0;
   float track_pT_max = 0.0;
   int Track_Cut_Bit = 0;
-  int track_chi_max = 0;
   double iso_max = 0;
   double noniso_min = 0;
   double noniso_max = 0;
@@ -258,11 +279,6 @@ int main(int argc, char *argv[])
           Track_Cut_Bit = atoi(value);
           std::cout << "Track Cut Bit: " << Track_Cut_Bit << std::endl; }
 
-      else if (strcmp(key, "Track_Chi_Max") == 0) {
-          track_chi_max = atoi(value);
-          std::cout << "Track Chi^2 Max: " << track_chi_max << std::endl; }
-
-      
       else if (strcmp(key, "Zt_bins") == 0) {
           nztbins = -1;
           for (const char *v = value; *v != ']';) {
@@ -432,56 +448,35 @@ int main(int argc, char *argv[])
 
 
 
-  // std::array< float,38 > track_pT_Correction_bins = {0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50,
-  // 						0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90,
-  // 						0.95, 1.00, 1.10, 1.20, 1.40, 1.60, 1.80, 2.00,
-  // 						2.20, 2.40, 2.60, 2.80, 3.00, 3.20, 3.60, 4.00,
-  // 						5.00, 6.00, 8.00, 10.0, 13.0, 20.0};
+  std::array< float,38 > track_pT_Correction_bins = {0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50,
+						0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90,
+						0.95, 1.00, 1.10, 1.20, 1.40, 1.60, 1.80, 2.00,
+						2.20, 2.40, 2.60, 2.80, 3.00, 3.20, 3.60, 4.00,
+						5.00, 6.00, 8.00, 10.0, 13.0, 20.0};
 
-  
+  int N_Track_pT_Bins = track_pT_Correction_bins.size()-1;
+  fprintf(stderr,"NUMBER OF TRACK PT BINS IS %i \n \n",N_Track_pT_Bins);
+    
+
   //p-Pb
-  // float pPb_Efficiency[37] = {0.701584, 0.794149, 0.811056, 0.824281, 0.833784, 0.8411, 0.846235, 0.850521,
-  // 			      0.853948, 0.855174, 0.857245, 0.858315, 0.858334, 0.859078, 0.860819, 0.860223,
-  // 			      0.860368, 0.860849, 0.862532, 0.864867, 0.867081, 0.869168, 0.869016, 0.872149,
-  // 			      0.872669, 0.874919, 0.876616, 0.876491, 0.87365, 0.877567, 0.8777, 0.882617,
-  // 			      0.88169, 0.881348, 0.880515, 0.87605, 0.882653};
+  float pPb_Efficiency[37] = {0.701584, 0.794149, 0.811056, 0.824281, 0.833784, 0.8411, 0.846235, 0.850521,
+			      0.853948, 0.855174, 0.857245, 0.858315, 0.858334, 0.859078, 0.860819, 0.860223,
+			      0.860368, 0.860849, 0.862532, 0.864867, 0.867081, 0.869168, 0.869016, 0.872149,
+			      0.872669, 0.874919, 0.876616, 0.876491, 0.87365, 0.877567, 0.8777, 0.882617,
+			      0.88169, 0.881348, 0.880515, 0.87605, 0.882653};
 
-  // float pPb_FakeRate[37] = {0.0444643, 0.0329245, 0.0274773, 0.0241898, 0.0222288, 0.0207158, 0.0195863,
-  // 			    0.0189526, 0.0184162, 0.0180536, 0.0175808, 0.0177315, 0.017413, 0.0172551,
-  // 			    0.0175637, 0.017715, 0.0172888, 0.0178326, 0.0178794, 0.0179673, 0.0177509,
-  // 			    0.0182945, 0.0181996, 0.0188647, 0.0190429, 0.0202744, 0.0209381, 0.0213728,
-  // 			    0.0237848, 0.0251898, 0.0297774, 0.0350703, 0.0518793, 0.0804111, 0.137953,
-  // 			    0.214123, 0.301459};
+  float pPb_FakeRate[37] = {0.0444643, 0.0329245, 0.0274773, 0.0241898, 0.0222288, 0.0207158, 0.0195863,
+			    0.0189526, 0.0184162, 0.0180536, 0.0175808, 0.0177315, 0.017413, 0.0172551,
+			    0.0175637, 0.017715, 0.0172888, 0.0178326, 0.0178794, 0.0179673, 0.0177509,
+			    0.0182945, 0.0181996, 0.0188647, 0.0190429, 0.0202744, 0.0209381, 0.0213728,
+			    0.0237848, 0.0251898, 0.0297774, 0.0350703, 0.0518793, 0.0804111, 0.137953,
+			    0.214123, 0.301459};
 
-  // float pPb_Smearing_Correction[37] = {0.894311, 0.994658, 1.00122, 1.0087, 1.00914, 1.01009, 1.00939, 1.01073, 1.00998, 1.00622, 1.00519, 1.00425, 1.00182, 0.99553, 0.992115, 0.991085, 0.989869, 0.988516, 0.987711, 0.989906, 0.990167, 0.994517, 0.994247, 0.99273, 0.983717, 0.986158, 0.978648, 0.986939, 0.963266, 0.959108, 0.945863, 0.923434, 0.896206, 0.86263, 0.71868, 0.629909, 0.425061};
+  float pPb_Smearing_Correction[37] = {0.894311, 0.994658, 1.00122, 1.0087, 1.00914, 1.01009, 1.00939, 1.01073, 1.00998, 1.00622, 1.00519, 1.00425, 1.00182, 0.99553, 0.992115, 0.991085, 0.989869, 0.988516, 0.987711, 0.989906, 0.990167, 0.994517, 0.994247, 0.99273, 0.983717, 0.986158, 0.978648, 0.986939, 0.963266, 0.959108, 0.945863, 0.923434, 0.896206, 0.86263, 0.71868, 0.629909, 0.425061};
   
 
-  std::array<float,52> track_pT_Correction_bins = {0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2, 2.2, 2.4, 2.6, 2.8, 3, 3.2, 3.4, 3.6, 3.8, 4, 4.5, 5, 5.5, 6, 6.5, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 
-    float pPb_Efficiency[51] = {0.679585, 0.76674, 0.78565, 0.800042, 0.812381, 0.822312, 0.829837, 0.835912, 0.840904, 0.843102, 0.846413, 0.847949, 0.848675, 0.849882, 0.851767, 0.851662, 0.851702, 0.853024, 0.854968, 0.857285, 0.858209, 0.860071, 0.860713, 0.862577, 0.863482, 0.862668, 0.862379, 0.866158, 0.867516, 0.869688, 0.871099, 0.870675, 0.867989, 0.871116, 0.873867, 0.873728, 0.870625, 0.878394, 0.876006, 0.87091, 0.887415, 0.873455, 0.885345, 0.872369, 0.87373, 0.869674, 0.852, 0.899281, 0.873563, 0.892857, 0.877193};
-
-    float pPb_FakeRate[51] = {0.0288587, 0.0227023, 0.0201382, 0.0185892, 0.0175023, 0.0167976, 0.0160735, 0.0157722, 0.015473, 0.0152811, 0.0149019, 0.0148865, 0.014695, 0.0146859, 0.0149738, 0.0150937, 0.014766, 0.0150073, 0.0149588, 0.0150989, 0.0149009, 0.0144755, 0.0144847, 0.0148771, 0.014925, 0.0149947, 0.0149865, 0.0154721, 0.0154909, 0.015774, 0.0164298, 0.0160145, 0.0177727, 0.0184202, 0.0185393, 0.0206371, 0.0210202, 0.0203409, 0.0239161, 0.0273942, 0.0345207, 0.0436947, 0.0468119, 0.0464516, 0.0710901, 0.0819367, 0.0946372, 0.15566, 0.15, 0.158333, 0.179487};
-
-    float pPb_Smearing_Correction[51] = {0.900361, 0.99487, 1.00041, 1.0064, 1.00725, 1.00898, 1.00901, 1.01101, 1.01011, 1.00651, 1.00588, 1.00471, 1.00274, 0.996152, 0.992602, 0.991865, 0.990361, 0.98932, 0.988507, 0.990986, 0.990221, 0.987836, 0.994203, 0.991718, 0.999723, 0.994458, 0.995187, 0.993518, 0.985992, 0.988016, 0.980657, 0.988024, 0.96586, 0.969533, 0.955084, 0.959389, 0.9422, 0.93353, 0.925015, 0.912635, 0.912671, 0.883333, 0.896161, 0.894224, 0.790026, 0.730526, 0.766187, 0.722543, 0.584615, 0.526316, 0.793651};
-    
-    int N_Track_pT_Bins = track_pT_Correction_bins.size()-1;
-    fprintf(stderr,"NUMBER OF TRACK PT BINS IS %i \n \n",N_Track_pT_Bins);
-
-    if (track_chi_max == 3) {
-
-      fprintf(stderr, "Using track correction numbers for Track Chi < 3 \n");
-      
-      // pPb_Efficiency[51] = {0.686996, 0.775531, 0.793871, 0.807701, 0.819356, 0.828636, 0.83543, 0.840878, 0.845463, 0.847352, 0.850117, 0.85156, 0.851906, 0.852988, 0.854718, 0.854498, 0.854393, 0.85556, 0.857298, 0.859614, 0.860319, 0.862071, 0.862849, 0.86455, 0.865329, 0.864577, 0.864177, 0.867986, 0.868904, 0.87142, 0.872679, 0.872472, 0.869415, 0.87276, 0.87548, 0.874937, 0.872051, 0.880136, 0.877809, 0.872479, 0.888552, 0.874632, 0.887069, 0.874406, 0.875181, 0.869674, 0.852, 0.899281, 0.873563, 0.892857, 0.877193};
-
-      // pPb_FakeRate[51] = {0.031081, 0.0241273, 0.0212176, 0.0194042, 0.0181999, 0.0173863, 0.0165904, 0.0162754, 0.015906, 0.0157139, 0.0153469, 0.0153109, 0.0151241, 0.0150638, 0.0153399, 0.0154959, 0.01507, 0.0154259, 0.0153653, 0.0155326, 0.0152615, 0.0148514, 0.0148878, 0.0154277, 0.0154584, 0.0155519, 0.0154006, 0.0159689, 0.015868, 0.0164291, 0.0169783, 0.0164718, 0.018588, 0.0192822, 0.0195231, 0.0219063, 0.0221333, 0.0218592, 0.0255982, 0.0298739, 0.0364034, 0.0455293, 0.0503597, 0.052665, 0.0798611, 0.0869565, 0.103976, 0.169725, 0.166667, 0.169355, 0.195122};
-   
-      // pPb_Smearing_Correction[51] = {0.898839, 0.994897, 1.0007, 1.00687, 1.00764, 1.00931, 1.00909, 1.01085, 1.01018, 1.00643, 1.0057, 1.00455, 1.00236, 0.996086, 0.992388, 0.991604, 0.989903, 0.989074, 0.988281, 0.990712, 0.990075, 0.987383, 0.994328, 0.991727, 0.999377, 0.994042, 0.994934, 0.993385, 0.985454, 0.987902, 0.979915, 0.988121, 0.965358, 0.968577, 0.954842, 0.957327, 0.940971, 0.933026, 0.923672, 0.910643, 0.907823, 0.87929, 0.893229, 0.887664, 0.781088, 0.715464, 0.75, 0.714286, 0.567164, 0.515464, 0.769231};
-      
-    }
-      
-
-    
-  std::array< float,51 > TPC_track_pT_Correction_bins = {0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5,
+    std::array< float,51 > TPC_track_pT_Correction_bins = {0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5,
 							   0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9,
 							   0.95, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6,
 							   1.7, 1.8, 1.9, 2, 2.2, 2.4, 2.6, 2.8,
@@ -556,10 +551,6 @@ int main(int argc, char *argv[])
 
   float pp_Smearing_Correction[37] = {0.899306, 0.990662, 0.999535, 1.0065, 1.00578, 1.01049, 1.0104, 1.00846, 1.00905, 1.00653, 1.00859, 1.00616, 0.997317, 1.00387, 0.993037, 1.00025, 0.994664, 0.99143, 1.00412, 0.994017, 0.989386, 0.995787, 0.987843, 0.990099, 0.972225, 0.997532, 0.975834, 0.971739, 0.939599, 0.951686, 0.971399, 0.904032, 0.915311, 0.897727, 0.670429, 0.666667, 0.512195};
     
-    int N_Track_pT_Bins_pp = pp_track_pT_Correction_bins.size()-1;
-    fprintf(stderr,"NUMBER OF TRACK PT BINS IS %i \n \n",N_Track_pT_Bins_pp);
-    
-
   TH2D* Corr[nztbins*nptbins];
   TH2D* IsoCorr[nztbins*nptbins];
   TH2D* BKGD_IsoCorr[nztbins*nptbins];
@@ -601,12 +592,6 @@ int main(int argc, char *argv[])
   Float_t purity_weight_sum[nptbins] = {0};
   Float_t BR_purity_weight_sum[nptbins] = {0};
 
-  TH1F Track_Weight_Spectra("Weight_Track_Spectra", "Weighted Track Spectra",30,0.5,8);
-  TH1F Track_Raw_Spectra("Raw_Track_Spectra", "Raw Track Spectra",30,0.5,8);
-
-
-  Track_Weight_Spectra.Sumw2();
-  Track_Raw_Spectra.Sumw2();
   //  TH1F track_above_ten("tracks_above_ten","Tracks above 10 GeV/c",)
   Long64_t tracks_tenGev = 0;
     
@@ -855,8 +840,8 @@ int main(int argc, char *argv[])
     //WEIGHTING and CLUSTER SPECTRA LOOP
 
     fprintf(stderr,"Looping to determine weights and pT spectra \n");
-    //for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
-    for(Long64_t ievent = 0; ievent < 1000 ; ievent++){
+    for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
+    //for(Long64_t ievent = 0; ievent < 1000 ; ievent++){
       _tree_event->GetEntry(ievent);
       fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, ievent, nentries);
 
@@ -1003,8 +988,6 @@ int main(int argc, char *argv[])
       Float_t purity_weight = 0;
       Float_t BR_purity_weight = 0;
       bool first_cluster = true;
-      if (not(first_cluster))
-	      continue;
 
       //Event Selection
       if(TMath::Abs(primary_vertex[2])>10) continue;
@@ -1093,8 +1076,7 @@ int main(int argc, char *argv[])
  	  if((track_quality[itrack]&Track_Cut_Bit)==0) continue; //select only tracks that pass selection 
 	  if(abs(track_eta[itrack]) > 0.8) continue;
 	  if( not(track_its_ncluster[itrack]>4)) continue;
-	  if( not(track_its_chi_square[itrack]/track_its_ncluster[itrack] < track_chi_max)) continue;
-	  //if( not(track_its_chi_square[itrack]/track_its_ncluster[itrack] <36)) continue;
+	  if( not(track_its_chi_square[itrack]/track_its_ncluster[itrack] <36)) continue;
 	  if( not(TMath::Abs(track_dca_xy[itrack])<0.0231+0.0315/TMath::Power(track_pt[itrack],1.3 ))) continue;
 
 	  //Electron Veto for associated tracks outside of isolation cone
@@ -1133,7 +1115,7 @@ int main(int argc, char *argv[])
 	    
 	    track_weight = 1.0;
 
-	    for (int ipt = 0; ipt < N_Track_pT_Bins_pp; ipt++){
+	    for (int ipt = 0; ipt < N_Track_pT_Bins; ipt++){
 	      if( (track_pt[itrack] >= pp_track_pT_Correction_bins[ipt]) && (track_pt[itrack] < pp_track_pT_Correction_bins[ipt+1])){
 		track_weight = pp_Smearing_Correction[ipt]*(1.0-pp_FakeRate[ipt])/pp_Efficiency[ipt];
 	      }
@@ -1141,11 +1123,8 @@ int main(int argc, char *argv[])
 	  }//pp
 	
 	  //fprintf(stderr,"\n Track pT = %f, Track weight = %f\n",track_pt[itrack],track_weight);
-
-	  //Track DEBUGGING
-	  //track_weight = 1;
-	  //fprintf(stderr,"%d: Track pT: %1.2f,  Track Weight = %1.4f \n",__LINE__,track_pt[itrack],track_weight);
-
+	  
+		  
 	  //Observables:
 	  Double_t zt = track_pt[itrack]/cluster_pt[n];
 	  Float_t DeltaPhi = TMath::Abs(TVector2::Phi_mpi_pi(cluster_phi[n] - track_phi[itrack]));
@@ -1158,8 +1137,6 @@ int main(int argc, char *argv[])
 		if(zt>ztbins[izt] and  zt<ztbins[izt+1]){
 		  if (first_cluster){
 		    h_track_phi_eta[izt+ipt*nztbins]->Fill(track_phi[itrack],track_eta[itrack]);
-		    Track_Weight_Spectra.Fill(track_pt[itrack],track_weight);
-		    Track_Raw_Spectra.Fill(track_pt[itrack]);
 		    if (track_pt[itrack] > 10)
 		    tracks_tenGev += 1;
 		  }
@@ -1197,7 +1174,7 @@ int main(int argc, char *argv[])
 
   size_t lastindex = std::string(root_file).find_last_of(".");
   std::string rawname = std::string(root_file).substr(0, lastindex);
-  fprintf(stderr,"%s: %d: Creating new file %s_SE_L0_Correlation.root",__FILE__,__LINE__,rawname.data());
+  fprintf(stderr,"%s: %d: Creating new file",__FILE__,__LINE__);
 
   TFile* fout;
 
@@ -1220,8 +1197,6 @@ int main(int argc, char *argv[])
 
   hweight.Write();
 
-  Track_Weight_Spectra.Write();
-  Track_Raw_Spectra.Write();
   Signal_pT_Dist->Write();
   BKGD_pT_Dist->Write();
   BKGD_pT_Dist_Weighted->Scale(1.0/(hweight.Integral(1,40))); //Divide by sum of weights
