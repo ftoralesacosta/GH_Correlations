@@ -76,18 +76,15 @@ Float_t Get_Purity_ErrFunction(Float_t pT_GeV, std::string deviation,bool Is_pp,
   return purity_val;
 }
 
-void Set_Trigger_Mask(std::string dataset, std::vector<ULong64_t> TriggerMask){
-
-  if (dataset.compare("pPb") !=0)
-    fprintf(stderr,"Hello World");
-	       
-}
 
 int main(int argc, char *argv[])
 {
-  if (argc < 2) {
+  if (argc < 3) {
+    fprintf(stderr,"%d: Syntax is [./command] [root_file] [13d, or 13f...]",__LINE__);
     exit(EXIT_FAILURE);
   }
+  fprintf(stderr,"NUMBER OF ARGUMENTS = %i \n",argc);
+
   int dummyc = 1;
   char **dummyv = new char *[1];
 
@@ -95,19 +92,79 @@ int main(int argc, char *argv[])
 
 
   bool Is_pp = false;
-
-
   std::string dataset = argv[2];
-  if (strcmp(coll_system.c_str(), "17q") == 0)
+  if (strcmp(dataset.c_str(), "17q") == 0)
     Is_pp = true;
 
   if (Is_pp)
       fprintf(stderr,"\n PROTON PROTON SELECTED \n \n");
 
-
-  std::vector<ULong64_t> Trigger_Mask;
-  Set_Trigger_Mask(dataset,Trigger_Mask);
+  const ULong64_t one1 = 1;
   
+  /*//////////////////////////////////////////////////////////////////////////////////
+    13d triggers
+  //////////////////////////////////////////////////////////////////////////////////*/
+  ULong64_t trigMask_13d_trigs[5] = {0};//0 = MB, 1 = EG1, 2 = EG2
+  trigMask_13d_trigs[0] = (one1 << 2);
+  trigMask_13d_trigs[1] = (one1 << 18);
+  trigMask_13d_trigs[2] = (one1 << 19);
+  trigMask_13d_trigs[3] = (one1 << 20);//EJ1
+  trigMask_13d_trigs[4] = (one1 << 21);//EJ2
+  
+  ULong64_t trigMask_13d_trigs_r195767[5] = {0};//0 = MB, 1 = EG1, 2 = EG2, 3 = EJ1, 4 = EJ2
+  trigMask_13d_trigs_r195767[0] = (one1 << 2);
+  trigMask_13d_trigs_r195767[1] = (one1 << 18);//EG1
+  trigMask_13d_trigs_r195767[2] = (one1 << 19);//EG2
+  trigMask_13d_trigs_r195767[3] = (one1 << 21);//EJ1
+  trigMask_13d_trigs_r195767[4] = (one1 << 22);//EJ2
+  
+  
+  /*//////////////////////////////////////////////////////////////////////////////////
+    13e triggers
+  //////////////////////////////////////////////////////////////////////////////////*/
+  ULong64_t trigMask_13e_trigs[5] = {0};//0 = MB, 1 = EG1, 2 = EG2
+  trigMask_13e_trigs[0] = (one1 << 2);
+  trigMask_13e_trigs[1] = (one1 << 17);
+  trigMask_13e_trigs[2] = (one1 << 18);
+  trigMask_13e_trigs[3] = (one1 << 19);
+  trigMask_13e_trigs[4] = (one1 << 20);
+  ULong64_t trigMask_13e_trigs_r196208[5] = {0};//0 = MB, 1 = EG1, 2 = EG2
+  trigMask_13e_trigs_r196208[0] = (one1 << 2);
+  trigMask_13e_trigs_r196208[1] = (one1 << 12);
+  trigMask_13e_trigs_r196208[2] = (one1 << 13);
+  trigMask_13e_trigs_r196208[3] = (one1 << 14);
+  trigMask_13e_trigs_r196208[4] = (one1 << 15);
+  /*//////////////////////////////////////////////////////////////////////////////////
+    13f triggers
+  //////////////////////////////////////////////////////////////////////////////////*/
+  ULong64_t trigMask_13f_trigs1[5] = {0};//0 = MB, 1 = EG1, 2 = EG2
+  trigMask_13f_trigs1[0] = (one1 << 2);
+  trigMask_13f_trigs1[1] = (one1 << 17);
+  trigMask_13f_trigs1[2] = (one1 << 18);
+  trigMask_13f_trigs1[3] = (one1 << 19);
+  trigMask_13f_trigs1[4] = (one1 << 20);
+  ULong64_t trigMask_13f_trigs2[5] = {0};//0 = MB, 1 = EG1, 2 = EG2
+  trigMask_13f_trigs2[0] = (one1 << 2);
+  trigMask_13f_trigs2[1] = (one1 << 12);
+  trigMask_13f_trigs2[2] = (one1 << 13);
+  trigMask_13f_trigs2[3] = (one1 << 14);
+  trigMask_13f_trigs2[4] = (one1 << 15);
+  
+  ULong64_t trigMask_13f_trigs3[5] = {0};//0 = MB, 1 = EG1, 2 = EG2
+  trigMask_13f_trigs3[0] = (one1 << 2);
+  trigMask_13f_trigs3[1] = (one1 << 16);
+  trigMask_13f_trigs3[2] = (one1 << 17);
+  trigMask_13f_trigs3[3] = (one1 << 18);
+  trigMask_13f_trigs3[4] = (one1 << 19);
+  ULong64_t trigMask_13f_trigs4[5] = {0};//0 = MB, 1 = EG1, 2 = EG2
+  trigMask_13f_trigs4[0] = (one1 << 2);
+  trigMask_13f_trigs4[1] = (one1 << 13);
+  trigMask_13f_trigs4[2] = (one1 << 14);
+  trigMask_13f_trigs4[3] = (one1 << 15);
+  trigMask_13f_trigs4[4] = (one1 << 16);
+
+  ULong64_t trigMask[5] = {0};  
+
   // char* input_name = argv[1];
   // char* testName;
   // int index;
@@ -485,7 +542,8 @@ int main(int argc, char *argv[])
 
     int N_TPC_Track_pT_Bins = TPC_track_pT_Correction_bins.size()-1;
 
-    float TPC_pPb_Efficiency[N_TPC_Track_pT_Bins] = {0.5867693424, 0.6911254525,0.7336804867, 0.7650601268,
+    //float TPC_pPb_Efficiency[N_TPC_Track_pT_Bins] 
+      std::array<float,50> TPC_pPb_Efficiency= {0.5867693424, 0.6911254525,0.7336804867, 0.7650601268,
 						     0.7925264239, 0.8127673268,0.8275696635, 0.8387191296,
 						     0.8461661935, 0.8519890308,0.85583359, 0.8587060571,
 						     0.8605732322, 0.8621085882,0.8631671667, 0.8642088175,
@@ -499,7 +557,8 @@ int main(int argc, char *argv[])
 						     0.8653901219, 0.8669821024,0.8549746871, 0.8416666389,
 						     0.8819277287, 0.8582089543};
 
-    float TPC_pPb_FakeRate[N_TPC_Track_pT_Bins] = {0.02952835709, 0.02360016666,
+      //float TPC_pPb_FakeRate[N_TPC_Track_pT_Bins] 
+      std::array<float,50> TPC_pPb_FakeRate = {0.02952835709, 0.02360016666,
 					     0.02065094374, 0.01941830292,0.01874902286, 0.01761478558,
 					     0.01669583283, 0.01596949063,0.01551650651, 0.01526045054,
 					     0.01498838048, 0.01479246933,0.01460200734, 0.01449344773,
@@ -513,7 +572,8 @@ int main(int argc, char *argv[])
 					     0.01106236875, 0.01042175572,0.009913654998, 0.01078320108,
 					     0.01424501464, 0.01892744564,0.008196720853, 0.007968127728};
 
-    float TPC_pPb_Smearing_Correction[N_TPC_Track_pT_Bins] =  {0.9633022736,1.000103796,0.9990538363,0.9980777293,
+      //float TPC_pPb_Smearing_Correction[N_TPC_Track_pT_Bins]
+      std::array<float,50> TPC_pPb_Smearing_Correction  =  {0.9633022736,1.000103796,0.9990538363,0.9980777293,
 							       0.9992338076,1.00126975,1.002764827,1.003955855,
 							       1.00396996,1.004819844,1.004234793,1.003327841,
 							       1.004936572,1.004297549,1.004503464,1.004763271,
@@ -588,9 +648,12 @@ int main(int argc, char *argv[])
   TH1F hBR("hBR", "Isolated cluster, bkg region", 40, 10.0, 50.0);
   TH1F hweight("hweight", "Isolated cluster, signal region", 40, 10.0, 50.0);
   TH1F* Weights_Sum = new TH1F("Weights_Sum", "Sum of Weights. XBin Centers = pt Bin", nptbins,0.5,4.5);
-  float weight_sum[nptbins] = {0};
-  Float_t purity_weight_sum[nptbins] = {0};
-  Float_t BR_purity_weight_sum[nptbins] = {0};
+  //   float weight_sum[nptbins] = {0};
+  //   Float_t purity_weight_sum[nptbins] = {0};
+  //   Float_t BR_purity_weight_sum[nptbins] = {0};
+  std::array<float,1> weight_sum = {0};
+  std::array<float,1> purity_weight_sum = {0};
+  std::array<float,1> BR_purity_weight_sum = {0};
 
   //  TH1F track_above_ten("tracks_above_ten","Tracks above 10 GeV/c",)
   Long64_t tracks_tenGev = 0;
@@ -666,15 +729,15 @@ int main(int argc, char *argv[])
       BKGD_IsoCorr_UW[izt+ipt*nztbins]->SetMinimum(0.);
 
 
-      h_track_phi_eta[izt+ipt*nztbins] = new TH2D(Form("track_phi_eta__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",2,ptbins[ipt],ptbins[ipt+1],
+      h_track_phi_eta[izt+ipt*nztbins] = new TH2D(Form("track_phi_eta__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",ptbins[ipt],ptbins[ipt+1],
       100*ztbins[izt],100*ztbins[izt+1]),"Paired Track #phi #eta distribution", n_phi_bins*2,0,M_PI, n_eta_bins*2, -1, 1);
 
       h_track_phi_eta[izt+ipt*nztbins]->Sumw2();
 
-      h_track_eta[izt+ipt*nztbins] = new TH1D(Form("track_eta__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",2,ptbins[ipt],ptbins[ipt+1],
+      h_track_eta[izt+ipt*nztbins] = new TH1D(Form("track_eta__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",ptbins[ipt],ptbins[ipt+1],
       100*ztbins[izt],100*ztbins[izt+1]),"Paired Track #eta distribution",n_eta_bins*2, -0.8, 0.8);
 
-      h_track_phi[izt+ipt*nztbins] = new TH1D(Form("track_phi__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",2,ptbins[ipt],ptbins[ipt+1],
+      h_track_phi[izt+ipt*nztbins] = new TH1D(Form("track_phi__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",ptbins[ipt],ptbins[ipt+1],
       100*ztbins[izt],100*ztbins[izt+1]),"Paired Track #phi distribution", n_phi_bins*2,0,M_PI);
 
 
@@ -709,7 +772,9 @@ int main(int argc, char *argv[])
     Double_t primary_vertex[3];
     Float_t ue_estimate_its_const;
     Float_t ue_estimate_tpc_const;
-    
+    ULong64_t trigger_mask[2];
+    Int_t run_number;
+
     //Tracks
     UInt_t ntrack;
     Float_t track_e[NTRACK_MAX];
@@ -814,6 +879,10 @@ int main(int argc, char *argv[])
     _tree_event->SetBranchAddress("cluster_iso_its_04_ue",cluster_iso_its_04_ue);
     _tree_event->SetBranchAddress("cluster_iso_tpc_04_ue",cluster_iso_tpc_04_ue);
     
+
+    _tree_event->SetBranchAddress("run_number", &run_number);
+    _tree_event->SetBranchAddress("trigger_mask", trigger_mask);
+
     //_tree_event->SetBranchAddress("eg_cross_section",&eg_cross_section);
     //_tree_event->SetBranchAddress("eg_ntrial",&eg_ntrial);
 
@@ -836,18 +905,93 @@ int main(int argc, char *argv[])
     fprintf(stderr,"%d: Dist. bad channel = %f \n ",__LINE__,Cluster_DtoBad);
     fprintf(stderr,"%d: cluster tof = %f \n ",__LINE__,cluster_time);
 
-    
-    //WEIGHTING and CLUSTER SPECTRA LOOP
+    TH1F pT_Purity("pT_Purity_Spectra","Cluster pT Spectra (Purity Weighted)",56,12,40);
 
+    //WEIGHTING and CLUSTER SPECTRA LOOP
+    ULong64_t trig_pass_count = 0;
     fprintf(stderr,"Looping to determine weights and pT spectra \n");
     for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
     //for(Long64_t ievent = 0; ievent < 1000 ; ievent++){
       _tree_event->GetEntry(ievent);
       fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, ievent, nentries);
 
+      //fprintf(stderr,"\n\n RUN NUMBER = %i\n\n",run_number);
       //Event selection
       if(TMath::Abs(primary_vertex[2])>10) continue;
       if(primary_vertex[2]==0.00) continue;
+
+      //13d
+      if(run_number >= 195724 && run_number <= 195872) {
+	std::memcpy(trigMask, trigMask_13d_trigs, sizeof(trigMask));
+	//cout << "run is from 13d" << endl;
+      }
+
+
+      //13e
+      if(run_number >= 195935 && run_number <= 196310)
+	std::memcpy(trigMask, trigMask_13e_trigs, sizeof(trigMask));
+      if(run_number == 196208)
+	std::memcpy(trigMask, trigMask_13e_trigs_r196208, sizeof(trigMask));
+      //13f
+      if(run_number >= 196433 && run_number <=197388)
+	//if((run_number >= 197298 && run_number <= 197342) || 
+	//   (run_number >= 197254 && run_number <= 197258) || 
+	//   (run_number >= 197153 && run_number <= 197153) ||
+	//   (run_number >= 196972 && run_number <= 197012) ||
+	//   (run_number >= 196528 && run_number <= 196965) ||
+	//   (run_number == 197247))
+	std::memcpy(trigMask, trigMask_13f_trigs1, sizeof(trigMask));
+      if(run_number == 196967 ||
+       run_number == 197015 ||
+       run_number == 197027 ||
+       run_number == 197248 ||
+       run_number == 197260 ||
+       run_number == 197296 ||
+       run_number == 197297 ||
+	 run_number == 197351)
+	std::memcpy(trigMask, trigMask_13f_trigs2, sizeof(trigMask));
+      if(run_number == 197091 || run_number == 197092)
+	std::memcpy(trigMask, trigMask_13f_trigs3, sizeof(trigMask));
+      if(run_number == 196433)
+	std::memcpy(trigMask, trigMask_13f_trigs4, sizeof(trigMask));
+      if(run_number == 197189) continue;
+
+      //Checking if the event has our trigger
+      ULong64_t localTrigBit = 0;
+      if(not ((trigMask[0] & trigger_mask[0]) == 0))  {
+	localTrigBit |= (1 << 0);
+      
+      }//*/
+      if(not ((trigMask[1] & trigger_mask[0]) == 0))  {
+	localTrigBit |= (1 << 1);
+      }//*/
+      if(not ((trigMask[2] & trigger_mask[0]) == 0))  {
+	localTrigBit |= (1 << 2);
+      
+      }//*/
+      if(not ((trigMask[3] & trigger_mask[0]) == 0))  {
+	localTrigBit |= (1 << 3);
+      
+      }//*/
+      if(not ((trigMask[4] & trigger_mask[0]) == 0))  {
+	localTrigBit |= (1 << 4);
+      
+      }//*/
+    
+      //localTrigBit pattern
+      //001 = 1 = MB
+      //110 = 6 = EG1||EG2
+      //111 = 7 = MB||EG1||EG2
+      //11000 = 24 = EJ1|EJ2
+      //11110 = 30 = EG1|EG2|EJ1|EJ2
+    
+      //Selecting on our triggers. You change the 7 to any othe number below 31 
+      //depending on what trigger you want. A few possible numbers and maps are listed
+      //above
+      //if((localTrigBit & 7) == 0) continue;
+      if((localTrigBit & 24) == 0) continue;
+
+      trig_pass_count +=1;
 
       if(do_pile && is_pileup_from_spd_5_08) continue;
       
@@ -903,7 +1047,8 @@ int main(int argc, char *argv[])
 
 	  //High DNN Trigger SIGNAL
 	  if (Signal and Isolated){  	    
-	    
+	    float purity_weight = 1.0/Get_Purity_ErrFunction(cluster_pt[n],purity_deviation,Is_pp,TPC_Iso_Flag);
+	    pT_Purity.Fill(cluster_pt[n],purity_weight);
 	    N_Signal_Triggers += 1;
 	    Signal_pT_Dist->Fill(cluster_pt[n]);
 	    hweight.Fill(cluster_pt[n]);
@@ -974,14 +1119,15 @@ int main(int argc, char *argv[])
 
     hweight.Divide(&hBR);
     std::cout<<"Clusters Passed Iosalation and Shower Shape: "<<N_Signal_Triggers<<std::endl;
+    fprintf(stderr,"Events Passed / Total = %llu = %llu \n",trig_pass_count,nentries);
     N_Signal_Triggers = 0; //helps check 2 loops have same cluster criteria
 
     
     //MAIN CORRELATION LOOP
 
     fprintf(stderr,"\n Looping for main correlation functions \n");
-    for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
-      //for(Long64_t ievent = 0; ievent < 10000 ; ievent++){     
+    //for(Long64_t ievent = 0; ievent < nentries ; ievent++){     
+    for(Long64_t ievent = 0; ievent < 10 ; ievent++){     
       _tree_event->GetEntry(ievent);
       fprintf(stderr, "\r%s:%d: %llu / %llu", __FILE__, __LINE__, ievent, nentries);
 
@@ -1041,7 +1187,7 @@ int main(int argc, char *argv[])
 	if(Background and Isolated){
 	  bkg_weight = hweight.GetBinContent(hweight.FindBin(cluster_pt[n]));
 	  if (strcmp(shower_shape.data(),"Lambda")!= 0)
-	    fprintf(stderr,"%s %f: WARNING \n \n WARNING: Using purity for LAMBDA");
+	    fprintf(stderr,"WARNING \n \n WARNING: Using purity for LAMBDA");
 
 	  BR_purity_weight = (1.0/Get_Purity_ErrFunction(cluster_pt[n],purity_deviation,Is_pp,TPC_Iso_Flag) - 1); //(1-p)/p = 1/p - 1
 	  for (int ipt = 0; ipt < nptbins; ipt++){
@@ -1125,6 +1271,9 @@ int main(int argc, char *argv[])
 	  //fprintf(stderr,"\n Track pT = %f, Track weight = %f\n",track_pt[itrack],track_weight);
 	  
 		  
+	  //DEBUGGING, FIXME:
+	  track_weight = 1.0;
+
 	  //Observables:
 	  Double_t zt = track_pt[itrack]/cluster_pt[n];
 	  Float_t DeltaPhi = TMath::Abs(TVector2::Phi_mpi_pi(cluster_phi[n] - track_phi[itrack]));
@@ -1190,6 +1339,8 @@ int main(int argc, char *argv[])
   std::cout<<"Clusters Passed Iosalation and Shower Shape: "<<N_Signal_Triggers<<std::endl;
   fprintf(stderr,"Tracks Above 10 GeV/c = %llu \n",tracks_tenGev);
 			  
+  pT_Purity.Write();
+
   h_purity.Write("purities");
 
   h_cluster_phi->Write();
