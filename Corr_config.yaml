@@ -22,7 +22,8 @@ Track_pT_Max:		      10.0
 #Track_pT_Max:		      6.0
 Track_Cut_Bit:                16
 #Track_Chi_Max:		      36
-Track_Chi_Max:		      2
+#Track_Chi_Max:		      2
+Track_Chi_Max:		      3
 #Track_Cut_Bit:                3 #CHECK pp CASE!
 
 Purity_Dev:		       None
