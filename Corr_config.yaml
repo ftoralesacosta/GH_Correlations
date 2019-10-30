@@ -20,11 +20,10 @@ N_Eta_Bins:                   14
 Track_pT_Min:		      0.5
 Track_pT_Max:		      10.0
 #Track_pT_Max:		      6.0
-Track_Cut_Bit:                16
-#Track_Chi_Max:		      36
-#Track_Chi_Max:		      2
-Track_Chi_Max:		      3
-#Track_Cut_Bit:                3 #CHECK pp CASE!
+Track_Chi_Max:		      36
+#Track_Chi_Max:		      3
+#Track_Cut_Bit:                16
+Track_Cut_Bit:                3 #CHECK pp CASE!
 
 Purity_Dev:		       None
 #Purity_Dev:		       Plus
@@ -40,8 +39,8 @@ Pt_bins:		       [12, 40] #CHANGE ABOVE ASWELL ------
 #Pt_bins:		       [12.00, 17.93, 26.78, 40.00] #3 pT Bins
 
 
-Cluster_isolation_determinant: cluster_iso_its_04_sub
-#Cluster_isolation_determinant: cluster_iso_tpc_04_sub
+#Cluster_isolation_determinant: cluster_iso_its_04_sub
+Cluster_isolation_determinant: cluster_iso_tpc_04_sub
 #Cluster_isolation_determinant: cluster_iso_its_04
 
 Shower_Shape:		       Lambda
