@@ -159,6 +159,9 @@ description_string = default_string
 #description_string = "zT_Rebin_8_006zT06zT13fnewChi2"
 #description_string = "zT_Rebin_8_006zT06zT13fnewChi36noWeights"
 #description_string = "zT_Rebin_8_006zT06zT13fnewChi2noWeights"
+#escription_string = "zT_Rebin_8_006zT06zT13fnewChi3GJ"
+#description_string = "zT_Rebin_8_006zT06zT13fnewTPCChi3GJ"
+#description_string = "zT_Rebin_8_006zT06zT13fnewTPCChi36GJ"
 
  
 #description_string = "zT_Rebin_7_006zT06zT"

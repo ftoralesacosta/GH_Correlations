@@ -43,7 +43,7 @@ def ZYAM_Line(Phi_Array, Phi_Error_Array):
 def GetLEProj(filename, ipt, izt, Signal_DNN=True,DoAverage=True):
     file = ROOT.TFile(filename)
     
-    eta_min = 0.9
+    eta_min = 0.9 #BIN CENTERS!!
     eta_max = 1.1
 
     DNN_Rgn = int(Signal_DNN) + 2*(1-int(Signal_DNN)) #convert bool to DNN_1 (Sgn) or DNN_2 (Bkgd)
@@ -168,6 +168,7 @@ def GetPhiProj(filename,prfx,ipt, izt, Signal_DNN=True):
 
 
 def Plot_UB():
+#FIXME: Change to take a dictionary instead. Move to correlation.py, needs to take place AFTER correlated subtraction to be meaningful
     for sys,ifile in zip(Systems,Files):
         print("%s: $z_\mathrm{T}$ interval & ZYAM  & Large $\Delta\eta$ & Difference"%(sys))
         for ipt in range (N_pT_Bins):
@@ -204,6 +205,7 @@ def Plot_UB():
                 #print(Sig_Z_Value/phi_width)
                 #print(Sig_Z_Error/phi_width)
 
+
                 print("%1.2f - %1.2f & %1.3f $\pm$ %1.3f & %1.3f $\pm$ %1.3f & %1.3f $\pm$ %1.3f\\\\"
                       %(zTbins[izt],zTbins[izt+1],Sig_Z_Value,Sig_Z_Error,S_LE,S_LE_Error,abs(Sig_Z_Value-S_LE), math.sqrt(Sig_Z_Error**2 + S_LE_Error**2) ))
 
@@ -228,10 +230,10 @@ def Plot_UB():
 
                 #sig
                 ax.plot(delta_phi_centers,Sig_Phi_Array,'bo',ms=10)
-                s_plot = ax.errorbar(delta_phi_centers,Sig_Phi_Array,xerr=phi_width,yerr=Sig_Phi_Error_Array,fmt=None,ecolor='b',label='Signal Region (stat. error)')
+                s_plot = ax.errorbar(delta_phi_centers,Sig_Phi_Array,xerr=phi_width,yerr=Sig_Phi_Error_Array,fmt='',ecolor='b',linestyle='None',label='Signal Region (stat. error)')
 
                 ax.plot(delta_phi_centers,Sig_LE_Phi_Array,'s',color="Grey",alpha=0.6,ms=10)
-                s_le_plot = ax.errorbar(delta_phi_centers,Sig_LE_Phi_Array,xerr=phi_width,yerr=Sig_LE_Error_Array,fmt=None,ecolor='Grey',alpha=0.8,label="0.8 <|$\Delta\eta$| < %1.1f"%(eta_max))
+                s_le_plot = ax.errorbar(delta_phi_centers,Sig_LE_Phi_Array,xerr=phi_width,yerr=Sig_LE_Error_Array,fmt='None',ecolor='Grey',alpha=0.8,linestyle='None',label="0.8 <|$\Delta\eta$| < %1.1f"%(eta_max))
 
                 
                 if (izt>3):
@@ -321,7 +323,6 @@ def ROOT_to_nparray():
 
     Dict = dict(zip(Keys, Corr_Arrays))
 
-
     for SYS,ifile in zip(Systems,Files):    
         for ipt in range (N_pT_Bins):
 
@@ -350,6 +351,13 @@ def ROOT_to_nparray():
                     SR_UB,SR_UB_Error = ZYAM_Line(Sig_Phi_Array, Sig_Phi_Error_Array)
                     BR_UB,BR_UB_Error = ZYAM_Line(Bkg_Phi_Array, Bkg_Phi_Error_Array)                                                                
 
+                    #If different from LE, take difference into error:
+                    Sig_LE_Phi_Array, Sig_LE_Error_Array = GetLEProj(ifile, ipt, izt, True,True) # Using AVERAGE LE  
+                    Bkg_LE_Phi_Array, Bkg_LE_Error_Array = GetLEProj(ifile, ipt, izt, False,True) # Using AVERAGE LE 
+                    SR_LE_UB, SR_LE_UB_Error = GetLE_Val(Sig_LE_Phi_Array, Sig_LE_Error_Array)
+                    BR_LE_UB, BR_LE_UB_Error = GetLE_Val(Bkg_LE_Phi_Array, Bkg_LE_Error_Array)
+
+                    
 
                 if (Average_UE):
                     Avg_UB = (SR_UB + BR_UB)/2
@@ -361,11 +369,11 @@ def ROOT_to_nparray():
 
                 else:
 
-                    if (Ped_Sub_First):
+                    if (Ped_Sub_First): #Current Default, OFF
                         Sig_Phi_Array -= SR_UB
                         Bkg_Phi_Array -= BR_UB
                         
-                    UB_Error = np.sqrt(SR_UB_Error**2 + BR_UB_Error**2)
+                    UB_Error = np.sqrt(SR_UB_Error**2 + BR_UB_Error**2) #Redefined Later
 
                     Dict["%s_CSR"%(SYS)][ipt][izt] = Sig_Phi_Array/dPhi_Width
                     Dict["%s_CSR_Errors"%(SYS)][ipt][izt] = Sig_Phi_Error_Array/dPhi_Width
