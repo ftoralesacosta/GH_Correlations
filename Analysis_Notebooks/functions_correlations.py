@@ -7,6 +7,7 @@ import matplotlib
 import math
 from default_values import *
 from functions_root_nparray import ZYAM_Line
+import matplotlib.lines as mlines
 
 
 def Plot_UB_Subtraction(Dict):
@@ -332,7 +333,7 @@ def Plot_pp_pPb_Cs(Dict):
             #if (izt > 1 and izt < 4):
             #    plt.xlabel(r'|$\Delta \varphi$|',fontsize=28)
             if (izt>3):
-                plt.xlabel(r'|$\Delta \varphi$|',fontsize=28)
+                plt.xlabel(r'|$\Delta \varphi$|',fontsize=42)
             if (izt<4):
                 #plt.ylim(-0.1,0.25)
                 plt.tick_params(bottom=False,labelbottom=False)
@@ -340,13 +341,14 @@ def Plot_pp_pPb_Cs(Dict):
                 #plt.ylim(-0.05,0.125)
             #if (izt%4 != 0):
             #    plt.tick_params(left=False,labelleft=False)
-            plt.xticks(fontsize=24)
+            plt.xticks(fontsize=26)
             plt.xlim((0.39269908169872414,3.14159))
             if (izt%4 == 0):
-                plt.ylabel(r'$1/N_{\gamma} \: \: \mathrm{d}^2N/\mathrm{d}\Delta \eta\mathrm{d}\Delta\varphi$',fontsize=28)
-            plt.yticks(fontsize=24)
-            plt.axhline(y=0,color='gray',linestyle='--',linewidth=1.3,alpha=0.8)        
-
+                plt.ylabel(r'$1/N_{\gamma} \: \: \mathrm{d}^2N/\mathrm{d}\Delta \eta\mathrm{d}\Delta\varphi$',fontsize=42)
+            plt.yticks(fontsize=28)
+            plt.axhline(y=0,color='gray',linestyle='--',linewidth=1.3,alpha=0.8)   
+            Int_Window = ax.axvline(x=dPhi_Bins[-N_Phi_Integrate-1],linestyle='--',color="black",alpha=0.5)
+            
             if not(Quad_UE):
                 pp_UE = ax.fill_between(ue_error_bar,-Dict["pp_Uncorr_Error"][ipt][izt][0],
                 Dict['pp_Uncorr_Error'][ipt][izt][0],facecolor='red',alpha=0.35) #Other for pp
@@ -360,49 +362,51 @@ def Plot_pp_pPb_Cs(Dict):
                 UE_Val =math.sqrt(pp_UE**2 + pPb_UE**2)
                 Combined_UE = ax.fill_between(ue_error_bar,-UE_Val,UE_Val,facecolor='purple',alpha=0.35)
                 
-            Int_Window = ax.axvline(x=dPhi_Bins[-N_Phi_Integrate-1],linestyle='--',color="black",alpha=1.0)
+            
+            #Int_Window = mlines.Line2D([dPhi_Bins[-N_Phi_Integrate-1],dPhi_Bins[-N_Phi_Integrate-1]], [0, 1.0], color='black', linestyle='dashed',linewidth=2)
+            #ax.add_line(Int_Window)
             
             #MC_UE = ax.fill_between(ue_error_bar,-Dict["MC_Uncorr_Error"][ipt][ztb][0],Dict["MC_Uncorr_Error"][ipt][ztb][0],facecolor='green',alpha=0.35)#One for p-Pb
             
             
-            Chi2,NDF,Pval = Get_pp_pPb_List_Chi2(Dict["p-Pb_CSR"][ipt][izt],Dict["p-Pb_CSR_Errors"][ipt][izt],Dict["p-Pb_Uncorr_Error"][ipt][izt],
+            Red_Chi2,NDF,Pval = Get_pp_pPb_List_Chi2(Dict["p-Pb_CSR"][ipt][izt],Dict["p-Pb_CSR_Errors"][ipt][izt],Dict["p-Pb_Uncorr_Error"][ipt][izt],
                                         Dict["pp_CSR"][ipt][izt],Dict["pp_CSR_Errors"][ipt][izt],Dict["pp_Uncorr_Error"][ipt][izt])
                         
-            plt.annotate("$\chi^2$ = %1.1f, ndf = %i, p = %1.2f"%(Chi2,NDF,Pval), xy=(0.99, 0.06), xycoords='axes fraction', ha='right', va='top', fontsize=24)
+            plt.annotate("$\chi^2/\mathrm{dof}$ = %1.1f/%i, p = %1.2f"%(Red_Chi2*NDF,NDF,Pval), xy=(0.99, 0.07), xycoords='axes fraction', ha='right', va='top', fontsize=28)
             if (izt < 1):
                 if(Use_MC):
-                        leg = plt.legend([pp,pPb,pyth,Combined_UE],['pp $\sqrt{s}= 5$ TeV (stat. error)',
-                        'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)', 'Pythia 8.2 Monash','UB Error'],
-                        loc = "upper left",fontsize=24,frameon=False,numpoints=1)
+                        leg = plt.legend([pp,pPb,pyth,Combined_UE],['pp $\sqrt{s}= 5$ TeV',
+                        'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV', 'Pythia 8.2','UB Error'],
+                        loc = "upper left",fontsize=28,frameon=False,numpoints=1)
                 else:    
                     if not(Quad_UE):
-                        leg = plt.legend([pp,pPb,pp_UE,pPb_UE],['pp $\sqrt{s}= 5$ TeV (stat. error)',
-                        'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)', 'pp UB Error', 'p-Pb UB Error'],
-                        loc = "upper left",fontsize=24,frameon=False,numpoints=1)
+                        leg = plt.legend([pp,pPb,pp_UE,pPb_UE],['pp $\sqrt{s}= 5$ TeV',
+                        'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV', 'pp UB Error', 'p-Pb UB Error'],
+                        loc = "upper left",fontsize=28,frameon=False,numpoints=1)
                     else:
-                        leg = plt.legend([pp,pPb,pyth,Combined_UE],['pp $\sqrt{s}= 5$ TeV (stat. error)',
-                        'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)', 'Pythia 8.2 Monash','UB Error'],
-                        loc = "upper left",fontsize=24,frameon=False,numpoints=1)
+                        leg = plt.legend([pp,pPb,pyth,Combined_UE],['pp $\sqrt{s}= 5$ TeV',
+                        'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV', 'Pythia 8.2','UB Error'],
+                        loc = "upper left",fontsize=28,frameon=False,numpoints=1)
 
             
             plt.tick_params(which='both',direction='in',right=True,bottom=True,top=True,length=10)
             if (izt < 1):
-                plt.annotate(r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]), xy=(0.04, 0.64), xycoords='axes fraction', ha='left', va='top', fontsize=26)
+                plt.annotate(r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]), xy=(0.99, 0.19), xycoords='axes fraction', ha='right', va='top', fontsize=28)
                 plt.ylim(-0.1,0.26)
                 if (len(Dict["p-Pb_CSR"]) > 1):
-                    plt.annotate(r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]), xy=(0.04, 0.55), xycoords='axes fraction', ha='left', va='top', fontsize=26)
+                    plt.annotate(r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]), xy=(0.99, 0.145), xycoords='axes fraction', ha='right', va='top', fontsize=28)
                 else:
-                    plt.annotate(r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[0],pTbins[N_pT_Bins]), xy=(0.04, 0.58), xycoords='axes fraction', ha='left', va='top', fontsize=26)
+                    plt.annotate(r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[0],pTbins[N_pT_Bins]), xy=(0.99, 0.145), xycoords='axes fraction', ha='right', va='top', fontsize=28)
             else:
-                plt.annotate(r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]), xy=(0.05, 0.98), xycoords='axes fraction', ha='left', va='top', fontsize=26)
+                plt.annotate(r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]), xy=(0.05, 0.98), xycoords='axes fraction', ha='left', va='top', fontsize=28)
                 if (len(Dict["p-Pb_CSR"]) > 1):
-                    plt.annotate(r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]), xy=(0.05, 0.93), xycoords='axes fraction', ha='left', va='top', fontsize=26)
+                    plt.annotate(r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]), xy=(0.05, 0.93), xycoords='axes fraction', ha='left', va='top', fontsize=28)
                 else:
-                    plt.annotate(r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[0],pTbins[N_pT_Bins]), xy=(0.05, 0.93), xycoords='axes fraction', ha='left', va='top', fontsize=26)
+                    plt.annotate(r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[0],pTbins[N_pT_Bins]), xy=(0.05, 0.93), xycoords='axes fraction', ha='left', va='top', fontsize=28)
             
             leg.set_title("ALICE Work in Progress")
             leg._legend_box.align = "left"
-            plt.setp(leg.get_title(),fontsize=26)
+            plt.setp(leg.get_title(),fontsize=32)
             fig.tight_layout()
 
         plt.show()
