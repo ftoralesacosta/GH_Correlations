@@ -367,24 +367,24 @@ def Plot_pp_pPb_Cs(Dict):
             
             #MC_UE = ax.fill_between(ue_error_bar,-Dict["MC_Uncorr_Error"][ipt][ztb][0],Dict["MC_Uncorr_Error"][ipt][ztb][0],facecolor='green',alpha=0.35)#One for p-Pb
             
-            label_size = 34
+            label_size = 35
             Red_Chi2,NDF,Pval = Get_pp_pPb_List_Chi2(Dict["p-Pb_CSR"][ipt][izt],Dict["p-Pb_CSR_Errors"][ipt][izt],Dict["p-Pb_Uncorr_Error"][ipt][izt],
                                         Dict["pp_CSR"][ipt][izt],Dict["pp_CSR_Errors"][ipt][izt],Dict["pp_Uncorr_Error"][ipt][izt])
                         
             plt.annotate("$\chi^2/\mathrm{dof}$ = %1.1f/%i, p = %1.2f"%(Red_Chi2*NDF,NDF,Pval), xy=(0.99, 0.07), xycoords='axes fraction', ha='right', va='top', fontsize=label_size)
             if (izt < 1):
                 if(Use_MC):
-                        leg = plt.legend([pp,pPb,pyth,Combined_UE],['pp $\sqrt{s}= 5$ TeV',
-                        'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV', 'Pythia 8.2','UB Error'],
+                        leg = plt.legend([pPb,pp,pyth,Combined_UE],
+                        ['p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV','pp $\sqrt{s}= 5$ TeV','Pythia 8.2','UB Error'],
                         loc = "upper left",fontsize=label_size,frameon=False,numpoints=1)
                 else:    
                     if not(Quad_UE):
-                        leg = plt.legend([pp,pPb,pp_UE,pPb_UE],['pp $\sqrt{s}= 5$ TeV',
-                        'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV', 'pp UB Error', 'p-Pb UB Error'],
+                        leg = plt.legend([pPb,pp,pPb_UE,pp_UE],[
+                        'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV', 'pp $\sqrt{s}= 5$ TeV', 'p-Pb UB Error','pp UB Error'],
                         loc = "upper left",fontsize=label_size,frameon=False,numpoints=1)
                     else:
-                        leg = plt.legend([pp,pPb,pyth,Combined_UE],['pp $\sqrt{s}= 5$ TeV',
-                        'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV', 'Pythia 8.2','UB Error'],
+                        leg = plt.legend([pPb,pp,pyth,Combined_UE],[
+                        'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV', 'pp $\sqrt{s}= 5$ TeV','Pythia 8.2','UB Error'],
                         loc = "upper left",fontsize=label_size,frameon=False,numpoints=1)
 
             
