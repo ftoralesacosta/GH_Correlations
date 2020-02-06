@@ -123,7 +123,7 @@ namespace {
     H5::DataSet event_dataset = h5_file.openDataSet( event_ds_name.c_str() );
     H5::DataSpace event_dataspace = event_dataset.getSpace();
 
-    //Initialize Event Dimensions                                                                    
+    //Initialize Event Dimensions
     const int event_ndims = event_dataspace.getSimpleExtentNdims();
     hsize_t event_maxdims[event_ndims];
     hsize_t eventdims[event_ndims];
@@ -160,37 +160,37 @@ namespace {
 
 		//Event dataspace rank only rank 2
 		UInt_t NEvent_Vars = eventdims[1];
-
 		//Define array hyperslab will be read into 
-		const hsize_t block_size = eventdims[0];
-		//hsize_t block_size = event_end-event_start;
-		float event_data_out[block_size][NEvent_Vars];
 
-		hsize_t event_offset[2] = {0,0};
+		//const hsize_t block_size = eventdims[0];
+		const hsize_t block_size = event_end-event_start;
+		float event_data_out[block_size][NEvent_Vars] = {0};
+		fprintf(stderr,"%s:%d: Block Size = %i, Event Start = %i, NVars = %i\n",__FILE__,__LINE__,block_size,event_start,NEvent_Vars);
+
+		//hsize_t event_offset[2] = {0,0};
+
+		hsize_t event_offset[2] = {event_start,0};
 		hsize_t event_count[2] = {block_size, NEvent_Vars};
-
-		event_dataspace.selectHyperslab( H5S_SELECT_SET, event_count, event_offset );
-
 		const int Event_RANK_OUT = 2; //Different for Events       
 		H5::DataSpace event_memspace( Event_RANK_OUT, eventdims );
-		hsize_t event_offset_out[2] = {0};
+		hsize_t event_offset_out[2] = {0,0};
 		hsize_t event_count_out[2] = {block_size, NEvent_Vars};
 
+		event_dataspace.selectHyperslab( H5S_SELECT_SET, event_count, event_offset );
 		event_memspace.selectHyperslab( H5S_SELECT_SET, event_count_out, event_offset_out );
-		event_dataset.read( event_data_out, H5::PredType::NATIVE_FLOAT, event_memspace, event_dataspace);
+		//event_dataset.read( event_data_out, H5::PredType::NATIVE_FLOAT, event_memspace, event_dataspace);
 		fprintf(stderr, "%s:%d: %s\n", __FILE__, __LINE__, "event dataset read into array: OK");
-		//fprintf(stderr,"%s: %d:",__FILE__,__LINE__ );
 
 		std::vector<float> ret;
 
-		for (size_t i = event_start; i < event_end; i++) {
-		  float v2 = event_data_out[i][0];
-		  //fprintf(stderr,"%s: %d: Event %ui v2 = %f \n",__FILE__,__LINE__,i,v2);
-		  ret.push_back(v2);
+		//for (size_t i = event_start; i < event_end; i++) {
+		  for (size_t i = 0; i < block_size; i++) {
+		    float v2 = event_data_out[i][0];
+		    ret.push_back(v2);
 			if (nfeature >= 2) {
 			  float multp = event_data_out[i][1];
 			  ret.push_back(multp);
-			  fprintf(stderr,"%d: z-vertex = %1.2f mp = %f\n",__LINE__,v2,multp);
+			  //fprintf(stderr,"%d: z-vertex = %1.2f mp = %f\n",__LINE__,v2,multp);
 			}
 		}
 		return ret;
@@ -409,11 +409,12 @@ std::map<size_t,std::vector<Long64_t> > mix_gale_shapley(const char *filename_0,
 	int Track_Skim = atoi(GeV_Track_Skim);
 
 	const size_t nevent_0 = nevent(filename_0);
-	const size_t nevent_1 = nevent_hdf5(filename_1);
+	size_t nevent_1 = nevent_hdf5(filename_1);
 
-	// const size_t nevent_0 = 4*2000; //Testing
-	// const size_t nevent_1 = 4*2000;
-
+	//TEMPORARY MAX
+	if (nevent_1 > 582695)
+	  nevent_1 = 582695;
+	
 	fprintf(stderr,"\n N EVENTS IN %s = %u \n",filename_0,nevent_0);
 
 	size_t block_size = 2000;
@@ -421,31 +422,22 @@ std::map<size_t,std::vector<Long64_t> > mix_gale_shapley(const char *filename_0,
 
 	size_t nblocks = (std::min(nevent_0, nevent_1 * nduplicate) / block_size);
 	while (nevent_0%block_size > 400) //Utilize most triggered events
-	  {
 	    block_size --;
-	  }
 
 	const size_t nblocks_0 = nevent_0 / block_size; 
 	const size_t nblocks_1 = ((nevent_1 * nduplicate)/
 				  block_size);
 
-	// const size_t nblocks_0 = 10;
-	// const size_t nblocks_1 = 10;
-
 	//For even distribution of MB events
 	int remainder_1 = (nevent_1%block_size)/(mixing_end-mixing_start);
 
-	size_t width = 150; //if changed, also must change when writing to Tree
 	const size_t n_mix = 300;
 	
 	std::vector<std::vector<float> >feature_0_vec;
 	std::vector<std::vector<float> >feature_1_vec;
 
-
-	//for(size_t h = 0; h < nblocks_0; h++){
-
-	//std::vector<float> a = feature_extract_hdf5(filename_1, 1, 10,nfeature);
 	for(size_t h = 0; h < nblocks_0; h++){
+	  //for(size_t h = 0; h < 2; h++){
 
 	  size_t event_start_0 = h * block_size;
 	  size_t event_end_0 = event_start_0 + block_size;
@@ -454,27 +446,22 @@ std::map<size_t,std::vector<Long64_t> > mix_gale_shapley(const char *filename_0,
 	    
 	    fprintf(stderr,"\n %d: GAMMA EVENT START=%u || EVENT END=%u",
 	    	    __LINE__,event_start_0,event_end_0);
-	
 	}
-
 
 	for (size_t i = mix_start; i < mix_end; i++) {
 	     	    
 	  size_t event_start_1 = i * (block_size + remainder_1);
 	  size_t event_end_1 = event_start_1 + block_size;
-	
-	  feature_1_vec.push_back(feature_extract_hdf5(filename_1, event_start_1, event_end_1,nfeature));
-
+	  
 	  fprintf(stderr,"\n %d: MB EVENT START=%u || EVENT END=%u \n",
-	  	  __LINE__,event_start_1,event_end_1);
-	    
+		  __LINE__,event_start_1,event_end_1);   
+	  feature_1_vec.push_back(feature_extract_hdf5(filename_1, event_start_1, event_end_1,nfeature));
 	}
 
 #pragma omp parallel for ordered schedule(dynamic)
 	for(size_t h = 0; h < nblocks_0; h++){
-	  //for(size_t h = 10; h < 20; h++){
 
-	    fprintf(stderr,"%s:%d: %s %lu %s %lu\n",__FILE__,__LINE__,"Block",h,"of",nblocks_0);	   
+	  fprintf(stderr,"%s:%d: %s %lu %s %lu\n",__FILE__,__LINE__,"Block",h,"of",nblocks_0);	   
 
 	  size_t event_start_0 = h * block_size;
 	  std::vector<std::vector<Long64_t> > k;		  

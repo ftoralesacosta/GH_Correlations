@@ -251,7 +251,11 @@ int main(int argc ,char *argv[])
 
       else if (strcmp(key, "Track_Cut_Bit") == 0) {
           Track_Cut_Bit = atoi(value);
-          std::cout << "Track Cut Bit: " << Track_Cut_Bit << std::endl; }
+	  if (Is_pp) {
+	    fprintf(stderr,"%d: Overwrite Track Cut Bit for PROTON PROTON COLLISIONS \n",__LINE__);
+	    Track_Cut_Bit = 3;
+	  }
+          std::cout << "Track Cut Bit: " << Track_Cut_Bit << std::endl;}
 
       else if (strcmp(key, "Track_Chi_Max") == 0) {
           track_chi_max = atoi(value);
@@ -592,7 +596,12 @@ int main(int argc ,char *argv[])
     //Define array hyperslab will be read into
     hsize_t block_size = eventdims[0];
 
-    // if(strstr(root_file,"13f") !=NULL){
+    //block_size = eventdims[0]/2; //FIXME: RAM on cori recently reduced.
+    if (eventdims[0] > 1000000){
+      block_size = 1000000;
+      fprintf(stderr,"%d: USING limited block size for large hdf5 file (block size = %d)\n",__LINE__,block_size);                                                                                                                                        
+    }
+    // if((strstr(root_file,"13f") !=NULL) && (strstr(root_file,"0") !=NULL)){
     //   block_size = eventdims[0]/2; //FIXME: RAM on cori recently reduced.
     //   fprintf(stderr,"%d: USING Half block size for 13f (block size = %d)\n",__LINE__,block_size);
     // }
@@ -602,7 +611,6 @@ int main(int argc ,char *argv[])
     // }
     //const Long64_t block_size = 2000;
     
-    float test_array[5700425][609][20];
     float track_data_out[block_size][ntrack_max][NTrack_Vars];
     float cluster_data_out[block_size][ncluster_max][NCluster_Vars];
     float event_data_out[block_size][NEvent_Vars];
@@ -819,7 +827,12 @@ int main(int argc ,char *argv[])
 	    if (abs(track_data_out[imix][itrack][2]) > 0.8) continue;
 	    if (track_data_out[imix][itrack][7] < 4) continue;
 	    if ((track_data_out[imix][itrack][8]/track_data_out[imix][itrack][7]) > track_chi_max) continue;
-	    if( not(TMath::Abs(track_data_out[imix][itrack][9])<0.0231+0.0315/TMath::Power(track_data_out[imix][itrack][4],1.3 ))) continue;
+	    //if( not(TMath::Abs(track_data_out[imix][itrack][9])<0.0231+0.0315/TMath::Power(track_data_out[imix][itrack][4],1.3 ))) continue;
+	    //	    if (not(TMath::Abs(track_dca_xy[itrack]<2.4))) continue;
+	    if (not(TMath::Abs(track_data_out[imix][itrack][9]<2.4))) continue; //dcaxy
+	    if (not(TMath::Abs(track_data_out[imix][itrack][10]<3.2))) continue; //dcaz
+	    
+	    
 	    double dRmin = 0.02;
 	    //veto charged particles from mixed event tracks
 	    bool MixTrack_HasMatch = false;
