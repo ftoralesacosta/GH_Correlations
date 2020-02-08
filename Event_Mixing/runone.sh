@@ -16,16 +16,16 @@ do
     echo $name
     
     if [ "17q" = "$name" ]; then #account for 17q-17p mixing
-	echo "./Parallel_Mix_Correlations_pWeight ../InputData/${name}_${p}GeVTrack_paired.root ../InputData/17p_MB_${p}GeV.hdf5 0 $n_mix $p pp"
-	./Parallel_Mix_Correlations_pWeight ../InputData/${name}_${p}GeVTrack_paired.root ../InputData/17p_MB_${p}GeV.hdf5 0 $n_mix $p pp
+	echo "./Parallel_Mix_Correlations_pWeight ../InputData/${name}_${p}GeVTrack_paired_hdf5.root ../InputData/17p_MB_${p}GeV.hdf5 0 $n_mix $p pp"
+	./Parallel_Mix_Correlations_pWeight ../InputData/${name}_${p}GeVTrack_paired_hdf5.root ../InputData/17p_MB_${p}GeV.hdf5 0 $n_mix $p pp
 	
     elif [ "13fnew_skimClusterMinE12" = "$name" ];
     then
-	echo "./Parallel_Mix_Correlations_pWeight ../InputData/${name}_${p}GeVTrack_paired.root ../InputData/13f_MB_${p}GeV.hdf5 0 $n_mix $p pPb"
-        ./Parallel_Mix_Correlations_pWeight ../InputData/${name}_${p}GeVTrack_paired.root ../InputData/13f_MB_${p}GeV.hdf5 0 $n_mix $p pPb
+	echo "./Parallel_Mix_Correlations_pWeight ../InputData/${name}_${p}GeVTrack_paired_hdf5.root ../InputData/13f_MB_${p}GeV.hdf5 0 $n_mix $p pPb"
+        ./Parallel_Mix_Correlations_pWeight ../InputData/${name}_${p}GeVTrack_paired_hdf5.root ../InputData/13f_MB_${p}GeV.hdf5 0 $n_mix $p pPb
     else
-	echo "./Parallel_Mix_Correlations_pWeight ../InputData/${name}_${p}GeVTrack_paired.root ../InputData/${name}_MB_${p}GeV.hdf5 0 $n_mix $p pPb"
-	./Parallel_Mix_Correlations_pWeight ../InputData/${name}_${p}GeVTrack_paired.root ../InputData/${name}_MB_${p}GeV.hdf5 0 $n_mix $p pPb
+	echo "./Parallel_Mix_Correlations_pWeight ../InputData/${name}_${p}GeVTrack_paired_hdf5.root ../InputData/${name}_MB_${p}GeV.hdf5 0 $n_mix $p pPb"
+	./Parallel_Mix_Correlations_pWeight ../InputData/${name}_${p}GeVTrack_paired_hdf5.root ../InputData/${name}_minbias_${p}GeVtracks.hdf5 0 $n_mix $p pPb
     fi
     echo "$nmix Mixed Events DATASET =  $name"
     echo

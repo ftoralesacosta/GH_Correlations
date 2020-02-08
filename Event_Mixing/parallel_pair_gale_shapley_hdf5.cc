@@ -412,8 +412,8 @@ std::map<size_t,std::vector<Long64_t> > mix_gale_shapley(const char *filename_0,
 	size_t nevent_1 = nevent_hdf5(filename_1);
 
 	//TEMPORARY MAX
-	if (nevent_1 > 582695)
-	  nevent_1 = 582695;
+	// if (nevent_1 > 582695)
+	//   nevent_1 = 582695;
 	
 	fprintf(stderr,"\n N EVENTS IN %s = %u \n",filename_0,nevent_0);
 

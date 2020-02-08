@@ -23,7 +23,7 @@ Track_pT_Max:		      10.0
 #Track_Chi_Max:		      36
 Track_Chi_Max:		      3
 Track_Cut_Bit:                16
-#Track_Cut_Bit:                3 #CHECK proton proton
+#Track_Cut_Bit:                3 #TPC Cut Bit. DOES NOT WORK WITH PROTON PROTON
 
 Purity_Dev:		       None
 #Purity_Dev:		       Plus
