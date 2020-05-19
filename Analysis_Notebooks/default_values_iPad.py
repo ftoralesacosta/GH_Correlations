@@ -1,9 +1,7 @@
 import numpy as np
 import math
-import ROOT
-import scipy.stats
-from hepdata_lib import Submission
-submission = Submission()
+
+
                  #####CASE SWITCHING#####
 
 #Shower = "NN"
@@ -116,7 +114,7 @@ Shower = "LO"
 #default_string = "zT_Rebin_8_006zT06zT"
 default_string = "zT_Rebin_8_006zT06zT13fnew"
 description_string = default_string
-#description_string="pT_Rebin_4"
+
 #description_string = "zT_Rebin_8_006zT06zTpPb"
 #description_string = "zT_Rebin_8_006zT06zTPbp"
 #description_string = "zT_Rebin_8_006zT06zT16dPhi"
@@ -179,10 +177,6 @@ Systems = ["pp","p-Pb"]
 Files = [pp_File,pPb_File]
 
 
-#Apply Eta correction:
-Eta_Correction = 1.05 #5% Correction
-Eta_Correction_Uncertainty = 0.025
-Apply_Eta_Correction = True
         # RANGE & BINNING:
 
 #pT
@@ -259,7 +253,7 @@ if(description_string == "zT_Rebin_9_06zT"):
     
 if("zT_Rebin_9_004zT06zT" in description_string):
     zTbins = np.asarray([0.040, 0.054, 0.073, 0.099, 0.133, 0.180, 0.243, 0.329, 0.444, 0.600])
-        
+    
 if (description_string == "zT_Rebin_10"):
     zTbins = np.asarray([0.05, 0.0675, 0.0910, 0.1228, 0.1657, 0.2236, 0.3017, 0.4071, 0.5493, 0.7411, 1.00])
     
@@ -324,48 +318,13 @@ for i,dphi in enumerate(dPhi_Bins):
         break
         
         
-Max_Hadron_pT = 12.0
-Min_Hadron_pT = 0.5    
-
-def Get_Purity(filename):
-
-    p_uncertainties = []
-    purities = []
-    for iter_file in Files:
-        file = ROOT.TFile(iter_file)
-        purities_pTs = np.zeros(N_pT_Bins)
-        p_uncertainties_pTs = np.zeros(N_pT_Bins)
     
-        for ipt in range(N_pT_Bins):
-            purity_histo = file.Get('H_Purities_pT%1.0f_%1.0f' %(pTbins[ipt],pTbins[ipt+1]))
-            purities_pTs[ipt] = purity_histo.GetMean()
-            
-            purity_uncertainty_histo = file.Get('H_Purity_Uncertanty_pT%1.0f_%1.0f' %(pTbins[ipt],pTbins[ipt+1]))
-            p_uncertainties_pTs[ipt] = purity_uncertainty_histo.GetMean()
-        
-            purities.append(purities_pTs)
-            p_uncertainties.append(p_uncertainties_pTs) #np array of pt bin purity for each system
 
-    return purities, p_uncertainties
-
-p,p_uncert = Get_Purity(Files)
-purity = dict(zip(Systems,p))
-purity_Uncertainty = dict(zip(Systems,p_uncert))
-Rel_pUncert = dict((k, float(purity_Uncertainty[k]) / purity[k]) for k in purity_Uncertainty)
-
-print(purity.keys())
-print(np.asarray(purity_Uncertainty.values())/np.asarray(purity.values()))
-
-zT_widths = [(j-i)/2. for i, j in zip(zTbins[zT_offset:-1], zTbins[zT_offset+1:])]
+zT_widths = [(j-i)/2 for i, j in zip(zTbins[zT_offset:-1], zTbins[zT_offset+1:])]
 zT_widths = np.asarray(zT_widths)
 zT_centers = (zTbins[1+zT_offset:] + zTbins[zT_offset:-1]) / 2
 NzT = len(zTbins)-zT_offset-1
 zt_box = np.ones(NzT) * 0.03 #plotting Uncert. Boxes
-
-zT_edges = []
-for i in range(0,NzT):
-    zT_edges.append([zTbins[i],zTbins[i+1]])
-zT_edges
 
 import itertools
 #marker = itertools.cycle((',', '+', '.', 'o', '*'))
@@ -474,10 +433,8 @@ if (N_dPhi_Bins == 8):
     pythia = pythia[:8]
     pythia_error = pythia_error[:8]
 
-    
-pythia = np.asarray(pythia)/dPhi_Width
-pythia_error = np.asarray(pythia_error)/dPhi_Width
-
-pythia_FF_Errors = np.zeros(N_dPhi_Bins)
-for izt in range(0,NzT):
-    pythia_FF_Errors[izt] = pythia_error[izt][-1:]/zT_widths[izt]
+print(type(pythia))
+pythia = np.asarray(pythia)
+print(pythia)
+#pythia = pythia*(1/dPhi_Width)
+#pythia_error = np.asarray(pythia_error)/dPhi_Width

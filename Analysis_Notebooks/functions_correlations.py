@@ -9,6 +9,8 @@ from default_values import *
 from functions_root_nparray import ZYAM_Line
 import matplotlib.lines as mlines
 
+import matplotlib.font_manager as font_manager
+font = font_manager.FontProperties(family='Helvetica',size=30)
 
 def Plot_UB_Subtraction(Dict):
     fsize = 20
@@ -68,7 +70,7 @@ def Plot_UB_Subtraction(Dict):
                 plt.yticks(fontsize=fsize-5)
 
                 if not(Ped_Sub_First):
-                    leg = plt.legend([s_plot,UE_Band,empt,empt2],['Shower Sig. Region (stat. error)',"UB Error",r'%1.2f < $z_\mathrm{T}$ < %1.2f'
+                    leg = plt.legend([s_plot,UE_Band,empt,empt2],['Shower Sig. Region (stat. error)',"UE Error",r'%1.2f < $z_\mathrm{T}$ < %1.2f'
                             %(zTbins[izt],zTbins[izt+1]),r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],
                             loc='best',title = "Alice %s 5 TeV",fontsize=14,frameon=False,numpoints=1)
                 else:
@@ -157,36 +159,45 @@ def Plot_Sub_UB_Overlay(Dict):
                 elif (NzT >12):
                     ax = fig.add_subplot(5,3,izt+1)
 
-
-                ax.plot(delta_phi_centers,Dict["%s_CSR"%(SYS)][ipt][ztb],'bo',color="blue",ms=10)
+                s_color = "black"
+                b_color = "grey"
+                ax.plot(delta_phi_centers,Dict["%s_CSR"%(SYS)][ipt][ztb],'o',color=s_color,ms=10)
                 s_plot = ax.errorbar(delta_phi_centers,Dict["%s_CSR"%(SYS)][ipt][ztb],xerr=phi_width,
-                    yerr=Dict["%s_CSR_Errors"%(SYS)][ipt][ztb],fmt='bo',ecolor="blue",label='Signal Region (stat. error)')
+                    yerr=Dict["%s_CSR_Errors"%(SYS)][ipt][ztb],fmt="o",color=s_color,ecolor=s_color,lw=0,label='Signal Region (stat. error)')
+                s_error_plot = ax.errorbar(delta_phi_centers,Dict["%s_CSR"%(SYS)][ipt][ztb],xerr=phi_width,
+                    yerr=Dict["%s_CSR_Errors"%(SYS)][ipt][ztb],fmt="o",color=s_color,ecolor=s_color)
 
-                ax.plot(delta_phi_centers,Dict["%s_CBR"%(SYS)][ipt][ztb],'ro',color="red",ms=10) #Scale UE Error by purity!
+                ax.plot(delta_phi_centers,Dict["%s_CBR"%(SYS)][ipt][ztb],'s',color=b_color,ms=10) #Scale UE Error by purity!
                 b_plot = ax.errorbar(delta_phi_centers,Dict["%s_CBR"%(SYS)][ipt][ztb],xerr=phi_width,
-                    yerr=Dict["%s_CBR_Errors"%(SYS)][ipt][ztb],fmt='ro',ecolor="red",label='Background Region (stat. error)')
+                    yerr=Dict["%s_CBR_Errors"%(SYS)][ipt][ztb],fmt="s",color=b_color,alpha=0.8,ecolor=b_color,lw=0,label='Background Region (stat. error)')
+                b_error_plot = ax.errorbar(delta_phi_centers,Dict["%s_CBR"%(SYS)][ipt][ztb],xerr=phi_width,
+                    yerr=Dict["%s_CBR_Errors"%(SYS)][ipt][ztb],fmt="s",color=b_color,alpha=0.8,ecolor=b_color)
                 #b_plot, = ax.plot([],[],' ')
 
                 #UE_Band = ax.fill_between(ue_error_bar,-Dict["%s_Uncorr_Error"%(SYS)][ipt][ztb][0],Dict["%s_Uncorr_Error"%(SYS)][ipt][ztb][0],facecolor="purple",alpha=0.35) 
                 #plt.axhline(y=0,color='gray',linestyle='--',linewidth=1.3,alpha=0.8)
 
 
-                plt.xlabel(r'|$\Delta \varphi$|',fontsize=fsize+4)
+                plt.xlabel(r'|$\Delta \varphi$| (rad)',fontsize=35,x=.86)
                 plt.xticks(fontsize=(fsize))
                 plt.xlim((0.39269908169872414,3.14159))
-                plt.ylabel(r'$1/N_{\mathrm{trig}} \: \: \mathrm{d}^2N/\mathrm{d}\Delta\varphi\mathrm{d}\Delta\eta$',fontsize=fsize+2)
+                plt.ylabel(r'$1/N_{\gamma^\mathrm{iso}} \: \: \mathrm{d}^2N/\mathrm{d}\Delta\varphi\mathrm{d}\Delta\eta$',fontsize=35,y=.65)
                 #plt.ylim((0,1.2*max(Sig_LE_Phi_Array)))
                 empt, = ax.plot([], [], ' ')
                 empt2, = ax.plot([],[],' ')
-                plt.yticks(fontsize=20)
+                plt.yticks(fontsize=30)
+                plt.xticks(fontsize=30)
+                plt.tick_params(which='both',direction='in',right=True,top=True,bottom=True,length=10)
 
-                leg = ax.legend([s_plot,b_plot,empt,empt2],['Shower Sig Region (stat. error)','Shower Bkg Region (scaled) (stat. error)',r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]),r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],
-                    loc='best',title = "Alice %s 5 TeV",fontsize=20,frameon=False,numpoints=1)
+                leg = ax.legend([s_plot,b_plot,empt,empt2],['Shower Signal Region','Background Region (scaled)',r'%1.0f < $p_\mathrm{T}^{\gamma^\mathrm{iso}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]),r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1])],
+                    loc='best',title = "Alice %s 5 TeV",fontsize=26,frameon=False,numpoints=1,markerscale=2)
                 if (SYS == 'pp'):
-                    leg.set_title("ALICE Work in Progress, $\sqrt{s}=$5 TeV %s"%(SYS))
+                    leg.set_title("ALICE, %s $\sqrt{s}=$5.02 TeV "%(SYS))
                 else:
-                    leg.set_title("ALICE Work in Progress, $\sqrt{s_{\mathrm{_{NN}}}}=$5 TeV %s"%(SYS))                
-                plt.setp(leg.get_title(),fontsize=20)
+                    leg.set_title("ALICE, %s $\sqrt{s_{\mathrm{_{NN}}}}=$5.02 TeV"%(SYS))                
+                plt.setp(leg.get_title(),fontsize=28)
+                plt.tight_layout()
+            fig.tight_layout()
             fig.savefig('pics/%s/%s/%s_SR_BR_Overlay_pT_%i.pdf'%(Shower,description_string,SYS,ipt))
 
 def Plot_Sub_UB_SR(Dict):
@@ -418,46 +429,72 @@ def Plot_pp_pPb_Cs(Dict):
 
 def Plot_pp_pPb_Cs_Individual(Dict):
     
-    Quad_UE = True
+    #matplotlib.rc('font',family='Times New Roman')    
+
+    Quad_UE = False
     Sub_Plots = True
-    
+    do_sys = True
+    anno_size = 32
     for ipt in range (len(Dict["p-Pb_CSR"])):
         
         for izt in range (NzT-ZT_OFF_PLOT):
             
-            fig = plt.figure(figsize=(10,9))
+            fig = plt.figure(figsize=(10,12))
 
-            pPb = plt.errorbar(delta_phi_centers,Dict["p-Pb_CSR"][ipt][izt],xerr=phi_width,yerr=Dict["p-Pb_CSR_Errors"][ipt][izt],fmt='bo',capsize=4,markersize=11)
-            pp = plt.errorbar(delta_phi_centers,Dict["pp_CSR"][ipt][izt],xerr=phi_width,yerr=Dict["pp_CSR_Errors"][ipt][izt],fmt='ro',capsize=4,markersize=11)
+            pPb_error = plt.errorbar(delta_phi_centers,Dict["p-Pb_CSR"][ipt][izt],xerr=phi_width*0,yerr=Dict["p-Pb_CSR_Errors"][ipt][izt],fmt='bo',capsize=0,markersize=11)
+            pp_error = plt.errorbar(delta_phi_centers,Dict["pp_CSR"][ipt][izt],xerr=phi_width*0,yerr=Dict["pp_CSR_Errors"][ipt][izt],fmt='rs',capsize=0,markersize=11)
+            pPb = plt.errorbar(delta_phi_centers,Dict["p-Pb_CSR"][ipt][izt],xerr=phi_width,yerr=Dict["p-Pb_CSR_Errors"][ipt][izt],fmt='bo',lw=0,capsize=0,markersize=11)
+            pp = plt.errorbar(delta_phi_centers,Dict["pp_CSR"][ipt][izt],xerr=phi_width,yerr=Dict["pp_CSR_Errors"][ipt][izt],fmt='rs',lw=0,capsize=0,markersize=11)
             
             if (Use_MC):
-                pyth = plt.errorbar(delta_phi_centers,pythia[izt],pythia_error[izt],fmt="-g",capsize=4)
-            
+                pyth = plt.plot(delta_phi_centers,pythia[izt],"--",color="forestgreen",label='PYTHIA 8.2 Monash')
+                pyth_error = plt.errorbar(delta_phi_centers,pythia[izt],pythia_error[izt],fmt="--",color="forestgreen",capsize=0)
             
 
-
-            plt.xlabel(r'|$\Delta \varphi$|',fontsize=28)
-            plt.xticks(fontsize=18)
+            #plt.xlabel(r'$\lvert\Delta\varphi\rvert$ (rad)',fontsize=35,x=0.87)
+            plt.xlabel(r'$|\Delta\varphi|$ (rad)',fontsize=35,x=0.86)
+            plt.xticks(fontsize=24)
             plt.xlim((0.39269908169872414,3.14159))
             #plt.xlim((0,3.14159))
-
-            plt.ylabel(r'$1/N_{\gamma} \: \: \mathrm{d}N/\mathrm{d}\Delta \eta \Delta \varphi$',fontsize=28)
-            plt.yticks(fontsize=18)
+            if (izt == 0):
+                plt.ylim(-0.1,0.249)
+            if (izt == 7):
+                plt.ylim(-0.015,0.03)
+            plt.ylabel(r'$1/N_{\gamma} \: \: \mathrm{d}^2N/\mathrm{d}\Delta \eta \mathrm{d}\Delta \varphi$',fontsize=35,y=0.8)
+            plt.yticks(fontsize=24)
+            plt.tick_params(which='both',direction='in',right=True,top=True,bottom=True,length=12)
+            #ax = plt.gca()
+            #[l.set_visible(False) for (i,l) in enumerate(ax.yaxis.get_ticklabels()[:-1]) if i % 2 != 0]
             plt.axhline(y=0,color='gray',linestyle='--',linewidth=1.3,alpha=0.8)        
-            if not(Quad_UE):
-                pp_UE = plt.fill_between(ue_error_bar,-Dict["pp_Uncorr_Error"][ipt][izt][0],
-                Dict['pp_Uncorr_Error'][ipt][izt][0],facecolor='red',alpha=0.35) #Other for pp
+            if not(Quad_UE):            
+                pp_UE = Dict["pp_Uncorr_Error"][ipt][izt][0]/(ZYAM_Max_i-ZYAM_Min_i)
+                pPb_UE = Dict["p-Pb_Uncorr_Error"][ipt][izt][0]/(ZYAM_Max_i-ZYAM_Min_i)
+                #plt.fill_between(ue_error_bar,-pp_UE,pp_UE,facecolor='red',edgecolor="red",alpha=0.35)
+                pp_ue_range = [2.95,3.05]
+                pPb_ue_range = [2.8,2.9]
+                pp_ue_fill = plt.fill_between(pp_ue_range,-pp_UE,pp_UE,facecolor='maroon',edgecolor="maroon",alpha=0.35)
+                pPb_ue_fill = plt.fill_between(pPb_ue_range,-pPb_UE,pPb_UE,facecolor='navy',edgecolor="navy",alpha=0.35)
+                Combined_UE = plt.fill_between(ue_error_bar,-0.000001,0.000001,facecolor='grey',edgecolor="grey",alpha=0.35)
                 
-                pPb_UE = plt.fill_between(ue_error_bar,-Dict["p-Pb_Uncorr_Error"][ipt][izt][0],
-                Dict['p-Pb_Uncorr_Error'][ipt][izt][0],facecolor='blue',alpha=0.35)#One for p-Pb
-            
             else:
                 pp_UE = Dict["pp_Uncorr_Error"][ipt][izt][0]/(ZYAM_Max_i-ZYAM_Min_i)
                 pPb_UE = Dict["p-Pb_Uncorr_Error"][ipt][izt][0]/(ZYAM_Max_i-ZYAM_Min_i)
                 UE_Val =math.sqrt(pp_UE**2 + pPb_UE**2)
-                Combined_UE = plt.fill_between(ue_error_bar,-UE_Val,UE_Val,facecolor='purple',alpha=0.35)
+                Combined_UE = plt.fill_between(ue_error_bar,-UE_Val,UE_Val,facecolor='grey',edgecolor="grey",alpha=0.35)
+            
+            if (do_sys):
+
+                #purity and tracking error
+                sys_pp = math.sqrt(Rel_pUncert["pp"]**2 + 0.056**2)*Dict["pp_CSR"][ipt][izt]
+                sys_pPb = math.sqrt(Rel_pUncert["p-Pb"]**2 + 0.056**2)*Dict["p-Pb_CSR"][ipt][izt]
+
+                Sys_Plot_pp = plt.bar(delta_phi_centers, sys_pp+sys_pp,bottom=Dict["pp_CSR"][ipt][izt]-sys_pp,width=phi_width*2,align='center',color='red',alpha=0.3,edgecolor='red')
+                Sys_Plot_pPb = plt.bar(delta_phi_centers, sys_pPb+sys_pPb,bottom=Dict["p-Pb_CSR"][ipt][izt]-sys_pPb,width=phi_width*2,align='center',fill=False,edgecolor='blue')
+                #bottom=Comb_Dict["%s_Combined_FF"%(SYS)][:NzT-ZT_OFF_PLOT]-Sys_Uncertainty[:NzT-ZT_OFF_PLOT],width=zT_widths[:NzT-ZT_OFF_PLOT], 
+                #                      align='center',color=sys_col,alpha=0.3,edgecolor=sys_col,hatch='//')
                 
-            Int_Window = plt.axvline(x=dPhi_Bins[-N_Phi_Integrate-1],linestyle='--',color="black",alpha=0.7)
+            
+            #Int_Window = plt.axvline(x=dPhi_Bins[-N_Phi_Integrate-1],linestyle='--',color="black",alpha=0.7)
             
             #MC_UE = ax.fill_between(ue_error_bar,-Dict["MC_Uncorr_Error"][ipt][ztb][0],Dict["MC_Uncorr_Error"][ipt][ztb][0],facecolor='green',alpha=0.35)#One for p-Pb
             
@@ -465,38 +502,55 @@ def Plot_pp_pPb_Cs_Individual(Dict):
             Chi2,NDF,Pval = Get_pp_pPb_List_Chi2(Dict["p-Pb_CSR"][ipt][izt],Dict["p-Pb_CSR_Errors"][ipt][izt],Dict["p-Pb_Uncorr_Error"][ipt][izt],
                                         Dict["pp_CSR"][ipt][izt],Dict["pp_CSR_Errors"][ipt][izt],Dict["pp_Uncorr_Error"][ipt][izt])
                         
-            plt.annotate("$\chi^2$ = %1.1f, ndf = %i, p = %1.2f"%(Chi2,NDF,Pval), xy=(0.98, 0.06), xycoords='axes fraction', ha='right', va='top', fontsize=22)
+            #plt.annotate("$\chi^2$ = %1.1f, ndf = %i, $p$ = %1.2f"%(Chi2,NDF,Pval), xy=(0.98, 0.06), xycoords='axes fraction', ha='right', va='top', fontsize=30)
+            plt.annotate("$\chi^2$ = %1.1f, ndf = %i, $p$ = %1.2f"%(Chi2,NDF,Pval), xy=(0.98, 0.06), xycoords='axes fraction', ha='right', va='top', fontsize=anno_size)
 
-            if(Use_MC):
-                    leg = plt.legend([pp,pPb,pyth,Combined_UE],['pp $\sqrt{s}= 5$ TeV (stat. error)',
-                    'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)', 'Pythia 8.2 Monash','UB Error'],
-                    loc = "upper left",fontsize=20,frameon=False,numpoints=1)
-            else:
-                    leg = plt.legend([pp,pPb,Combined_UE],['pp $\sqrt{s}= 5$ TeV (stat. error)',
-                    'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)','UB Error'],
-                    loc = "upper left",fontsize=20,frameon=False,numpoints=1)
+            if (izt == 0):
+                if(Use_MC):
+                    leg = plt.legend([pp,pPb,pyth[0],pp_ue_fill,pPb_ue_fill],['pp',
+                    'p$-$Pb', 'PYTHIA 8.2 Monash','pp UE Error','p$-$Pb UE Error'],
+                    loc = "upper left",fontsize=anno_size,frameon=False,numpoints=1)
+                else:
+                    leg = plt.legend([pp,pPb,Combined_UE],['pp $\sqrt{s}= 5.02$ TeV',
+                    'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5.02$ TeV','UE Error'],
+                    loc = "upper left",fontsize=anno_size,frameon=False,numpoints=1)
+            #plt.setp(leg.texts, family='Times New Roman')
             #else:    
             #    if not(Quad_UE):
             #        leg = plt.legend([pp,pPb,pp_UE,pPb_UE],['pp $\sqrt{s}= 5$ TeV (stat. error)',
-            #        'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)', 'pp UB Error', 'p-Pb UB Error'],
+            #        'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)', 'pp UE Error', 'p-Pb UE Error'],
             #        loc = "upper left",fontsize=20,frameon=False,numpoints=1)
             #    else:
 
+            #plt.annotate(r'%1.2f \textless $z_\mathrm{T}$ \textless %1.2f'%(zTbins[izt],zTbins[izt+1]), xy=(0.98, 0.15), xycoords='axes fraction', ha='right', va='top', fontsize=anno_size)
+            plt.annotate(r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]), xy=(0.98, 0.195), xycoords='axes fraction', ha='right', va='top', fontsize=30)
 
-            plt.annotate(r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]), xy=(0.05, 0.56), xycoords='axes fraction', ha='left', va='top', fontsize=22)
-            
             if (len(Dict["p-Pb_CSR"]) > 1):
-                plt.annotate(r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]), xy=(0.05, 0.64), xycoords='axes fraction', ha='left', va='top', fontsize=22)
+                hpT_Max = pTbins[ipt]*zTbins[izt+1]
+                if (pTbins[N_pT_Bins]*zTbins[izt+1] > Max_Hadron_pT):
+                    hpT_Max = Max_Hadron_pT
+                plt.annotate(r'%1.1f < $p_\mathrm{T}^{h}$ < %1.1f GeV/$c$'%(pTbins[ipt]*zTbins[izt],hpT_Max), xy=(0.98, 0.105), xycoords='axes fraction', ha='right', va='top',fontsize=anno_size)
+                plt.annotate(r'%1.0f < $p_\mathrm{T}^{\gamma}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]), xy=(0.98, 0.105), xycoords='axes fraction', ha='right', va='top', fontsize=anno_size)
             else:
-                plt.annotate(r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[0],pTbins[N_pT_Bins]), xy=(0.05, 0.64), xycoords='axes fraction', ha='left', va='top', fontsize=22)
-            
-            leg.set_title("ALICE Work in Progress")
-            leg._legend_box.align = "left"
-            plt.setp(leg.get_title(),fontsize=22)
+                hpT_Max = pTbins[N_pT_Bins]*zTbins[izt+1]
+                if (pTbins[N_pT_Bins]*zTbins[izt+1] > Max_Hadron_pT):
+                    hpT_Max = Max_Hadron_pT
+                plt.annotate(r'%1.1f < $p_\mathrm{T}^{h}$ < %1.1f GeV/$c$'%(pTbins[0]*zTbins[izt],hpT_Max), xy=(0.98, 0.105), xycoords='axes fraction', ha='right', va='top',fontsize=anno_size)
+                plt.annotate(r'%1.0f < $p_\mathrm{T}^{\gamma}$ < %1.0f GeV/$c$'%(pTbins[0],pTbins[N_pT_Bins]), xy=(0.98, 0.15), xycoords='axes fraction', ha='right', va='top', fontsize=anno_size)
+                #plt.annotate(r'%1.0f < $p_\mathrm{T}^{\gamma}$ < %1.0f GeV/$c$'%(pTbins[0],pTbins[N_pT_Bins]), xy=(0.05, 0.67), xycoords='axes fraction', ha='left', va='top', fontsize=30)
+
+            if (izt == 7):
+                plt.annotate(r"ALICE",xy=(0.05,0.97), xycoords='axes fraction', ha='left',va='top',fontsize=anno_size+2)
+                plt.annotate(r"$\sqrt{s_{\mathrm{_{NN}}}}=5.02$ TeV",xy=(0.05,0.92), xycoords='axes fraction', ha='left',va='top',fontsize=anno_size)
+                #leg.set_title("ALICE")
+                #leg._legend_box.align = "left"
+                #plt.setp(leg.get_title(),fontsize=30)
+
             fig.tight_layout()
             
             plt.show()
             #fig.savefig('pics/Gamma_hadron_corr_zT_%i.pdf'%(ztb))
+            #fig.savefig('pics/%s/%s/Cs_Final_Indv_pT_%i_zT_%i.png'%(Shower,description_string,ipt,izt))
             fig.savefig('pics/%s/%s/Cs_Final_Indv_pT_%i_zT_%i.pdf'%(Shower,description_string,ipt,izt))
 
         
@@ -622,7 +676,7 @@ def Compare_Cs_Averages(save_name,strings,string_descrp_list,colors):
                 
                 #Labels
                 if (izt>2):
-                    plt.xlabel(r'|$\Delta \varphi$|',fontsize=28)
+                    plt.xlabel(r'\|$\Delta \varphi$|',fontsize=28)
                 if (izt%3 == 0):
                     plt.ylabel(r'$1/N_{\gamma} \: \: \mathrm{d}N/\mathrm{d}\Delta \eta$',fontsize=28)
                 
@@ -712,7 +766,7 @@ def Integrate_Away_Side(Phi_array,Phi_Errors,UE_Error,N_Phi_Intgl=N_Phi_Integrat
             
             else:
                 FF_zt_Errors[ipt][izt] = math.sqrt(temp_error.sum())/zT_width
-            
+                
     return FF_zt, FF_zt_Errors,FF_zt_UE
 
 
@@ -749,6 +803,10 @@ def Get_Fragmentation(Dict,N_Phi_Intgl=N_Phi_Integrate,Use_Avg_Cs=False):
             
         if (Use_Avg_Cs):
             temp_FF,temp_FF_Errors,temp_purity_Errors, temp_FF_UE_Errors = temp_FF[0],temp_FF_Errors[0],temp_purity_Errors[0]
+
+        if (Apply_Eta_Correction and SYS=="p-Pb"):   
+            temp_FF = temp_FF*Eta_Correction
+            temp_FF_Errors = temp_FF_Errors*Eta_Correction
             
         FF_Vals.append(temp_FF)
         FF_Vals.append(temp_FF_Errors)
@@ -799,7 +857,7 @@ def LaTeX_Results_Summary(FF_Dict):
         print("                        LaTeX Table")
 
         i=0
-        j=len(FF_Dict["pp_FF_Errors"][0])/2        
+        j=len(FF_Dict["pp_FF_Errors"][0])/2 #First Half        
         print(i)
         print(j)
         pp_stat_min_low = np.amin(FF_Dict["pp_FF_Errors"][0][i:j]/FF_Dict["pp_FF"][0][i:j])*100
@@ -817,8 +875,8 @@ def LaTeX_Results_Summary(FF_Dict):
         pPb_ue_min_low = np.amin(FF_Dict["p-Pb_UE_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
         pPb_ue_max_low = np.amax(FF_Dict["p-Pb_UE_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
 
-        i=len(FF_Dict["pp_FF_Errors"][0])/2 +1
-        j = len(FF_Dict["pp_FF_Errors"][0])
+        i=len(FF_Dict["pp_FF_Errors"][0])/2 +1 #Second Half
+        j = len(FF_Dict["pp_FF_Errors"][0]) - 1
 
         print(i)
         print(j)
@@ -854,16 +912,19 @@ def LaTeX_Results_Summary(FF_Dict):
 
         print("Tracking Efficiency &  5.6\% & 5.6\%  \\\\ ")
     
-
-        pp_sys_min_low = np.sqrt(pp_purity_min_low**2 +pp_ue_min_low**2 + 5.6**2 +1)
+#+1 at the end is an overestimate to the combined contribution of Photon Energy scale sources of uncertainty
+        pp_sys_min_low = np.sqrt(pp_purity_min_low**2 +pp_ue_min_low**2 + 5.6**2 +1) 
         pp_sys_min_high = np.sqrt(pp_purity_min_high**2 +pp_ue_min_high**2 + 5.6**2 +1)
         pp_sys_max_low = np.sqrt(pp_purity_max_low**2 +pp_ue_max_low**2 + 5.6**2 +1)
         pp_sys_max_high = np.sqrt(pp_purity_max_high**2 +pp_ue_max_high**2 + 5.6**2 +1)
 
-        pPb_sys_min_low = np.sqrt(pPb_purity_min_low**2 +pPb_ue_min_low**2 + 5.6**2 +1)
-        pPb_sys_min_high = np.sqrt(pPb_purity_min_high**2 +pPb_ue_min_high**2 + 5.6**2 +1)
-        pPb_sys_max_low = np.sqrt(pPb_purity_max_low**2 +pPb_ue_max_low**2 + 5.6**2 +1)
-        pPb_sys_max_high = np.sqrt(pPb_purity_max_high**2 +pPb_ue_max_high**2 + 5.6**2 +1)
+        Eta_Cor_Uncert = Eta_Correction_Uncertainty
+        if not(Apply_Eta_Correction):
+            Eta_Cor_Uncert = 0 #2% otherwise
+        pPb_sys_min_low = np.sqrt(pPb_purity_min_low**2 +pPb_ue_min_low**2 + 5.6**2 +1 + Eta_Cor_Uncert)
+        pPb_sys_min_high = np.sqrt(pPb_purity_min_high**2 +pPb_ue_min_high**2 + 5.6**2 +1 + Eta_Cor_Uncert)
+        pPb_sys_max_low = np.sqrt(pPb_purity_max_low**2 +pPb_ue_max_low**2 + 5.6**2 +1 + Eta_Cor_Uncert)
+        pPb_sys_max_high = np.sqrt(pPb_purity_max_high**2 +pPb_ue_max_high**2 + 5.6**2 +1 + Eta_Cor_Uncert)
 
         pp_total_min_low = np.sqrt(pp_stat_min_low**2 + pp_sys_min_low**2)
         pp_total_min_high = np.sqrt(pp_stat_min_high**2 + pp_sys_min_high**2)
@@ -1035,7 +1096,7 @@ def ProcessData(input_x, input_y, input_yerr,UE_binmin=2, UE_binmax=9,label='dat
     plt.fill_between(ue_band_x, 0.0- UE_error, 0.0+UE_error, alpha=.5,color='grey')
       
     plt.ylabel('Rate per dphixdeta',fontsize=16)
-    plt.xlabel('dphi (rad)',fontsize=16)
+    plt.xlabel('dphi (\text{rad})',fontsize=16)
 
     #subtract UE
     y = np.subtract(y, UE_rate)
