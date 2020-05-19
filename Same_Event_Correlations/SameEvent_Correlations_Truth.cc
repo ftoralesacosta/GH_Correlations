@@ -581,13 +581,15 @@ int main(int argc, char *argv[])
 
   float N_Signal_Triggers = 0;
   float N_BKGD_Triggers = 0;
-
-  TH1F* Signal_pT_Dist[nptbins];
+  
+  TH1F* Signal_pT_Dist = new TH1F("Signal_pT_Dist","Cluster Pt Spectrum For Isolation (its_04) bins 0.55 < DNN < 0.85",(pT_max-pT_min)*2,pT_min,pT_max);
+  TH1F* Signal_pT_Dist_OnlypTWeight = new TH1F("Signal_pT_Dist_OnlypTWeight","Cluster Pt Spectrum For Isolation (its_04) bins 0.55 < DNN < 0.85",(pT_max-pT_min)*2,pT_min,pT_max);
   
   TH1F* BKGD_pT_Dist = new TH1F("BKGD_pT_Dist","Cluster Pt Spectrum For Isolation (its_04) bins 0.0 < DNN < 0.3",(pT_max-pT_min)*2,pT_min,pT_max);
     TH1F* BKGD_pT_Dist_OnlypTWeight = new TH1F("BKGD_pT_Dist_OnlypTWeight","Cluster Pt Spectrum For Isolation (its_04) bins 0.0 < DNN < 0.3",(pT_max-pT_min)*2,pT_min,pT_max);
   TH1F* BKGD_pT_Dist_Weighted = new TH1F("BKGD_pT_Dist_Weighted","Weighted Cluster Pt Spectrum For Isolation (its_04) bins 0.0 < DNN < 0.3",(pT_max-pT_min)*2,pT_min,pT_max);
 
+  Signal_pT_Dist->Sumw2();
   BKGD_pT_Dist->Sumw2();
   BKGD_pT_Dist_Weighted->Sumw2();
 
@@ -652,8 +654,6 @@ int main(int argc, char *argv[])
       Form("H_Purity_Uncertanty_pT%1.0f_%1.0f",ptbins[ipt],ptbins[ipt+1]),
       "yields weighted average purity uncertainty for pT bin", 100, 0.0,0.10);
       
-      Signal_pT_Dist[ipt] = new TH1F(Form("Signal_pT_Dist_pT%1.0f_%1.0f",ptbins[ipt],ptbins[ipt+1]),"Cluster Pt Spectrum Isolated, Signal Photons",200,0,50);
-      Signal_pT_Dist[ipt]->Sumw2();
 
       for (int izt = 0; izt<nztbins; izt++){
 
@@ -758,7 +758,6 @@ int main(int argc, char *argv[])
     Float_t cluster_frixione_tpc_04_02[NTRACK_MAX];
     Float_t cluster_frixione_its_04_02[NTRACK_MAX];
     Float_t cluster_s_nphoton[NTRACK_MAX][4];
-    unsigned short cluster_mc_truth_index[NTRACK_MAX][32];
     Int_t cluster_ncell[NTRACK_MAX];
     UShort_t  cluster_cell_id_max[NTRACK_MAX];
     Float_t cluster_lambda_square[NTRACK_MAX][2];   
@@ -775,15 +774,20 @@ int main(int argc, char *argv[])
     Float_t mc_truth_pt[NTRACK_MAX];
     Float_t mc_truth_eta[NTRACK_MAX];  
     Float_t mc_truth_phi[NTRACK_MAX];
-    short mc_truth_pdg_code[NTRACK_MAX];
-    short mc_truth_first_parent_pdg_code[NTRACK_MAX];
-    char mc_truth_charge[NTRACK_MAX];
-
+    unsigned short cluster_mc_truth_index[NTRACK_MAX][32];
+    unsigned short track_mc_truth_index[NTRACK_MAX];
+    UChar_t mc_truth_status[NTRACK_MAX];
+    
+    //Not using as of Feb 2020
     Float_t mc_truth_first_parent_e[NTRACK_MAX];
     Float_t mc_truth_first_parent_pt[NTRACK_MAX];
     Float_t mc_truth_first_parent_eta[NTRACK_MAX];
     Float_t mc_truth_first_parent_phi[NTRACK_MAX];
-    UChar_t mc_truth_status[NTRACK_MAX];
+    short mc_truth_pdg_code[NTRACK_MAX];
+    short mc_truth_first_parent_pdg_code[NTRACK_MAX];
+    char mc_truth_charge[NTRACK_MAX];
+
+
     //Float_t eg_cross_section;
     //Int_t   eg_ntrial;
      
@@ -820,7 +824,6 @@ int main(int argc, char *argv[])
     _tree_event->SetBranchAddress("cluster_eta", cluster_eta);
     _tree_event->SetBranchAddress("cluster_phi", cluster_phi);
     _tree_event->SetBranchAddress("cluster_s_nphoton", cluster_s_nphoton);
-    _tree_event->SetBranchAddress("cluster_mc_truth_index", cluster_mc_truth_index);
     _tree_event->SetBranchAddress("cluster_lambda_square", cluster_lambda_square);
     _tree_event->SetBranchAddress("cluster_iso_tpc_04",cluster_iso_tpc_04);
     _tree_event->SetBranchAddress("cluster_iso_its_04",cluster_iso_its_04);
@@ -836,6 +839,14 @@ int main(int argc, char *argv[])
     _tree_event->SetBranchAddress("cluster_tof", cluster_tof);
     _tree_event->SetBranchAddress("cluster_iso_its_04_ue",cluster_iso_its_04_ue);
     _tree_event->SetBranchAddress("cluster_iso_tpc_04_ue",cluster_iso_tpc_04_ue);
+    
+    //MONTE CARLO STUFF
+    _tree_event->SetBranchAddress("mc_truth_pt", mc_truth_pt);
+    _tree_event->SetBranchAddress("mc_truth_phi", mc_truth_phi);
+    _tree_event->SetBranchAddress("mc_truth_eta", mc_truth_eta);
+    _tree_event->SetBranchAddress("mc_truth_status", mc_truth_status);        
+    _tree_event->SetBranchAddress("cluster_mc_truth_index", cluster_mc_truth_index);
+    _tree_event->SetBranchAddress("track_mc_truth_index", track_mc_truth_index);
     
     //_tree_event->SetBranchAddress("eg_cross_section",&eg_cross_section);
     //_tree_event->SetBranchAddress("eg_ntrial",&eg_ntrial);
@@ -928,6 +939,7 @@ int main(int argc, char *argv[])
 	  if (Signal and Isolated){  	    
 	    
 	    N_Signal_Triggers += 1;
+	    Signal_pT_Dist->Fill(cluster_pt[n]);
 	    hweight.Fill(cluster_pt[n]);
 
 	    //N_pT_Ranges corresponds to pT binning of purity, not pT binning of correlations
@@ -942,7 +954,6 @@ int main(int argc, char *argv[])
 
 	    for (int ipt = 0; ipt < nptbins; ipt++){
 	      if (cluster_pt[n] >ptbins[ipt] && cluster_pt[n] <ptbins[ipt+1]){
-		Signal_pT_Dist[ipt]->Fill(cluster_pt[n]);
 		H_Signal_Triggers[ipt]->Fill(1);
 		H_Purities[ipt]->Fill(Cluster_Purity); 
 		H_Purity_Uncertainties[ipt]->Fill(Cluster_Purity_Uncertainty);
@@ -1057,8 +1068,24 @@ int main(int argc, char *argv[])
           Signal = (cluster_e_max[n]/cluster_e[n] > Emax_max);
           Background = (cluster_e_max[n]/cluster_e[n] < Emax_min);
         }
-
-
+	
+	Bool_t isTrue = false;
+	Float_t cluster_truth_pt = 0;
+	Float_t cluster_truth_eta = 0;
+	Float_t cluster_truth_phi = 0;
+	for(int counter = 0 ; counter<32; counter++){
+	  unsigned short index = cluster_mc_truth_index[n][counter];                   
+	  if(isTrue) break;
+	  if(index==65535) continue;
+	  if( not (mc_truth_status[index] >0)) continue;        
+	  isTrue = true;
+	  cluster_truth_pt     = mc_truth_pt[index];
+	  cluster_truth_phi    = mc_truth_phi[index];
+	  cluster_truth_eta    = mc_truth_eta[index];
+	}//end loop over indices
+	   
+	if (not(isTrue)) continue;
+	
 	float bkg_weight = 1.0;
 	float track_weight = 1.0; //Fake Rate, smearing, efficiency
 
@@ -1105,7 +1132,9 @@ int main(int argc, char *argv[])
 	  //if( not(TMath::Abs(track_dca_xy[itrack])<0.0231+0.0315/TMath::Power(track_pt[itrack],1.3 ))) continue;
 	  if (not(TMath::Abs(track_dca_xy[itrack]<2.4))) continue;
 	  if (not(TMath::Abs(track_dca_z[n]) < 3.2)) continue;
-	  
+
+	  unsigned int track_mc_index = track_mc_truth_index[itrack];
+	  if (track_mc_index < 65534) continue;
 
 	  //Electron Veto for associated tracks outside of isolation cone
 	  double dRmin = 0.02;
@@ -1123,40 +1152,6 @@ int main(int argc, char *argv[])
 
 	  //Apply corrections as weights. 1/Eff, *FakeRate, *SmearingAffect
 
-	    for (int ipt = 0; ipt < N_Track_pT_Bins; ipt++){
-	      if( (track_pt[itrack] >= track_pT_Correction_bins[ipt]) && (track_pt[itrack] < track_pT_Correction_bins[ipt+1])){
-		track_weight = pPb_Smearing_Correction[ipt]*(1.0-pPb_FakeRate[ipt])/pPb_Efficiency[ipt];
-		//fprintf(stderr,"\n %d: Low Edge=%f, High Edge=%f, Smear=%f, FakeRake=%f, Efficiency=%f\n",__LINE__,track_pT_Correction[ipt],track_pT_Correction[ipt+1],pPb_Smearing_Correction[ipt],pPb_FakeRate[ipt],pPb_Efficiency[ipt]);
-	      }
-	    }
-	
-	    if (TPC_Iso_Flag){ //When this is used, TPC pure tracks are also used, hence weighting change
-	      track_weight = 1.0;
-	      for (int ipt = 0; ipt < N_TPC_Track_pT_Bins; ipt++){
-		if( (track_pt[itrack] >= TPC_track_pT_Correction_bins[ipt]) && (track_pt[itrack] < TPC_track_pT_Correction_bins[ipt+1])){
-		  track_weight = TPC_pPb_Smearing_Correction[ipt]*(1.0-TPC_pPb_FakeRate[ipt])/TPC_pPb_Efficiency[ipt];
-		  //fprintf(stderr,"\n %d: Low Edge=%f, High Edge=%f, Smear=%f, FakeRake=%f, Efficiency=%f\n",__LINE__,TPC_track_pT_Correction_bins[ipt],TPC_track_pT_Correction_bins[ipt+1],TPC_pPb_Smearing_Correction[ipt],TPC_pPb_FakeRate[ipt],TPC_pPb_Efficiency[ipt]);
-		}
-	      }
-	    }
-	    
-	  if (Is_pp){
-	    
-	    track_weight = 1.0;
-
-	    for (int ipt = 0; ipt < N_Track_pT_Bins_pp; ipt++){
-	      if( (track_pt[itrack] >= pp_track_pT_Correction_bins[ipt]) && (track_pt[itrack] < pp_track_pT_Correction_bins[ipt+1])){
-		track_weight = pp_Smearing_Correction[ipt]*(1.0-pp_FakeRate[ipt])/pp_Efficiency[ipt];
-	      }
-	    }
-	  }//pp
-	  
-	  //fprintf(stderr,"\n Track pT = %f, Track weight = %f\n",track_pt[itrack],track_weight);
-
-	  //Track DEBUGGING
-	  track_weight = 1;
-	  //fprintf(stderr,"%d: Track pT: %1.2f,  Track Weight = %1.4f \n",__LINE__,track_pt[itrack],track_weight);
-	  
 	  if (first_cluster){
 		    Track_Weight_Spectra.Fill(track_pt[itrack],track_weight);
 		    Track_Raw_Spectra.Fill(track_pt[itrack]);
@@ -1165,8 +1160,8 @@ int main(int argc, char *argv[])
 	  
 	  //Observables:
 	  Double_t zt = track_pt[itrack]/cluster_pt[n];
-	  Float_t DeltaPhi = TMath::Abs(TVector2::Phi_mpi_pi(cluster_phi[n] - track_phi[itrack]));
-	  Float_t DeltaEta = cluster_eta[n] - track_eta[itrack];
+	  Float_t DeltaPhi = TMath::Abs(TVector2::Phi_mpi_pi(cluster_truth_phi - mc_truth_phi[track_mc_index]));
+	  Float_t DeltaEta = cluster_truth_eta - mc_truth_eta[track_mc_index];
 	  if ((TMath::Abs(DeltaPhi) < 0.005) && (TMath::Abs(DeltaEta) < 0.005)) continue; //Match Mixing Cut
 
 	  for (int ipt = 0; ipt < nptbins; ipt++){
@@ -1174,19 +1169,20 @@ int main(int argc, char *argv[])
 	      for(int izt = 0; izt<nztbins ; izt++){
 		if(zt>ztbins[izt] and  zt<ztbins[izt+1]){
 		  if (first_cluster){
-		    h_track_phi_eta[izt+ipt*nztbins]->Fill(track_phi[itrack],track_eta[itrack]);
+		    h_track_phi_eta[izt+ipt*nztbins]->Fill(mc_truth_phi[track_mc_index],mc_truth_eta[track_mc_index]);
 		    if (track_pt[itrack] > 10)
 		    tracks_tenGev += 1;
 		  }
 		  //2 DNN Regions
 
 		  if (Signal and Isolated)
-		    IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta,track_weight*purity_weight);
+		    //IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta,track_weight*purity_weight);
+		    IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta,purity_weight);
 
 		  if (Background and Isolated){
-		    BKGD_IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta,bkg_weight*track_weight*BR_purity_weight);
+		    BKGD_IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
 		    //not weighted with pT distro
-		    BKGD_IsoCorr_UW[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta,track_weight);
+		    BKGD_IsoCorr_UW[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta);
 		  }
 		
 	    	  
@@ -1243,12 +1239,10 @@ int main(int argc, char *argv[])
   Track_Weight_Spectra.Write();
   Track_Raw_Spectra.Write();
   Chi_Distro.Write();
+  Signal_pT_Dist->Write();
   BKGD_pT_Dist->Write();
   BKGD_pT_Dist_Weighted->Scale(1.0/(hweight.Integral(1,40))); //Divide by sum of weights
   BKGD_pT_Dist_Weighted->Write();
-
-  for (int ipt = 0; ipt<nptbins; ipt++)
-    Signal_pT_Dist[ipt]->Write();
 
   for (int ipt = 0; ipt<nptbins; ipt++)
     H_Signal_Triggers[ipt]->Write();

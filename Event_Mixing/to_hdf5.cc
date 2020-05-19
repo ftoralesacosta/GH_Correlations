@@ -52,8 +52,9 @@ void find_ntrack_ncluster_max(char *argv_first[], char *argv_last[], UInt_t &nev
         UInt_t ntrack;
         UInt_t ncluster;
         UInt_t njet_ak04its;
-        //nevent_max = UInt_t(hi_tree->GetEntries());
-	nevent_max = 1000000;
+        nevent_max = UInt_t(hi_tree->GetEntries());
+	if (nevent_max > 1000000)
+	  nevent_max = 1000000;
 
         hi_tree->SetBranchAddress("ntrack", &ntrack);
         hi_tree->SetBranchAddress("ncluster", &ncluster);
@@ -62,7 +63,7 @@ void find_ntrack_ncluster_max(char *argv_first[], char *argv_last[], UInt_t &nev
         fprintf(stderr, "%s:%d: %s\n", __FILE__, __LINE__, "Obtaining ntrack, ncluster, and njet max for hdf5 file");
 
         //for (Long64_t i = 0; i < hi_tree->GetEntries(); i++) {
-	for (Long64_t i = 0; i < 1000000; i++) {
+	for (Long64_t i = 0; i < nevent_max; i++) {
             hi_tree->GetEntry(i);
             ntrack_max = std::max(ntrack_max, ntrack);
             ncluster_max = std::max(ncluster_max, ncluster);
