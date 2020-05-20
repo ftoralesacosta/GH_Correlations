@@ -208,7 +208,9 @@ if ("16dPhi" in description_string):
 dPhi_Bins = [i*math.pi/N_dPhi_Bins for i in range(0,N_dPhi_Bins+1)]
 dPhi_Width = dPhi_Bins[1]-dPhi_Bins[0]
 delta_phi_centers = [i*math.pi/N_dPhi_Bins+math.pi/N_dPhi_Bins/2 for i in range(0,N_dPhi_Bins)] #skip first dPhi bin to avoid Isolation
-
+delta_phi_edges = []
+for p in range(0,N_dPhi_Bins):
+    delta_phi_edges.append([p*dPhi_Width,(p+1)*dPhi_Width])
 #UE
 
 dphi_start_integral = 0

@@ -9,8 +9,9 @@ from default_values import *
 from functions_root_nparray import ZYAM_Line
 import matplotlib.lines as mlines
 
-import matplotlib.font_manager as font_manager
-font = font_manager.FontProperties(family='Helvetica',size=30)
+from hepdata_lib import Submission
+from hepdata_lib import Table
+from hepdata_lib import Variable, Uncertainty
 
 def Plot_UB_Subtraction(Dict):
     fsize = 20
@@ -429,8 +430,6 @@ def Plot_pp_pPb_Cs(Dict):
 
 def Plot_pp_pPb_Cs_Individual(Dict):
     
-    #matplotlib.rc('font',family='Times New Roman')    
-
     Quad_UE = False
     Sub_Plots = True
     do_sys = True
@@ -445,31 +444,30 @@ def Plot_pp_pPb_Cs_Individual(Dict):
             pp_error = plt.errorbar(delta_phi_centers,Dict["pp_CSR"][ipt][izt],xerr=phi_width*0,yerr=Dict["pp_CSR_Errors"][ipt][izt],fmt='rs',capsize=0,markersize=11)
             pPb = plt.errorbar(delta_phi_centers,Dict["p-Pb_CSR"][ipt][izt],xerr=phi_width,yerr=Dict["p-Pb_CSR_Errors"][ipt][izt],fmt='bo',lw=0,capsize=0,markersize=11)
             pp = plt.errorbar(delta_phi_centers,Dict["pp_CSR"][ipt][izt],xerr=phi_width,yerr=Dict["pp_CSR_Errors"][ipt][izt],fmt='rs',lw=0,capsize=0,markersize=11)
-            
+            #2 plots such that lines do not show on legend (ALICE style...)
+
             if (Use_MC):
                 pyth = plt.plot(delta_phi_centers,pythia[izt],"--",color="forestgreen",label='PYTHIA 8.2 Monash')
                 pyth_error = plt.errorbar(delta_phi_centers,pythia[izt],pythia_error[izt],fmt="--",color="forestgreen",capsize=0)
             
-
-            #plt.xlabel(r'$\lvert\Delta\varphi\rvert$ (rad)',fontsize=35,x=0.87)
             plt.xlabel(r'$|\Delta\varphi|$ (rad)',fontsize=35,x=0.86)
             plt.xticks(fontsize=24)
             plt.xlim((0.39269908169872414,3.14159))
-            #plt.xlim((0,3.14159))
+
             if (izt == 0):
                 plt.ylim(-0.1,0.249)
             if (izt == 7):
                 plt.ylim(-0.015,0.03)
+
             plt.ylabel(r'$1/N_{\gamma} \: \: \mathrm{d}^2N/\mathrm{d}\Delta \eta \mathrm{d}\Delta \varphi$',fontsize=35,y=0.8)
             plt.yticks(fontsize=24)
             plt.tick_params(which='both',direction='in',right=True,top=True,bottom=True,length=12)
-            #ax = plt.gca()
-            #[l.set_visible(False) for (i,l) in enumerate(ax.yaxis.get_ticklabels()[:-1]) if i % 2 != 0]
             plt.axhline(y=0,color='gray',linestyle='--',linewidth=1.3,alpha=0.8)        
+
             if not(Quad_UE):            
                 pp_UE = Dict["pp_Uncorr_Error"][ipt][izt][0]/(ZYAM_Max_i-ZYAM_Min_i)
                 pPb_UE = Dict["p-Pb_Uncorr_Error"][ipt][izt][0]/(ZYAM_Max_i-ZYAM_Min_i)
-                #plt.fill_between(ue_error_bar,-pp_UE,pp_UE,facecolor='red',edgecolor="red",alpha=0.35)
+
                 pp_ue_range = [2.95,3.05]
                 pPb_ue_range = [2.8,2.9]
                 pp_ue_fill = plt.fill_between(pp_ue_range,-pp_UE,pp_UE,facecolor='maroon',edgecolor="maroon",alpha=0.35)
@@ -484,25 +482,15 @@ def Plot_pp_pPb_Cs_Individual(Dict):
             
             if (do_sys):
 
-                #purity and tracking error
                 sys_pp = math.sqrt(Rel_pUncert["pp"]**2 + 0.056**2)*Dict["pp_CSR"][ipt][izt]
                 sys_pPb = math.sqrt(Rel_pUncert["p-Pb"]**2 + 0.056**2)*Dict["p-Pb_CSR"][ipt][izt]
 
                 Sys_Plot_pp = plt.bar(delta_phi_centers, sys_pp+sys_pp,bottom=Dict["pp_CSR"][ipt][izt]-sys_pp,width=phi_width*2,align='center',color='red',alpha=0.3,edgecolor='red')
                 Sys_Plot_pPb = plt.bar(delta_phi_centers, sys_pPb+sys_pPb,bottom=Dict["p-Pb_CSR"][ipt][izt]-sys_pPb,width=phi_width*2,align='center',fill=False,edgecolor='blue')
-                #bottom=Comb_Dict["%s_Combined_FF"%(SYS)][:NzT-ZT_OFF_PLOT]-Sys_Uncertainty[:NzT-ZT_OFF_PLOT],width=zT_widths[:NzT-ZT_OFF_PLOT], 
-                #                      align='center',color=sys_col,alpha=0.3,edgecolor=sys_col,hatch='//')
-                
-            
-            #Int_Window = plt.axvline(x=dPhi_Bins[-N_Phi_Integrate-1],linestyle='--',color="black",alpha=0.7)
-            
-            #MC_UE = ax.fill_between(ue_error_bar,-Dict["MC_Uncorr_Error"][ipt][ztb][0],Dict["MC_Uncorr_Error"][ipt][ztb][0],facecolor='green',alpha=0.35)#One for p-Pb
-            
             
             Chi2,NDF,Pval = Get_pp_pPb_List_Chi2(Dict["p-Pb_CSR"][ipt][izt],Dict["p-Pb_CSR_Errors"][ipt][izt],Dict["p-Pb_Uncorr_Error"][ipt][izt],
                                         Dict["pp_CSR"][ipt][izt],Dict["pp_CSR_Errors"][ipt][izt],Dict["pp_Uncorr_Error"][ipt][izt])
                         
-            #plt.annotate("$\chi^2$ = %1.1f, ndf = %i, $p$ = %1.2f"%(Chi2,NDF,Pval), xy=(0.98, 0.06), xycoords='axes fraction', ha='right', va='top', fontsize=30)
             plt.annotate("$\chi^2$ = %1.1f, ndf = %i, $p$ = %1.2f"%(Chi2,NDF,Pval), xy=(0.98, 0.06), xycoords='axes fraction', ha='right', va='top', fontsize=anno_size)
 
             if (izt == 0):
@@ -514,15 +502,7 @@ def Plot_pp_pPb_Cs_Individual(Dict):
                     leg = plt.legend([pp,pPb,Combined_UE],['pp $\sqrt{s}= 5.02$ TeV',
                     'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5.02$ TeV','UE Error'],
                     loc = "upper left",fontsize=anno_size,frameon=False,numpoints=1)
-            #plt.setp(leg.texts, family='Times New Roman')
-            #else:    
-            #    if not(Quad_UE):
-            #        leg = plt.legend([pp,pPb,pp_UE,pPb_UE],['pp $\sqrt{s}= 5$ TeV (stat. error)',
-            #        'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV (stat. error)', 'pp UE Error', 'p-Pb UE Error'],
-            #        loc = "upper left",fontsize=20,frameon=False,numpoints=1)
-            #    else:
 
-            #plt.annotate(r'%1.2f \textless $z_\mathrm{T}$ \textless %1.2f'%(zTbins[izt],zTbins[izt+1]), xy=(0.98, 0.15), xycoords='axes fraction', ha='right', va='top', fontsize=anno_size)
             plt.annotate(r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]), xy=(0.98, 0.195), xycoords='axes fraction', ha='right', va='top', fontsize=30)
 
             if (len(Dict["p-Pb_CSR"]) > 1):
@@ -537,26 +517,70 @@ def Plot_pp_pPb_Cs_Individual(Dict):
                     hpT_Max = Max_Hadron_pT
                 plt.annotate(r'%1.1f < $p_\mathrm{T}^{h}$ < %1.1f GeV/$c$'%(pTbins[0]*zTbins[izt],hpT_Max), xy=(0.98, 0.105), xycoords='axes fraction', ha='right', va='top',fontsize=anno_size)
                 plt.annotate(r'%1.0f < $p_\mathrm{T}^{\gamma}$ < %1.0f GeV/$c$'%(pTbins[0],pTbins[N_pT_Bins]), xy=(0.98, 0.15), xycoords='axes fraction', ha='right', va='top', fontsize=anno_size)
-                #plt.annotate(r'%1.0f < $p_\mathrm{T}^{\gamma}$ < %1.0f GeV/$c$'%(pTbins[0],pTbins[N_pT_Bins]), xy=(0.05, 0.67), xycoords='axes fraction', ha='left', va='top', fontsize=30)
 
             if (izt == 7):
                 plt.annotate(r"ALICE",xy=(0.05,0.97), xycoords='axes fraction', ha='left',va='top',fontsize=anno_size+2)
                 plt.annotate(r"$\sqrt{s_{\mathrm{_{NN}}}}=5.02$ TeV",xy=(0.05,0.92), xycoords='axes fraction', ha='left',va='top',fontsize=anno_size)
-                #leg.set_title("ALICE")
-                #leg._legend_box.align = "left"
-                #plt.setp(leg.get_title(),fontsize=30)
 
             fig.tight_layout()
             
             plt.show()
-            #fig.savefig('pics/Gamma_hadron_corr_zT_%i.pdf'%(ztb))
-            #fig.savefig('pics/%s/%s/Cs_Final_Indv_pT_%i_zT_%i.png'%(Shower,description_string,ipt,izt))
             fig.savefig('pics/%s/%s/Cs_Final_Indv_pT_%i_zT_%i.pdf'%(Shower,description_string,ipt,izt))
 
-        
-        
-        #Above can be adapted for pp & PbPb comparisons
-        
+
+            #HEP Correlations
+            loc_dict = {0:"Left",3:"Middle",7:"Right"}
+            if not(izt in [0,3,7]): continue
+            Fig4 = Table("Figure 4 zT Bin %i"%(izt))
+            Fig4.description = "$\gamma^\mathrm{iso}$--hadron correlation functions for pp (red) and p$-$Pb~(blue) data at $\sqrt{s_\mathrm{NN}}$ = 5.02 TeV as measured by the ALICE detector. The different panels represent three different z_\mathrm{T}~bins. The correlation functions are projected over the range $|\Delta\eta| < 1.2$. The darker bands at zero represents the uncertainty from the underlying event estimation in pp and p$-$Pb. The underlying event was estimated over the range $|0.4 <\Delta\varphi < 1.6|$. The vertical bars represent statistical uncertainties only. The boxes indicate the systematic uncertainties. The dashed green line represents the \gammaiso--hadron correlation function obtained with \textsc{PYTHIA 8.2} Monash Tune. `$p$' is the p-value for the hypothesis that the pp and p$-$Pb data follow the same true correlation function.ing the uncertainty on the fit."
+            Fig4.location = "Data from Figure 4 %s pannel, Page 14"%(loc_dict[izt])
+            Fig4.keywords["observables"] = ["$1/N_{\gamma} \: \: \mathrm{d}^2N/\mathrm{d}\Delta \eta \mathrm{d}\Delta \varphi$"]
+            Fig4.add_image("./pics/%s/%s/Cs_Final_Indv_pT_%i_zT_%i.pdf"%(Shower,description_string,ipt,izt))
+            
+            # x-axis: Delta phi
+            dphi = Variable("$|\Delta\varphi|$ (rad)$", is_independent=True, is_binned=True, units="")
+            dphi.values = delta_phi_edges
+            
+            # y-axis: p-Pb Correlations
+            pPb_data = Variable("p$-$Pb Isolated photon hadron correlations", is_independent=False, is_binned=False, units="")
+            pPb_data.values = Dict["p-Pb_CSR"][ipt][izt]
+            pPb_sys = Uncertainty("p-Pb Systematic", is_symmetric=True)
+            pPb_sys.values = sys_pPb
+            pPb_ue_hep = Uncertainty("p-Pb Underlying Event Uncertainty", is_symmetric=True)
+            pPb_ue_hep.values = np.full(N_dPhi_Bins,pPb_UE)
+            pPb_stat = Uncertainty("p-Pb Statistical", is_symmetric=True)
+            pPb_stat.values = Dict["p-Pb_CSR_Errors"][ipt][izt]
+            pPb_data.add_uncertainty(pPb_stat)
+            pPb_data.add_uncertainty(pPb_sys)
+            pPb_data.add_uncertainty(pPb_ue_hep)
+
+            # y-axis: pp Correlations
+            pp_data = Variable("pp Isolated photon hadron correlations", is_independent=False, is_binned=False, units="")
+            pp_data.values = Dict["pp_CSR"][ipt][izt]
+            pp_sys = Uncertainty("pp Systematic", is_symmetric=True)
+            pp_sys.values = sys_pp
+            pp_ue_hep = Uncertainty("pp Underlying Event Uncertainty", is_symmetric=True)
+            pp_ue_hep.values = np.full(N_dPhi_Bins,pp_UE)
+            pp_stat = Uncertainty("pp Statistical", is_symmetric=True)
+            pp_stat.values = Dict["pp_CSR_Errors"][ipt][izt]
+            pp_data.add_uncertainty(pp_stat)
+            pp_data.add_uncertainty(pp_sys)
+            pp_data.add_uncertainty(pp_ue_hep)
+
+            # y-axis: PYTHIA Correlations
+            pythia_data = Variable("PYTHIA Isolated photon hadron correlations", is_independent=False, is_binned=False, units="")
+            pythia_data.values = Dict["pp_CSR"][ipt][izt]
+            pythia_stat = Uncertainty("pp Statistical", is_symmetric=True)
+            pythia_stat.values = Dict["pp_CSR_Errors"][ipt][izt]
+            pythia_data.add_uncertainty(pythia_stat)
+
+            #Add everything to Tables
+            Fig4.add_variable(pPb_data)
+            Fig4.add_variable(pp_data)
+            Fig4.add_variable(pythia_data)
+
+            submission.add_table(Fig4)
+            
 def Cs_Weighted_Average(Dict):
     
     #Change this to empty dictionary with keys taking SYS. Then just loop over systems

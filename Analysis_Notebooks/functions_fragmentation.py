@@ -407,10 +407,8 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
         
         #Plots
         if (SYS=="pp"):
-            #leg_string = "%s $\sqrt{s}=5.02$ TeV"%(SYS)
             leg_string = SYS
         if (SYS=="p-Pb"):
-            #leg_string = "p$-$Pb$\ \sqrt{s_{\mathrm{_{NN}}}}=5.02$ TeV"
             leg_string = "p$-$Pb"
         plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT], Comb_Dict["%s_Combined_FF"%(SYS)][:NzT-ZT_OFF_PLOT],xerr=zT_widths[:NzT-ZT_OFF_PLOT]*0,
         yerr=Comb_Dict["%s_Combined_FF_Errors"%(SYS)][:NzT-ZT_OFF_PLOT],linewidth=1, fmt=marker,color=sys_col,capsize=0)#for lines
@@ -418,11 +416,9 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
         plt.plot(zT_centers[:NzT-ZT_OFF_PLOT], Comb_Dict["%s_Combined_FF"%(SYS)][:NzT-ZT_OFF_PLOT],marker,linewidth=0,color=sys_col,
         label=leg_string)#for legend without lines
         
-            #label=r' %s %1.0f \textless $p_\mathrm{T}^{\mathrm{trig}}$ \textless %1.0f GeV/$c$'%(SYS,pTbins[0],pTbins[N_pT_Bins]))   
         if (SYS == "pp"):
             Sys_Plot_pp = plt.bar(zT_centers[:NzT-ZT_OFF_PLOT], Sys_Uncertainty[:NzT-ZT_OFF_PLOT]+Sys_Uncertainty[:NzT-ZT_OFF_PLOT],
             bottom=Comb_Dict["%s_Combined_FF"%(SYS)][:NzT-ZT_OFF_PLOT]-Sys_Uncertainty[:NzT-ZT_OFF_PLOT],width=zT_widths[:NzT-ZT_OFF_PLOT]*2, align='center',color=sys_col,alpha=0.3,edgecolor=sys_col)
-            #bottom=Comb_Dict["%s_Combined_FF"%(SYS)][:NzT-ZT_OFF_PLOT]-Sys_Uncertainty[:NzT-ZT_OFF_PLOT],width=zt_box[:NzT-ZT_OFF_PLOT], align='center',color=sys_col,alpha=0.3)
         else:
             Sys_Plot_pp = plt.bar(zT_centers[:NzT-ZT_OFF_PLOT], Sys_Uncertainty[:NzT-ZT_OFF_PLOT]+Sys_Uncertainty[:NzT-ZT_OFF_PLOT],
             bottom=Comb_Dict["%s_Combined_FF"%(SYS)][:NzT-ZT_OFF_PLOT]-Sys_Uncertainty[:NzT-ZT_OFF_PLOT],width=zT_widths[:NzT-ZT_OFF_PLOT]*2,align='center',color=sys_col,fill=False,edgecolor="blue")
@@ -445,13 +441,8 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
     plt.tick_params(which='both',direction='in',right=True,top=True,bottom=False,length=10)
     plt.tick_params(which='minor',length=5)
 
-        
-    #Chi2 and Labels
-    #purity_normalization = np.full(len(Comb_Dict["pp_Combined_FF"][:NzT-ZT_OFF_PLOT]),math.sqrt(0.15**2+0.056**2)) #estimate of constant normalization Error
     pp_sys_Error = (Comb_Dict["pp_Combined_FF"][:NzT-ZT_OFF_PLOT])*math.sqrt(Rel_pUncert["pp"]**2+0.056**2)
-    p_Pb_sys_Error = (Comb_Dict["p-Pb_Combined_FF"][:NzT-ZT_OFF_PLOT])*math.sqrt(Rel_pUncert["p-Pb"]**2+0.056**2)
-    #pp_sys_Error = purity_normalization
-    #p-Pb_sys_Error = purity_normalization
+    p_Pb_sys_Error = (Comb_Dict["p-Pb_Combined_FF"][:NzT-ZT_OFF_PLOT])*math.sqrt(Rel_pUncert["p-Pb"]**2+0.056**2+Eta_Cor**2)
     
     Chi2,NDF,Pval = Get_pp_pPb_List_Chi2(Comb_Dict["pp_Combined_FF"][:NzT-ZT_OFF_PLOT],
                                          Comb_Dict["pp_Combined_FF_Errors"][:NzT-ZT_OFF_PLOT],
@@ -460,38 +451,65 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
                                          Comb_Dict["p-Pb_Combined_FF_Errors"][:NzT-ZT_OFF_PLOT],
                                          p_Pb_sys_Error)
 
-    #plt.annotate("$\chi^2$ = %1.1f, ndf = %i, p = %f"%(Chi2,NDF,p), xy=(0.99, 0.06), xycoords='axes fraction', ha='right', va='top', fontsize=16)
-    
-    #plt.annotate("%s"%(description_string),xy=(0.01,0.1),xycoords="axes fraction",ha="left",va="top",fontsize=12)
-
     leg = plt.legend(numpoints=1,frameon=True,edgecolor='white', framealpha=0.0, fontsize=label_size,handlelength=1,labelspacing=0.2,loc='lower left',bbox_to_anchor=(0.001, 0.05))
 
-    #leg.set_title("ALICE")
-    #leg.get_title().set_position((-43, 0))
-    #plt.setp(leg.get_title(),fontsize=label_size+2)
-    #plt.annotate(r"%1.0f < $p_\mathrm{T}^{\gamma}$ < %1.0f GeV/$c$"%(pTbins[0],pTbins[N_pT_Bins]),xy=(0.585, 0.66), xycoords='axes fraction', ha='left', va='top', fontsize=label_size)
+
     plt.annotate(r"ALICE, $\sqrt{s_{\mathrm{_{NN}}}}=5.02$ TeV",xy=(0.115,0.008),xycoords='axes fraction', ha='left',va='bottom',fontsize=label_size)
     plt.annotate(r"%1.0f < $p_\mathrm{T}^{\gamma}$ < %1.0f GeV/$c$"%(pTbins[0],pTbins[N_pT_Bins]),xy=(0.97, 0.81), xycoords='axes fraction', ha='right', va='top', fontsize=label_size)
     plt.annotate(r"%1.1f < $p_\mathrm{T}^{h}$ < %1.1f GeV/$c$"%(Min_Hadron_pT,Max_Hadron_pT),xy=(0.97, 0.89), xycoords='axes fraction', ha='right', va='top', fontsize=label_size)
     plt.annotate("$\chi^2/\mathrm{ndf}$ = %1.1f/%i, $p$ = %1.2f"%(Chi2*NDF,NDF,Pval), xy=(0.97, 0.97), xycoords='axes fraction', ha='right', va='top', fontsize=label_size)
 
-    #plt.annotate("%1.0f < $p_\mathrm{T}^{\gamma}$ < %1.0f GeV/$c$"%(pTbins[0],pTbins[N_pT_Bins]),xy=(0.47, 0.875), xycoords='axes fraction', ha='left', va='top', fontsize=label_size)
+
+
+#HEP FF
+    Fig5 = Table("Figure 5 Top Pannel")
+    Fig5.description = "$\gamma^\mathrm{iso}$-tagged fragmentation function for pp (red) and p$-$Pb~data (blue) at $\sqrt{s_\mathrm{NN}}$ = 5.02 TeV as measured by the ALICE detector. The boxes represent the systematic uncertainties while the vertical bars indicate the statistical uncertainties. The dashed green line corresponds to \textsc{PYTHIA 8.2}. The $\chi^2$ test for the comparison of pp and p$-$Pb~data incorporates correlations among different $z_\mathrm{T}$~intervals. A constant that was fit to the ratio is shown as grey band, with the width indicating the uncertainty on the fit."
+    Fig5.location = "Data from Figure 5 Top Pannel, Page 15"
+    Fig5.keywords["observables"] = ["$\frac{1}{N_{\mathrm{\gamma}}}\frac{\mathrm{d}^3N}{\mathrm{d}z_{\mathrm{T}}\mathrm{d}\Delta\varphi\mathrm{d}\Delta\eta}$"]
+    Fig5.add_image("./pics/LO/zT_Rebin_8_006zT06zT13fnew/Final_FFunction_and_Ratio.pdf")
     
-    crap_boxes = False
-    if (crap_boxes):
-        #RED
-
-        currentAxis = plt.gca()
-        currentAxis.add_patch(Rectangle((0.2745, 1.53), 0.028, 0.72, fill=True,fc="red",ec="red",alpha=0.3))
-        currentAxis.add_patch(Rectangle((0.2745, 2.85), 0.028, 1.35, fill=None,alpha=1,ec="blue"))
-
-        
-    #plt.title(r'Integrated $\mathrm{\gamma}$-Hadron Correlation: $%s < \Delta\varphi < \pi$ '%(Phi_String),fontdict = {'fontsize' : 19})
+    # x-axis: zT
+    zt = Variable("$z_\mathrm{T}$", is_independent=True, is_binned=True, units="")
+    zt.values = zT_edges
     
-#Write to Root File
-    #FF_Root = ROOT.TGraphErrors(len(zT_centers),Comb_Dict["pPb_Combined_FF"]),)
+    # y-axis: p-Pb Yields
+    pPb_data = Variable("p$-$Pb conditional yield of associated hadrons", is_independent=False, is_binned=False, units="")
+    pPb_data.values = Comb_Dict["p-Pb_Combined_FF"]
+    
+    pPb_sys = Uncertainty("p-Pb Systematic", is_symmetric=True)
+    pPb_sys.values = p_Pb_sys_Error
+    pPb_stat = Uncertainty("p-Pb Statistical", is_symmetric=True)
+    pPb_stat.values = Comb_Dict["p-Pb_Combined_FF_Errors"]
+    pPb_data.add_uncertainty(pPb_sys)
+    pPb_data.add_uncertainty(pPb_stat)    
 
+    # y-axis: pp Yields
+    pp_data = Variable("pp conditional yield of associated hadrons", is_independent=False, is_binned=False, units="")
+    pp_data.values = Comb_Dict["pp_Combined_FF"]
+    
+    pp_sys = Uncertainty("pp Systematic", is_symmetric=True)
+    pp_sys.values = pp_sys_Error
+    pp_stat = Uncertainty("pp Statistical", is_symmetric=True)
+    pp_stat.values = Comb_Dict["pp_Combined_FF_Errors"]
+    pp_data.add_uncertainty(pp_sys)
+    pp_data.add_uncertainty(pp_stat)
 
+    # y-axis: PYTHIA Yields
+    pythia_data = Variable("PYTHIA conditional yield of associated hadrons", is_independent=False, is_binned=False, units="")
+    pythia_data.values = pythia_FF
+    
+    pythia_stat = Uncertainty("PYTHIA Statistical", is_symmetric=True)
+    pythia_stat.values = pythia_FF_Errors
+    pythia_data.add_uncertainty(pythia_stat)
+
+    #Add everything to the HEP Table
+    Fig5.add_variable(pPb_data)
+    Fig5.add_variable(pp_data)
+    Fig5.add_variable(pythia_data)
+
+    submission.add_table(Fig5)
+
+    #RATIO SECOND Y_AXIS
     fig.add_axes((0.1,0.1,0.88,0.2))
 
     pPb_Combined = Comb_Dict["p-Pb_Combined_FF"]
@@ -516,18 +534,8 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
     if (CorrectedP):
         Ratio_Systematic = np.sqrt(Purity_Uncertainty**2 + Efficiency_Uncertainty**2 + Eta_Cor_Uncertainty**2)
         
-            
-    print("\n                 Absolute Full Systematic:")
-    
-    print(Ratio_Systematic[:NzT-ZT_OFF_PLOT]/Ratio[:NzT-ZT_OFF_PLOT])
-    
     Sys_Plot = plt.bar(zT_centers[:NzT-ZT_OFF_PLOT], Ratio_Systematic[:NzT-ZT_OFF_PLOT]+Ratio_Systematic[:NzT-ZT_OFF_PLOT],
-            #bottom=Ratio[:NzT-ZT_OFF_PLOT]-Ratio_Systematic[:NzT-ZT_OFF_PLOT], width=zt_box[:NzT-ZT_OFF_PLOT], align='center',edgecolor="k",color='w')
             bottom=Ratio[:NzT-ZT_OFF_PLOT]-Ratio_Systematic[:NzT-ZT_OFF_PLOT], width=zT_widths[:NzT-ZT_OFF_PLOT]*2, align='center',color='black',alpha=0.25)
-    
-    #Sys_Plot = plt.bar(zT_centers[:NzT-ZT_OFF_PLOT], 2*Ratio_Systematic[:NzT-ZT_OFF_PLOT], 
-    #   bottom=1.0-Ratio_Systematic[:NzT-ZT_OFF_PLOT], width=2*zT_widths[:NzT-ZT_OFF_PLOT], align='center',color='black',alpha = 0.2)
-    
     
     ### ROOT LINEAR and CONSTANT FITS ###
     Ratio_TGraph = TGraphErrors()
@@ -546,13 +554,10 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
     if (Show_Fits):
         sys_const = 0.19 #23% relative from purity + tracking
         plt.annotate("$c = {0:.2f} \pm {1:.2f} \pm {2:.2f}$".format(p0,p0e,sys_const), xy=(0.98, 0.9), xycoords='axes fraction', ha='right', va='top', color="black",fontsize=label_size,alpha=.9)
-        #plt.annotate(r"$\chi^2_{red} = %1.2f$"%(chi2_red), xy=(0.7, 0.94), xycoords='axes fraction', ha='left', va='top', color=p0col,fontsize=18,alpha=.7)
         plt.annotate(r"$p = %1.2f$"%(pval), xy=(0.98, 0.75), xycoords='axes fraction', ha='right', va='top', color="black",fontsize=label_size,alpha=.9)
 
         c_error = math.sqrt(p0e**2 + sys_const**2)
         plt.fill_between(np.arange(0,1.1,0.1), p0+c_error, p0-c_error,color=p0col,alpha=.3)
-        #plt.fill_between(np.arange(0,1.1,0.1), p0+p0e, p0-p0e,color='None',alpha=.99,edgecolor=p0col,hatch='//')
-    
     
     ###LABELS/AXES###
     plt.axhline(y=1, color='k', linestyle='--')
@@ -566,16 +571,30 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
     plt.tick_params(which='both',direction='in',right=True,bottom=True,top=True,length=10)
     plt.tick_params(which='both',direction='in',top=True,length=5)
 
-    #model_p-Pb = Fit_FF_PowerLaw(Comb_Dict,"p-Pb")
-    #plt.plot(zT_centers[:NzT-ZT_OFF_PLOT], model_pp, 'g:')
-        #plt.yscale("log")
-    
-    #plt.gcf()
-    #plt.tight_layout()
-    #plt.savefig("pics/%s/%s/Final_FFunction_and_Ratio.png"%(Shower,description_string))#, bbox_inches = "tight")
     plt.savefig("pics/%s/%s/Final_FFunction_and_Ratio.pdf"%(Shower,description_string), bbox_inches = "tight")
     plt.show()
 
+#RATIO HEP
+    FigRatio = Table("Figure 5 Bottom Pannel")
+    FigRatio.description = "$\gamma^\mathrm{iso}$-tagged fragmentation function for pp (red) and p$-$Pb~data (blue) at $\sqrt{s_\mathrm{NN}}$ = 5.02 TeV as measured by the ALICE detector. The boxes represent the systematic uncertainties while the vertical bars indicate the statistical uncertainties. The dashed green line corresponds to \textsc{PYTHIA 8.2}. The $\chi^2$ test for the comparison of pp and p$-$Pb~data incorporates correlations among different $z_\mathrm{T}$~intervals. A constant that was fit to the ratio is shown as grey band, with the width indicating the uncertainty on the fit."
+    FigRatio.location = "Data from Figure 5, Bottom Pannel, Page 15"
+    FigRatio.keywords["observables"] = ["$\frac{1}{N_{\mathrm{\gamma}}}\frac{\mathrm{d}^3N}{\mathrm{d}z_{\mathrm{T}}\mathrm{d}\Delta\varphi\mathrm{d}\Delta\eta}$"]
+    FigRatio.add_image("./pics/LO/zT_Rebin_8_006zT06zT13fnew/Final_FFunction_and_Ratio.pdf")
+
+    # x-axis: zT     zt = Variable("$z_\mathrm{T}$", is_independent=True, is_binned=True, units="")
+    zt.values = zT_edges
+
+    # y-axis: p-Pb Yields
+    Ratio_HEP = Variable("Ratio conditional yield of associated hadrons in pp and p$-$Pb", is_independent=False, is_binned=False, units="")
+    Ratio_HEP.values = Ratio
+    Ratio_sys = Uncertainty("p-Pb Systematic", is_symmetric=True)
+    Ratio_sys.values = Ratio_Systematic
+    Ratio_stat = Uncertainty("Ratio Statistical", is_symmetric=True)
+    Ratio_stat.values = Ratio_Error
+    Ratio_HEP.add_uncertainty(Ratio_stat)
+    Ratio_HEP.add_uncertainty(Ratio_sys)
+    FigRatio.add_variable(Ratio_HEP)
+    submission.add_table(FigRatio)
 
 def FF_Integral(Comb_Dict):
     for SYS in (Systems):
