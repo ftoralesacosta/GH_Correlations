@@ -1,0 +1,141 @@
+---
+comment: ''
+data_license:
+  description: The content can be shared and adapted but you must             give
+    appropriate credit and cannot restrict access to others.
+  name: cc-by-4.0
+  url: https://creativecommons.org/licenses/by/4.0/
+---
+additional_resources:
+- description: Image file
+  location: Cs_Final_Indv_pT_0_zT_0.png
+- description: Thumbnail image file
+  location: thumb_Cs_Final_Indv_pT_0_zT_0.png
+data_file: figure_4_zt_bin_0.yaml
+description: "$\\gamma^\\mathrm{iso}$--hadron correlation functions for pp (red) and\
+  \ p$-$Pb~(blue) data at $\\sqrt{s_\\mathrm{NN}}$ = 5.02 TeV as measured by the ALICE\
+  \ detector. The different panels represent three different z_\\mathrm{T}~bins. The\
+  \ correlation functions are projected over the range $|\\Delta\\eta| < 1.2$. The\
+  \ darker bands at zero represents the uncertainty from the underlying event estimation\
+  \ in pp and p$-$Pb. The underlying event was estimated over the range $|0.4 <\\\
+  Delta\varphi < 1.6|$. The vertical bars represent statistical uncertainties only.\
+  \ The boxes indicate the systematic uncertainties. The dashed green line represents\
+  \ the \\gammaiso--hadron correlation function obtained with \textsc{PYTHIA 8.2}\
+  \ Monash Tune. `$p$' is the p-value for the hypothesis that the pp and p$-$Pb data\
+  \ follow the same true correlation function.ing the uncertainty on the fit."
+keywords:
+- name: observables
+  values:
+  - "$1/N_{\\gamma} \\: \\: \\mathrm{d}^2N/\\mathrm{d}\\Delta \\eta \\mathrm{d}\\\
+    Delta \varphi$"
+- name: cmenergies
+  values:
+  - 5020
+location: Data from Figure 4 Left pannel, Page 14
+name: Figure 4 zT Bin 0
+---
+additional_resources:
+- description: Image file
+  location: Cs_Final_Indv_pT_0_zT_3.png
+- description: Thumbnail image file
+  location: thumb_Cs_Final_Indv_pT_0_zT_3.png
+data_file: figure_4_zt_bin_3.yaml
+description: "$\\gamma^\\mathrm{iso}$--hadron correlation functions for pp (red) and\
+  \ p$-$Pb~(blue) data at $\\sqrt{s_\\mathrm{NN}}$ = 5.02 TeV as measured by the ALICE\
+  \ detector. The different panels represent three different z_\\mathrm{T}~bins. The\
+  \ correlation functions are projected over the range $|\\Delta\\eta| < 1.2$. The\
+  \ darker bands at zero represents the uncertainty from the underlying event estimation\
+  \ in pp and p$-$Pb. The underlying event was estimated over the range $|0.4 <\\\
+  Delta\varphi < 1.6|$. The vertical bars represent statistical uncertainties only.\
+  \ The boxes indicate the systematic uncertainties. The dashed green line represents\
+  \ the \\gammaiso--hadron correlation function obtained with \textsc{PYTHIA 8.2}\
+  \ Monash Tune. `$p$' is the p-value for the hypothesis that the pp and p$-$Pb data\
+  \ follow the same true correlation function.ing the uncertainty on the fit."
+keywords:
+- name: observables
+  values:
+  - "$1/N_{\\gamma} \\: \\: \\mathrm{d}^2N/\\mathrm{d}\\Delta \\eta \\mathrm{d}\\\
+    Delta \varphi$"
+- name: cmenergies
+  values:
+  - 5020
+location: Data from Figure 4 Middle pannel, Page 14
+name: Figure 4 zT Bin 3
+---
+additional_resources:
+- description: Image file
+  location: Cs_Final_Indv_pT_0_zT_7.png
+- description: Thumbnail image file
+  location: thumb_Cs_Final_Indv_pT_0_zT_7.png
+data_file: figure_4_zt_bin_7.yaml
+description: "$\\gamma^\\mathrm{iso}$--hadron correlation functions for pp (red) and\
+  \ p$-$Pb~(blue) data at $\\sqrt{s_\\mathrm{NN}}$ = 5.02 TeV as measured by the ALICE\
+  \ detector. The different panels represent three different z_\\mathrm{T}~bins. The\
+  \ correlation functions are projected over the range $|\\Delta\\eta| < 1.2$. The\
+  \ darker bands at zero represents the uncertainty from the underlying event estimation\
+  \ in pp and p$-$Pb. The underlying event was estimated over the range $|0.4 <\\\
+  Delta\varphi < 1.6|$. The vertical bars represent statistical uncertainties only.\
+  \ The boxes indicate the systematic uncertainties. The dashed green line represents\
+  \ the \\gammaiso--hadron correlation function obtained with \textsc{PYTHIA 8.2}\
+  \ Monash Tune. `$p$' is the p-value for the hypothesis that the pp and p$-$Pb data\
+  \ follow the same true correlation function.ing the uncertainty on the fit."
+keywords:
+- name: observables
+  values:
+  - "$1/N_{\\gamma} \\: \\: \\mathrm{d}^2N/\\mathrm{d}\\Delta \\eta \\mathrm{d}\\\
+    Delta \varphi$"
+- name: cmenergies
+  values:
+  - 5020
+location: Data from Figure 4 Right pannel, Page 14
+name: Figure 4 zT Bin 7
+---
+additional_resources:
+- description: Image file
+  location: Final_FFunction_and_Ratio.png
+- description: Thumbnail image file
+  location: thumb_Final_FFunction_and_Ratio.png
+data_file: figure_5_top_pannel.yaml
+description: "$\\gamma^\\mathrm{iso}$-tagged fragmentation function for pp (red) and\
+  \ p$-$Pb~data (blue) at $\\sqrt{s_\\mathrm{NN}}$ = 5.02 TeV as measured by the ALICE\
+  \ detector. The boxes represent the systematic uncertainties while the vertical\
+  \ bars indicate the statistical uncertainties. The dashed green line corresponds\
+  \ to \textsc{PYTHIA 8.2}. The $\\chi^2$ test for the comparison of pp and p$-$Pb~data\
+  \ incorporates correlations among different $z_\\mathrm{T}$~intervals. A constant\
+  \ that was fit to the ratio is shown as grey band, with the width indicating the\
+  \ uncertainty on the fit."
+keywords:
+- name: observables
+  values:
+  - "$\frac{1}{N_{\\mathrm{\\gamma}}}\frac{\\mathrm{d}^3N}{\\mathrm{d}z_{\\mathrm{T}}\\\
+    mathrm{d}\\Delta\varphi\\mathrm{d}\\Delta\\eta}$"
+- name: cmenergies
+  values:
+  - 5020
+location: Data from Figure 5 Top Pannel, Page 15
+name: Figure 5 Top Pannel
+---
+additional_resources:
+- description: Image file
+  location: Final_FFunction_and_Ratio.png
+- description: Thumbnail image file
+  location: thumb_Final_FFunction_and_Ratio.png
+data_file: figure_5_bottom_pannel.yaml
+description: "$\\gamma^\\mathrm{iso}$-tagged fragmentation function for pp (red) and\
+  \ p$-$Pb~data (blue) at $\\sqrt{s_\\mathrm{NN}}$ = 5.02 TeV as measured by the ALICE\
+  \ detector. The boxes represent the systematic uncertainties while the vertical\
+  \ bars indicate the statistical uncertainties. The dashed green line corresponds\
+  \ to \textsc{PYTHIA 8.2}. The $\\chi^2$ test for the comparison of pp and p$-$Pb~data\
+  \ incorporates correlations among different $z_\\mathrm{T}$~intervals. A constant\
+  \ that was fit to the ratio is shown as grey band, with the width indicating the\
+  \ uncertainty on the fit."
+keywords:
+- name: observables
+  values:
+  - "$\frac{1}{N_{\\mathrm{\\gamma}}}\frac{\\mathrm{d}^3N}{\\mathrm{d}z_{\\mathrm{T}}\\\
+    mathrm{d}\\Delta\varphi\\mathrm{d}\\Delta\\eta}$"
+- name: cmenergies
+  values:
+  - 5020
+location: Data from Figure 5, Bottom Pannel, Page 15
+name: Figure 5 Bottom Pannel
