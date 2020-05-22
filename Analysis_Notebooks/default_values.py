@@ -483,3 +483,14 @@ pythia_error = np.asarray(pythia_error)/dPhi_Width
 pythia_FF_Errors = np.zeros(N_dPhi_Bins)
 for izt in range(0,NzT):
     pythia_FF_Errors[izt] = pythia_error[izt][-1:]/zT_widths[izt]
+
+
+
+#Models
+CNM_zt = np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2], dtype='float64')
+CNM_IpPb = np.array([1.064, 1.036, 1.056, 1.100, 1.141, 1.180, 1.157, 1.181, 1.202, 1.164, 1.206, 1.237], dtype='float64')
+
+#With parton energy loss
+QGP_zt = np.array([0.15, 0.35, 0.55, 0.75, 0.95, 1.15], dtype='float64')
+QGP_IpPb_LowAll = np.array([0.974025, 0.909975, 0.95335, 0.943225, 0.954, 0.9837], dtype='float64')
+QGP_IpPb_HighAll = np.array([1.0018, 0.963775, 0.9727, 0.9789, 0.995675, 1.00545], dtype='float64')

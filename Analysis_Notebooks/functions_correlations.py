@@ -182,7 +182,7 @@ def Plot_Sub_UB_Overlay(Dict):
                 plt.xlabel(r'|$\Delta \varphi$| (rad)',fontsize=35,x=.86)
                 plt.xticks(fontsize=(fsize))
                 plt.xlim((0.39269908169872414,3.14159))
-                plt.ylabel(r'$1/N_{\gamma^\mathrm{iso}} \: \: \mathrm{d}^2N/\mathrm{d}\Delta\varphi\mathrm{d}\Delta\eta$',fontsize=35,y=.65)
+                plt.ylabel(r'$1/N_{\gamma^\mathrm{iso}} \: \: \mathrm{d}^2N/\mathrm{d}|\Delta\varphi|\mathrm{d}\Delta\eta$',fontsize=35,y=.65)
                 #plt.ylim((0,1.2*max(Sig_LE_Phi_Array)))
                 empt, = ax.plot([], [], ' ')
                 empt2, = ax.plot([],[],' ')
@@ -459,7 +459,7 @@ def Plot_pp_pPb_Cs_Individual(Dict):
             if (izt == 7):
                 plt.ylim(-0.015,0.03)
 
-            plt.ylabel(r'$1/N_{\gamma} \: \: \mathrm{d}^2N/\mathrm{d}\Delta \eta \mathrm{d}\Delta \varphi$',fontsize=35,y=0.8)
+            plt.ylabel(r'$1/N_{\gamma} \: \: \mathrm{d}^2N/\mathrm{d}\Delta \eta \mathrm{d}|\Delta \varphi|$',fontsize=35,y=0.8)
             plt.yticks(fontsize=24)
             plt.tick_params(which='both',direction='in',right=True,top=True,bottom=True,length=12)
             plt.axhline(y=0,color='gray',linestyle='--',linewidth=1.3,alpha=0.8)        
