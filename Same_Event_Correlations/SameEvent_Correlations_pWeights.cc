@@ -1186,9 +1186,8 @@ int main(int argc, char *argv[])
 		  if (Background and Isolated){
 		    BKGD_IsoCorr[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta,bkg_weight*track_weight*BR_purity_weight);
 		    //not weighted with pT distro
-		    BKGD_IsoCorr_UW[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta,track_weight);
+		    BKGD_IsoCorr_UW[izt+ipt*nztbins]->Fill(DeltaPhi,DeltaEta,track_weight*bkg_weight);//Adding background weight just for IRC error propgation
 		  }
-		
 	    	  
 		  //no shower shape selection
 		  if(Isolated)

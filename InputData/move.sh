@@ -6,9 +6,9 @@ cd ../Event_Mixing/
 mkdir ../Analysis_Notebooks/pics/LO/$1/
 touch ../Analysis_Notebooks/pics/LO/$1/.gitignore
 
-git pull
-git add -f ../InputData/$1
-git add ../Corr_config.yaml
-git add ../Analysis_Notebooks/pics/LO/$1/
-git commit -m "${1}"
-git push
+#git pull
+#git add -f ../InputData/$1
+#git add ../Corr_config.yaml
+#git add ../Analysis_Notebooks/pics/LO/$1/
+#git commit -m "${1}"
+#git push

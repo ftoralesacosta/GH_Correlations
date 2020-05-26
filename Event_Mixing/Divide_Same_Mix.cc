@@ -24,6 +24,9 @@ int main(int argc, char *argv[])
     std::cout<<"Syntax is [Command] [Same_Event_root_file] (Assumes Mixed File)"<<std::endl;
     exit(EXIT_FAILURE);
   }
+  //TString se_file = (TString)argv[1] + (TString)"_SE_L0_Correlation.root";
+  //TFile *corr = TFile::Open(se_file);
+  
   TFile *corr = TFile::Open((TString)argv[1]);
   
   if (corr == NULL) {
@@ -79,8 +82,6 @@ int main(int argc, char *argv[])
       std::cout<<"Shower Shape: "<<shower_shape.data()<<std::endl;
       //if (strcmp(shower_shape.data(),"Lambda")== 0) std::cout<<"test worked"<<std::endl;
     }
-
-
 
     else if (strcmp(key, "Zt_bins") == 0) {
       nztbins = -1;
@@ -144,12 +145,12 @@ int main(int argc, char *argv[])
   trackPtSkims[1] = 4.0; //trackPtSkims[2] = 6.0;
   trackPtSkims[2] = 40.0;
 
-    std::string basic_name = argv[1];
-
-    // std::string::size_type pos = basic_name.find('_');
-    // if (pos != std::string::npos)
-    //   basic_name = basic_name.substr(0, pos);
-
+  std::string basic_name = argv[1];
+  
+  std::string::size_type pos = basic_name.find('_');
+  if (pos != std::string::npos)
+    basic_name = basic_name.substr(0, pos);
+  
     int n = 4; //Number of "_" to skip
     int i;
     for (i = 0; i < basic_name.length(); i++)
@@ -165,6 +166,10 @@ int main(int argc, char *argv[])
       }
 
     basic_name = basic_name.substr(0, i);
+
+    if (strcmp(basic_name.c_str(),"13fnew"))
+      basic_name = "13f";
+
     fprintf(stderr,"%d: basic_name = %s \n",__LINE__,basic_name.c_str());
 
 
@@ -187,7 +192,7 @@ int main(int argc, char *argv[])
   }
   
 
-TH2F* Same_Inclusive_Corr[nztbins*nptbins];
+  TH2F* Same_Inclusive_Corr[nztbins*nptbins];
   TH2F* Same_Isolated_Corr[nztbins*nptbins];
   TH2F* Same_DNN1_Corr[nztbins*nptbins];
   TH2F* Same_DNN2_Corr[nztbins*nptbins];
@@ -236,7 +241,7 @@ TH2F* Same_Inclusive_Corr[nztbins*nptbins];
       Same_Isolated_Corr[izt+ipt*nztbins] = (TH2F*)corr->Get(
 	  Form("Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",
 	  ptbins[ipt],ptbins[ipt+1],100*ztbins[izt],100*ztbins[izt+1]));
-
+      fprintf(stderr,"%d: HERE \n",__LINE__);
       if (Same_Isolated_Corr[izt+ipt*nztbins] == NULL) {
 	std::cout << "Same Iso TH2D fail" << std::endl;
         exit(EXIT_FAILURE);}
@@ -301,12 +306,13 @@ TH2F* Same_Inclusive_Corr[nztbins*nptbins];
 	  //fprintf(stderr,"Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",
 	  //ptbins[ipt],ptbins[ipt+1],100*ztbins[izt],100*ztbins[izt+1]);
 
-	  DNN1_entries = Mix_Isolated_Corr[izt+ipt*nztbins]->GetEntries();
 	  //fprintf(stderr, "%s:%d: Number of Entries in Mix Isolated %lld \n",__FILE__,__LINE__,DNN1_entries);
       
 	  if (Mix_Isolated_Corr[izt+ipt*nztbins] == NULL) {
 	    std::cout << "Mix Iso TH2D fail" << std::endl;
 	    exit(EXIT_FAILURE);}
+
+	  DNN1_entries = Mix_Isolated_Corr[izt+ipt*nztbins]->GetEntries();
 
 	  Mix_DNN1_Corr[izt+ipt*nztbins] = (TH2F*)MixFile[iSkim]->Get(
           Form("DNN%i_Correlation__pT%1.0f_%1.0f__zT%1.0f_zT%1.0f",

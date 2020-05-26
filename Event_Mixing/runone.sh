@@ -9,7 +9,7 @@ n_mix=300
 #for dataset in {13f_new_skimClusterMinE12,13}
 #dataset="13f_new_skimClusterMinE12"
 	       #for dataset in {13f_new_skimClusterMinE12,17q}
-for p in {4,}
+for p in {0,}
 		 
 do
     name=${1}
