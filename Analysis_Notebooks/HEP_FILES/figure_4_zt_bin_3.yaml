@@ -1,0 +1,171 @@
+dependent_variables:
+- header:
+    name: p$-$Pb Isolated photon hadron correlations
+  values:
+  - errors:
+    - label: p-Pb Statistical
+      symerror: 0.015683
+    - label: p-Pb Systematic
+      symerror: -0.0049736
+    - label: p-Pb Underlying Event Uncertainty
+      symerror: 0.0085101
+    value: -0.037996
+  - errors:
+    - label: p-Pb Statistical
+      symerror: 0.015298
+    - label: p-Pb Systematic
+      symerror: -0.0014165
+    - label: p-Pb Underlying Event Uncertainty
+      symerror: 0.0085101
+    value: -0.010821
+  - errors:
+    - label: p-Pb Statistical
+      symerror: 0.014555
+    - label: p-Pb Systematic
+      symerror: 0.00012111
+    - label: p-Pb Underlying Event Uncertainty
+      symerror: 0.0085101
+    value: 0.0009252
+  - errors:
+    - label: p-Pb Statistical
+      symerror: 0.01435
+    - label: p-Pb Systematic
+      symerror: 0.0012954
+    - label: p-Pb Underlying Event Uncertainty
+      symerror: 0.0085101
+    value: 0.009896
+  - errors:
+    - label: p-Pb Statistical
+      symerror: 0.015192
+    - label: p-Pb Systematic
+      symerror: 0.00056303
+    - label: p-Pb Underlying Event Uncertainty
+      symerror: 0.0085101
+    value: 0.0043013
+  - errors:
+    - label: p-Pb Statistical
+      symerror: 0.015973
+    - label: p-Pb Systematic
+      symerror: 0.004137
+    - label: p-Pb Underlying Event Uncertainty
+      symerror: 0.0085101
+    value: 0.031605
+  - errors:
+    - label: p-Pb Statistical
+      symerror: 0.017613
+    - label: p-Pb Systematic
+      symerror: 0.0097917
+    - label: p-Pb Underlying Event Uncertainty
+      symerror: 0.0085101
+    value: 0.074804
+  - errors:
+    - label: p-Pb Statistical
+      symerror: 0.01948
+    - label: p-Pb Systematic
+      symerror: 0.016238
+    - label: p-Pb Underlying Event Uncertainty
+      symerror: 0.0085101
+    value: 0.12405
+- header:
+    name: pp Isolated photon hadron correlations
+  values:
+  - errors:
+    - label: pp Statistical
+      symerror: 0.019138
+    - label: pp Systematic
+      symerror: 0.00040303
+    - label: pp Underlying Event Uncertainty
+      symerror: 0.0099798
+    value: 0.0021216
+  - errors:
+    - label: pp Statistical
+      symerror: 0.01791
+    - label: pp Systematic
+      symerror: -0.0029596
+    - label: pp Underlying Event Uncertainty
+      symerror: 0.0099798
+    value: -0.01558
+  - errors:
+    - label: pp Statistical
+      symerror: 0.016401
+    - label: pp Systematic
+      symerror: -0.00010172
+    - label: pp Underlying Event Uncertainty
+      symerror: 0.0099798
+    value: -0.00053544
+  - errors:
+    - label: pp Statistical
+      symerror: 0.01751
+    - label: pp Systematic
+      symerror: 0.0030613
+    - label: pp Underlying Event Uncertainty
+      symerror: 0.0099798
+    value: 0.016115
+  - errors:
+    - label: pp Statistical
+      symerror: 0.01661
+    - label: pp Systematic
+      symerror: -0.0029091
+    - label: pp Underlying Event Uncertainty
+      symerror: 0.0099798
+    value: -0.015314
+  - errors:
+    - label: pp Statistical
+      symerror: 0.018908
+    - label: pp Systematic
+      symerror: 0.0027639
+    - label: pp Underlying Event Uncertainty
+      symerror: 0.0099798
+    value: 0.014549
+  - errors:
+    - label: pp Statistical
+      symerror: 0.022114
+    - label: pp Systematic
+      symerror: 0.0081924
+    - label: pp Underlying Event Uncertainty
+      symerror: 0.0099798
+    value: 0.043125
+  - errors:
+    - label: pp Statistical
+      symerror: 0.025509
+    - label: pp Systematic
+      symerror: 0.013029
+    - label: pp Underlying Event Uncertainty
+      symerror: 0.0099798
+    value: 0.068588
+- header:
+    name: PYTHIA Isolated photon hadron correlations
+  values:
+  - errors:
+    - label: pp Statistical
+      symerror: 0.019138
+    value: 0.0021216
+  - errors:
+    - label: pp Statistical
+      symerror: 0.01791
+    value: -0.01558
+  - errors:
+    - label: pp Statistical
+      symerror: 0.016401
+    value: -0.00053544
+  - errors:
+    - label: pp Statistical
+      symerror: 0.01751
+    value: 0.016115
+  - errors:
+    - label: pp Statistical
+      symerror: 0.01661
+    value: -0.015314
+  - errors:
+    - label: pp Statistical
+      symerror: 0.018908
+    value: 0.014549
+  - errors:
+    - label: pp Statistical
+      symerror: 0.022114
+    value: 0.043125
+  - errors:
+    - label: pp Statistical
+      symerror: 0.025509
+    value: 0.068588
+independent_variables: []
