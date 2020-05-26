@@ -53,6 +53,8 @@ void find_ntrack_ncluster_max(char *argv_first[], char *argv_last[], UInt_t &nev
         UInt_t ncluster;
         UInt_t njet_ak04its;
         nevent_max = UInt_t(hi_tree->GetEntries());
+	if (nevent_max > 1000000)
+	  nevent_max = 1000000;
 
         hi_tree->SetBranchAddress("ntrack", &ntrack);
         hi_tree->SetBranchAddress("ncluster", &ncluster);
@@ -60,8 +62,8 @@ void find_ntrack_ncluster_max(char *argv_first[], char *argv_last[], UInt_t &nev
 
         fprintf(stderr, "%s:%d: %s\n", __FILE__, __LINE__, "Obtaining ntrack, ncluster, and njet max for hdf5 file");
 
-        for (Long64_t i = 0; i < hi_tree->GetEntries(); i++) {
-	//for (Long64_t i = 0; i < 10000; i++) {
+        //for (Long64_t i = 0; i < hi_tree->GetEntries(); i++) {
+	for (Long64_t i = 0; i < nevent_max; i++) {
             hi_tree->GetEntry(i);
             ntrack_max = std::max(ntrack_max, ntrack);
             ncluster_max = std::max(ncluster_max, ncluster);
@@ -121,6 +123,7 @@ void write_track_cluster(H5::DataSet &event_data_set, H5::DataSet &track_data_se
         std::vector<UChar_t> track_its_ncluster(ntrack_max, NAN);
         std::vector<Float_t> track_its_chi_square(ntrack_max, NAN);
         std::vector<Float_t> track_dca_xy(ntrack_max, NAN);
+	std::vector<Float_t> track_dca_z(ntrack_max, NAN);
 
         UInt_t ncluster;
         std::vector<Float_t> cluster_e(ncluster_max, NAN);
@@ -152,6 +155,7 @@ void write_track_cluster(H5::DataSet &event_data_set, H5::DataSet &track_data_se
         hi_tree->SetBranchAddress("track_its_ncluster", &track_its_ncluster[0]);
         hi_tree->SetBranchAddress("track_its_chi_square", &track_its_chi_square[0]);
         hi_tree->SetBranchAddress("track_dca_xy", &track_dca_xy[0]);
+	hi_tree->SetBranchAddress("track_dca_z", &track_dca_z[0]);
 
         hi_tree->SetBranchAddress("ncluster", &ncluster);
         hi_tree->SetBranchAddress("cluster_e", &cluster_e[0]);
@@ -177,12 +181,12 @@ void write_track_cluster(H5::DataSet &event_data_set, H5::DataSet &track_data_se
 	fprintf(stderr,"\n %d: BLOCK SIZE = %u\n",__LINE__,block_size);
 
 	std::vector<float> event_data (block_size * nEventVariables, NAN); //2 variables, multp, vertx
-	std::vector<float> track_data(block_size * ntrack_max * 10, NAN);
+	std::vector<float> track_data(block_size * ntrack_max * 11, NAN);
 	std::vector<float> cluster_data(block_size * ncluster_max * 5, NAN);
 	std::vector<float> jet_data(block_size * njet_max * nJetVariables, NAN);
 
-        for (Long64_t i = 0; i < hi_tree->GetEntries(); i++) {
-	  //for (Long64_t i = 0; i < 10000; i++) {
+        //for (Long64_t i = 0; i < hi_tree->GetEntries(); i++) {
+	for (Long64_t i = 0; i < 1000000; i++) {
             hi_tree->GetEntry(i);
 	    
 	    int iblock = i % block_size;
@@ -195,16 +199,17 @@ void write_track_cluster(H5::DataSet &event_data_set, H5::DataSet &track_data_se
         
             for (Long64_t j = 0; j < ntrack; j++) {
                 // Note HDF5 is always row-major (C-like)
-                track_data[iblock*ntrack_max*10 + j*10 + 0] = track_e[j];
-                track_data[iblock*ntrack_max*10 + j*10 + 1] = track_pt[j];
-                track_data[iblock*ntrack_max*10 + j*10 + 2] = track_eta[j];
-                track_data[iblock*ntrack_max*10 + j*10 + 3] = track_phi[j];
-                track_data[iblock*ntrack_max*10 + j*10 + 4] = track_quality[j];
-                track_data[iblock*ntrack_max*10 + j*10 + 5] = track_eta_emcal[j];
-                track_data[iblock*ntrack_max*10 + j*10 + 6] = track_phi_emcal[j];
-                track_data[iblock*ntrack_max*10 + j*10 + 7] = track_its_ncluster[j];
-                track_data[iblock*ntrack_max*10 + j*10 + 8] = track_its_chi_square[j];
-                track_data[iblock*ntrack_max*10 + j*10 + 9] = track_dca_xy[j];
+                track_data[iblock*ntrack_max*11 + j*11 + 0] = track_e[j];
+                track_data[iblock*ntrack_max*11 + j*11 + 1] = track_pt[j];
+                track_data[iblock*ntrack_max*11 + j*11 + 2] = track_eta[j];
+                track_data[iblock*ntrack_max*11 + j*11 + 3] = track_phi[j];
+                track_data[iblock*ntrack_max*11 + j*11 + 4] = track_quality[j];
+                track_data[iblock*ntrack_max*11 + j*11 + 5] = track_eta_emcal[j];
+                track_data[iblock*ntrack_max*11 + j*11 + 6] = track_phi_emcal[j];
+                track_data[iblock*ntrack_max*11 + j*11 + 7] = track_its_ncluster[j];
+                track_data[iblock*ntrack_max*11 + j*11 + 8] = track_its_chi_square[j];
+                track_data[iblock*ntrack_max*11 + j*11 + 9] = track_dca_xy[j];
+		track_data[iblock*ntrack_max*11 + j*11 + 10] = track_dca_z[j];
             }
 
             for(Long64_t n = 0; n < ncluster; n++){
@@ -365,11 +370,13 @@ int main(int argc, char *argv[])
 
     // Access mode H5F_ACC_TRUNC truncates any existing file, while
     // not throwing any exception (unlike H5F_ACC_RDWR)
-    H5::H5File file(argv[argc - 1], H5F_ACC_TRUNC);
+    std::string file_str = argv[argc-1];
+    H5::H5File file( file_str.c_str(), H5F_ACC_TRUNC );
+    //H5::H5File file(argv[argc - 1], H5F_ACC_TRUNC);
 
     // How many properties per track is written
     static const size_t event_row_size = 2;
-    static const size_t track_row_size = 10;
+    static const size_t track_row_size = 11;
     static const size_t cluster_row_size = 5;
     static const size_t jet_row_size = 5;
     //easier to just make cluster use same # properties, reuse dim_extend

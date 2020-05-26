@@ -3,7 +3,7 @@
 module load root
 make Divide_Same_Mix
 
-for data in {"13d","13e","13f","13f_new_skimClusterMinE12","17q"}
+for data in {"13d","13e","13f","13fnew","17q"}
 #for data in {"13d","13e","13f","17q_wSDD"}
 #for data in {"13d"}
 do

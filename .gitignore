@@ -23,6 +23,7 @@ B
 *.txt
 *.pyc
 *.ipynb
+*checkpoint.py
 .DS_Store
 .ipynb_checkpoints  
 ./batchjobs/res_dir/
