@@ -6,7 +6,7 @@ dependent_variables:
     - label: p-Pb Statistical
       symerror: 0.0021742
     - label: p-Pb Systematic
-      symerror: 0.00014214
+      symerror: 0.0002807
     - label: p-Pb Underlying Event Uncertainty
       symerror: 0.0011424
     value: 0.0010859
@@ -14,7 +14,7 @@ dependent_variables:
     - label: p-Pb Statistical
       symerror: 0.0021339
     - label: p-Pb Systematic
-      symerror: 1.9464e-06
+      symerror: 0.00038783
     - label: p-Pb Underlying Event Uncertainty
       symerror: 0.0011424
     value: 1.487e-05
@@ -22,7 +22,7 @@ dependent_variables:
     - label: p-Pb Statistical
       symerror: 0.0021179
     - label: p-Pb Systematic
-      symerror: 0.0004026
+      symerror: 0.00073221
     - label: p-Pb Underlying Event Uncertainty
       symerror: 0.0011424
     value: 0.0030757
@@ -30,7 +30,7 @@ dependent_variables:
     - label: p-Pb Statistical
       symerror: 0.0016454
     - label: p-Pb Systematic
-      symerror: -0.00040455
+      symerror: 0.00094978
     - label: p-Pb Underlying Event Uncertainty
       symerror: 0.0011424
     value: -0.0030905
@@ -38,7 +38,7 @@ dependent_variables:
     - label: p-Pb Statistical
       symerror: 0.0023712
     - label: p-Pb Systematic
-      symerror: 0.00061579
+      symerror: 0.0011232
     - label: p-Pb Underlying Event Uncertainty
       symerror: 0.0011424
     value: 0.0047043
@@ -46,7 +46,7 @@ dependent_variables:
     - label: p-Pb Statistical
       symerror: 0.0025463
     - label: p-Pb Systematic
-      symerror: -0.00035676
+      symerror: 0.0013388
     - label: p-Pb Underlying Event Uncertainty
       symerror: 0.0011424
     value: -0.0027255
@@ -54,7 +54,7 @@ dependent_variables:
     - label: p-Pb Statistical
       symerror: 0.0039252
     - label: p-Pb Systematic
-      symerror: 0.0014509
+      symerror: 0.0026288
     - label: p-Pb Underlying Event Uncertainty
       symerror: 0.0011424
     value: 0.011084
@@ -62,7 +62,7 @@ dependent_variables:
     - label: p-Pb Statistical
       symerror: 0.0052129
     - label: p-Pb Systematic
-      symerror: 0.0015974
+      symerror: 0.0034518
     - label: p-Pb Underlying Event Uncertainty
       symerror: 0.0011424
     value: 0.012204
@@ -73,7 +73,7 @@ dependent_variables:
     - label: pp Statistical
       symerror: 0.0028341
     - label: pp Systematic
-      symerror: 0.00035677
+      symerror: 0.00060681
     - label: pp Underlying Event Uncertainty
       symerror: 0.002169
     value: 0.001878
@@ -81,7 +81,7 @@ dependent_variables:
     - label: pp Statistical
       symerror: 0.0033003
     - label: pp Systematic
-      symerror: 0.00050274
+      symerror: 0.00075475
     - label: pp Underlying Event Uncertainty
       symerror: 0.002169
     value: 0.0026465
@@ -89,7 +89,7 @@ dependent_variables:
     - label: pp Statistical
       symerror: 0.0039979
     - label: pp Systematic
-      symerror: 0.00061858
+      symerror: 0.00086736
     - label: pp Underlying Event Uncertainty
       symerror: 0.002169
     value: 0.0032562
@@ -97,7 +97,7 @@ dependent_variables:
     - label: pp Statistical
       symerror: 0.0039325
     - label: pp Systematic
-      symerror: -0.0011213
+      symerror: 0.0022021
     - label: pp Underlying Event Uncertainty
       symerror: 0.002169
     value: -0.0059027
@@ -105,7 +105,7 @@ dependent_variables:
     - label: pp Statistical
       symerror: 0.0046678
     - label: pp Systematic
-      symerror: 0.00019749
+      symerror: 0.00057434
     - label: pp Underlying Event Uncertainty
       symerror: 0.002169
     value: 0.0010396
@@ -113,7 +113,7 @@ dependent_variables:
     - label: pp Statistical
       symerror: 0.0055884
     - label: pp Systematic
-      symerror: 0.00066847
+      symerror: 0.00089185
     - label: pp Underlying Event Uncertainty
       symerror: 0.002169
     value: 0.0035188
@@ -121,7 +121,7 @@ dependent_variables:
     - label: pp Statistical
       symerror: 0.0060444
     - label: pp Systematic
-      symerror: 0.00013196
+      symerror: 0.002005
     - label: pp Underlying Event Uncertainty
       symerror: 0.002169
     value: 0.00069462
@@ -129,7 +129,7 @@ dependent_variables:
     - label: pp Statistical
       symerror: 0.0089154
     - label: pp Systematic
-      symerror: 0.0035254
+      symerror: 0.0047152
     - label: pp Underlying Event Uncertainty
       symerror: 0.002169
     value: 0.018558
@@ -137,35 +137,55 @@ dependent_variables:
     name: PYTHIA Isolated photon hadron correlations
   values:
   - errors:
-    - label: pp Statistical
-      symerror: 0.0028341
-    value: 0.001878
+    - label: pythia Statistical
+      symerror: 0.0013251
+    value: -0.0023288
   - errors:
-    - label: pp Statistical
-      symerror: 0.0033003
-    value: 0.0026465
+    - label: pythia Statistical
+      symerror: 0.0017601
+    value: 0.0013551
   - errors:
-    - label: pp Statistical
-      symerror: 0.0039979
-    value: 0.0032562
+    - label: pythia Statistical
+      symerror: 0.0013571
+    value: -0.0011096
   - errors:
-    - label: pp Statistical
-      symerror: 0.0039325
-    value: -0.0059027
+    - label: pythia Statistical
+      symerror: 0.001463
+    value: -0.00095751
   - errors:
-    - label: pp Statistical
-      symerror: 0.0046678
-    value: 0.0010396
+    - label: pythia Statistical
+      symerror: 0.0017443
+    value: 0.0014076
   - errors:
-    - label: pp Statistical
-      symerror: 0.0055884
-    value: 0.0035188
+    - label: pythia Statistical
+      symerror: 0.0016057
+    value: 0.00088256
   - errors:
-    - label: pp Statistical
-      symerror: 0.0060444
-    value: 0.00069462
+    - label: pythia Statistical
+      symerror: 0.0019197
+    value: 0.006426
   - errors:
-    - label: pp Statistical
-      symerror: 0.0089154
-    value: 0.018558
-independent_variables: []
+    - label: pythia Statistical
+      symerror: 0.0025784
+    value: 0.021318
+independent_variables:
+- header:
+    name: $|\Delta \varphi|$
+    units: Radians
+  values:
+  - high: 0.3927
+    low: 0.0
+  - high: 0.7854
+    low: 0.3927
+  - high: 1.1781
+    low: 0.7854
+  - high: 1.5708
+    low: 1.1781
+  - high: 1.9635
+    low: 1.5708
+  - high: 2.3562
+    low: 1.9635
+  - high: 2.7489
+    low: 2.3562
+  - high: 3.1416
+    low: 2.7489

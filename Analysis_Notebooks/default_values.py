@@ -210,7 +210,7 @@ dPhi_Width = dPhi_Bins[1]-dPhi_Bins[0]
 delta_phi_centers = [i*math.pi/N_dPhi_Bins+math.pi/N_dPhi_Bins/2 for i in range(0,N_dPhi_Bins)] #skip first dPhi bin to avoid Isolation
 delta_phi_edges = []
 for p in range(0,N_dPhi_Bins):
-    delta_phi_edges.append([p*dPhi_Width,(p+1)*dPhi_Width])
+    delta_phi_edges.append(tuple([(p*dPhi_Width),((p+1)*dPhi_Width)]))
 #UE
 
 dphi_start_integral = 0
@@ -326,7 +326,7 @@ for i,dphi in enumerate(dPhi_Bins):
         break
         
         
-Max_Hadron_pT = 12.0
+Max_Hadron_pT = 10.0
 Min_Hadron_pT = 0.5    
 
 def Get_Purity(filename):
@@ -355,8 +355,8 @@ purity = dict(zip(Systems,p))
 purity_Uncertainty = dict(zip(Systems,p_uncert))
 Rel_pUncert = dict((k, float(purity_Uncertainty[k]) / purity[k]) for k in purity_Uncertainty)
 
-#print(purity.keys())
-#print(np.asarray(purity_Uncertainty.values())/np.asarray(purity.values()))
+print(purity.keys())
+print(np.asarray(purity_Uncertainty.values())/np.asarray(purity.values()))
 
 zT_widths = [(j-i)/2. for i, j in zip(zTbins[zT_offset:-1], zTbins[zT_offset+1:])]
 zT_widths = np.asarray(zT_widths)
@@ -366,7 +366,7 @@ zt_box = np.ones(NzT) * 0.03 #plotting Uncert. Boxes
 
 zT_edges = []
 for i in range(0,NzT):
-    zT_edges.append([zTbins[i],zTbins[i+1]])
+    zT_edges.append(tuple([zTbins[i],zTbins[i+1]]))
 zT_edges
 
 import itertools

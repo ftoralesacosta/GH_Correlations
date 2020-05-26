@@ -318,6 +318,7 @@ def ROOT_to_nparray():
         Keys.append("%s_CBR_Errors"%(SYS))
         Keys.append("%s_Uncorr_Error"%(SYS))
         Keys.append("%s_Uncorr_Estimate"%(SYS))
+        Keys.append("%s_pUncert"%(SYS))
 
     Corr_Arrays = np.zeros((len(Keys),N_pT_Bins,NzT,N_dPhi_Bins))
 
@@ -381,6 +382,10 @@ def ROOT_to_nparray():
                     Dict["%s_CBR_Errors"%(SYS)][ipt][izt] = Bkg_Phi_Error_Array/dPhi_Width
                     Dict["%s_Uncorr_Error"%(SYS)][ipt][izt] = UB_Error/dPhi_Width #constant in for zT bins
                     Dict["%s_Uncorr_Estimate"%(SYS)][ipt][izt] = SR_UB/dPhi_Width
-
+                    #IRC Change using sigma_Cs = | Cbr - Cs | * sigma_P / P = |CBR-CSR|sigma_P/P^2
+                    csr = Dict["%s_CSR"%(SYS)][ipt][izt]*purity[SYS]
+                    cbr = Dict["%s_CBR"%(SYS)][ipt][izt]/(1/purity[SYS] - 1)
+                    Dict["%s_pUncert"%(SYS)][ipt][izt] = np.abs(cbr-csr)/(purity[SYS]**2)*purity_Uncertainty[SYS]
+                    print(Dict["%s_pUncert"%(SYS)][ipt][izt])
     return Dict    
         

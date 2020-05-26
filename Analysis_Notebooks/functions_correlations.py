@@ -186,11 +186,17 @@ def Plot_Sub_UB_Overlay(Dict):
                 #plt.ylim((0,1.2*max(Sig_LE_Phi_Array)))
                 empt, = ax.plot([], [], ' ')
                 empt2, = ax.plot([],[],' ')
+                empt3, = ax.plot([],[],' ')
                 plt.yticks(fontsize=30)
                 plt.xticks(fontsize=30)
                 plt.tick_params(which='both',direction='in',right=True,top=True,bottom=True,length=10)
 
-                leg = ax.legend([s_plot,b_plot,empt,empt2],['Shower Signal Region','Background Region (scaled)',r'%1.0f < $p_\mathrm{T}^{\gamma^\mathrm{iso}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]),r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1])],
+                hpT_Max = pTbins[ipt]*zTbins[izt+1] #Edit later to support multiple pT bins later
+                if (pTbins[N_pT_Bins]*zTbins[izt+1] > Max_Hadron_pT):
+                    hpT_Max = Max_Hadron_pT
+                #plt.annotate(r'%1.1f < $p_\mathrm{T}^{h}$ < %1.1f GeV/$c$'%(pTbins[ipt]*zTbins[izt],hpT_Max), xy=(0.98, 0.105), xycoords='axes fraction', ha='right', va='top',fontsize=anno_size)
+
+                leg = ax.legend([s_plot,b_plot,empt,empt3,empt2],['Shower Signal Region','Background Region (scaled)',r'%1.0f < $p_\mathrm{T}^{\gamma^\mathrm{iso}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1]),r'%1.1f < $p_\mathrm{T}^{h}$ < %1.1f GeV/$c$'%(pTbins[ipt]*zTbins[izt],hpT_Max),r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1])],
                     loc='best',title = "Alice %s 5 TeV",fontsize=26,frameon=False,numpoints=1,markerscale=2)
                 if (SYS == 'pp'):
                     leg.set_title("ALICE, %s $\sqrt{s}=$5.02 TeV "%(SYS))
@@ -295,6 +301,7 @@ def Ped_Sub_After_Cs(Dict):
 
                 #print("%s ZYAM %i %1.4f"%(SYS,izt,ZYAM_Cs))
                 Dict["%s_CSR"%(SYS)][ipt][izt] = Dict["%s_CSR"%(SYS)][ipt][izt] - ZYAM_Cs
+                Dict["%s_CBR"%(SYS)][ipt][izt] = Dict["%s_CBR"%(SYS)][ipt][izt] - ZYAM_Cs
                 Dict["%s_Uncorr_Error"%(SYS)][ipt][izt] = ZYAM_Cs_Error
                 
         np.save("npy_files/%s_%s_%s_Cs"%(Shower,description_string,SYS),Dict["%s_CSR"%(SYS)])
@@ -384,6 +391,7 @@ def Plot_pp_pPb_Cs(Dict):
                                         Dict["pp_CSR"][ipt][izt],Dict["pp_CSR_Errors"][ipt][izt],Dict["pp_Uncorr_Error"][ipt][izt])
                         
             plt.annotate("$\chi^2/\mathrm{dof}$ = %1.1f/%i, p = %1.2f"%(Red_Chi2*NDF,NDF,Pval), xy=(0.99, 0.07), xycoords='axes fraction', ha='right', va='top', fontsize=label_size)
+
             if (izt < 1):
                 if(Use_MC):
                         leg = plt.legend([pPb,pp,pyth,Combined_UE],
@@ -399,8 +407,8 @@ def Plot_pp_pPb_Cs(Dict):
                         'p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV', 'pp $\sqrt{s}= 5$ TeV','Pythia 8.2','UB Error'],
                         loc = "upper left",fontsize=label_size,frameon=False,numpoints=1)
 
-            
             plt.tick_params(which='both',direction='in',right=True,bottom=True,top=True,length=10)
+
             if (izt < 1):
                 plt.annotate(r'%1.2f < $z_\mathrm{T}$ < %1.2f'%(zTbins[izt],zTbins[izt+1]), xy=(0.99, 0.20), xycoords='axes fraction', ha='right', va='top', fontsize=label_size)
                 plt.ylim(-0.1,0.26)
@@ -482,14 +490,31 @@ def Plot_pp_pPb_Cs_Individual(Dict):
             
             if (do_sys):
 
-                sys_pp = math.sqrt(Rel_pUncert["pp"]**2 + 0.056**2)*Dict["pp_CSR"][ipt][izt]
-                sys_pPb = math.sqrt(Rel_pUncert["p-Pb"]**2 + 0.056**2)*Dict["p-Pb_CSR"][ipt][izt]
+                #sys_pp = math.sqrt(Rel_pUncert["pp"]**2 + 0.056**2)*Dict["pp_CSR"][ipt][izt]
+                #sys_pPb = math.sqrt(Rel_pUncert["p-Pb"]**2 + 0.056**2)*Dict["p-Pb_CSR"][ipt][izt]
+
+                #IRC Change using sigma_Cs = | Cbr - Cs | * sigma_P / P
+                # CBR is already scaled by the 1-purity, so we need to un-scale it
+                #CSR was already subtracted, so CSR = Cs here as well
+                
+                #pPb_BR = Dict["p-Pb_CBR"][ipt][izt]/(1-purity["p-Pb"])
+                #pPb_pUncert = np.abs(pPb_BR-Dict["p-Pb_CSR"][ipt][izt])*Rel_pUncert["p-Pb"]
+                
+                #pp_BR = Dict["pp_CBR"][ipt][izt]/(1-purity["pp"])
+                #pp_pUncert = np.abs(pp_BR-Dict["pp_CSR"][ipt][izt])*Rel_pUncert["pp"]
+
+                pp_pUncert = Dict["%s_pUncert"%("pp")][ipt][izt]
+                pPb_pUncert = Dict["%s_pUncert"%("p-Pb")][ipt][izt]
+
+                sys_pp = np.sqrt(pp_pUncert**2 + 0.056*Dict["pp_CSR"][ipt][izt]**2)
+                sys_pPb = np.sqrt(pPb_pUncert**2 + 0.056*Dict["p-Pb_CSR"][ipt][izt]**2)
+                print(sys_pp)
 
                 Sys_Plot_pp = plt.bar(delta_phi_centers, sys_pp+sys_pp,bottom=Dict["pp_CSR"][ipt][izt]-sys_pp,width=phi_width*2,align='center',color='red',alpha=0.3,edgecolor='red')
                 Sys_Plot_pPb = plt.bar(delta_phi_centers, sys_pPb+sys_pPb,bottom=Dict["p-Pb_CSR"][ipt][izt]-sys_pPb,width=phi_width*2,align='center',fill=False,edgecolor='blue')
             
             Chi2,NDF,Pval = Get_pp_pPb_List_Chi2(Dict["p-Pb_CSR"][ipt][izt],Dict["p-Pb_CSR_Errors"][ipt][izt],Dict["p-Pb_Uncorr_Error"][ipt][izt],
-                                        Dict["pp_CSR"][ipt][izt],Dict["pp_CSR_Errors"][ipt][izt],Dict["pp_Uncorr_Error"][ipt][izt])
+                                        Dict["pp_CSR"][ipt][izt],Dict["pp_CSR_Errors"][ipt][izt],Dict["pp_Uncorr_Error"][ipt][izt]) #Change here
                         
             plt.annotate("$\chi^2$ = %1.1f, ndf = %i, $p$ = %1.2f"%(Chi2,NDF,Pval), xy=(0.98, 0.06), xycoords='axes fraction', ha='right', va='top', fontsize=anno_size)
 
@@ -532,15 +557,16 @@ def Plot_pp_pPb_Cs_Individual(Dict):
             loc_dict = {0:"Left",3:"Middle",7:"Right"}
             if not(izt in [0,3,7]): continue
             Fig4 = Table("Figure 4 zT Bin %i"%(izt))
-            Fig4.description = "$\gamma^\mathrm{iso}$--hadron correlation functions for pp (red) and p$-$Pb~(blue) data at $\sqrt{s_\mathrm{NN}}$ = 5.02 TeV as measured by the ALICE detector. The different panels represent three different z_\mathrm{T}~bins. The correlation functions are projected over the range $|\Delta\eta| < 1.2$. The darker bands at zero represents the uncertainty from the underlying event estimation in pp and p$-$Pb. The underlying event was estimated over the range $|0.4 <\Delta\varphi < 1.6|$. The vertical bars represent statistical uncertainties only. The boxes indicate the systematic uncertainties. The dashed green line represents the \gammaiso--hadron correlation function obtained with \textsc{PYTHIA 8.2} Monash Tune. `$p$' is the p-value for the hypothesis that the pp and p$-$Pb data follow the same true correlation function.ing the uncertainty on the fit."
-            Fig4.location = "Data from Figure 4 %s pannel, Page 14"%(loc_dict[izt])
-            Fig4.keywords["observables"] = ["$1/N_{\gamma} \: \: \mathrm{d}^2N/\mathrm{d}\Delta \eta \mathrm{d}\Delta \varphi$"]
+            Fig4.description = r"$\gamma^\mathrm{iso}$-hadron correlation functions for pp (red) and p$-$Pb (blue) data at $\sqrt{s_\mathrm{NN}}$ = 5.02 TeV as measured by the ALICE detector. The different panels represent three different $z_\mathrm{T}$ bins. The correlation functions are projected over the range $|\Delta\eta| < 1.2$. The darker bands at zero represents the uncertainty from the underlying event estimation in pp and p$-$Pb. The underlying event was estimated over the range $|0.4 <\Delta\varphi < 1.6|$. The vertical bars represent statistical uncertainties only. The boxes indicate the systematic uncertainties. The dashed green line represents the $\gamma^\mathrm{iso}$-hadron correlation function obtained with PYTHIA 8.2 Monash Tune. '$p$' is the p-value for the hypothesis that the pp and p$-$Pb data follow the same true correlation function."
+            Fig4.location = "Data from Figure 4 %s panel, Page 14"%(loc_dict[izt])
+            Fig4.keywords["observables"] = [r"$1/N_{\gamma}\ \mathrm{d}^2N/\mathrm{d}\Delta \eta \mathrm{d}\Delta \varphi$"]
             Fig4.add_image("./pics/%s/%s/Cs_Final_Indv_pT_%i_zT_%i.pdf"%(Shower,description_string,ipt,izt))
             
             # x-axis: Delta phi
-            dphi = Variable("$|\Delta\varphi|$ (rad)$", is_independent=True, is_binned=True, units="")
+            dphi = Variable(r"$|\Delta \varphi|$", is_independent=True, is_binned=True, units="Radians")
             dphi.values = delta_phi_edges
-            
+            Fig4.add_variable(dphi)
+
             # y-axis: p-Pb Correlations
             pPb_data = Variable("p$-$Pb Isolated photon hadron correlations", is_independent=False, is_binned=False, units="")
             pPb_data.values = Dict["p-Pb_CSR"][ipt][izt]
@@ -569,9 +595,9 @@ def Plot_pp_pPb_Cs_Individual(Dict):
 
             # y-axis: PYTHIA Correlations
             pythia_data = Variable("PYTHIA Isolated photon hadron correlations", is_independent=False, is_binned=False, units="")
-            pythia_data.values = Dict["pp_CSR"][ipt][izt]
-            pythia_stat = Uncertainty("pp Statistical", is_symmetric=True)
-            pythia_stat.values = Dict["pp_CSR_Errors"][ipt][izt]
+            pythia_data.values = pythia[izt]
+            pythia_stat = Uncertainty("pythia Statistical", is_symmetric=True)
+            pythia_stat.values = pythia_error[izt]
             pythia_data.add_uncertainty(pythia_stat)
 
             #Add everything to Tables
@@ -920,7 +946,7 @@ def LaTeX_Results_Summary(FF_Dict):
         pPb_ue_min_high = np.amin(FF_Dict["p-Pb_UE_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
         pPb_ue_max_high = np.amax(FF_Dict["p-Pb_UE_FF_Errors"][0][i:j]/FF_Dict["p-Pb_FF"][0][i:j])*100
 
-        print("Source   &  pp data & p--Pb~data  \\\\")
+        print("Source   &  pp data & p--Pb data  \\\\")
         print("Statistical Uncertainty & {0}\%-{1}\% & {2}\%-{3}\% & {4}\%-{5}\% & {6}\%-{7}\% \\\\".format(int(pp_stat_min_low+0.5),
                             int(pp_stat_max_low+0.5),int(pp_stat_min_high+0.5),int(pp_stat_max_high+0.5),
                             int(pPb_stat_min_low+0.5),int(pPb_stat_max_low+0.5),int(pPb_stat_min_high+0.5),int(pPb_stat_max_high+0.5)) )
@@ -1017,169 +1043,3 @@ def LaTeX_Ratio_Systematics(FF_Dict):
                     
                     print("%1.2f--%1.2f &"%(zTbins[izt],zTbins[izt+1])),
                     print("{0}\% & {1}\% & {2}\% & 8\% & 5\%\\\\".format(int(stat_rel[ipt][izt]+0.5),int(UE_rel[ipt][izt]+0.5),int(purity_rel[ipt][izt]+0.5)))
-    
-def Plot_FF(FF_Dict):
-    
-    fig = plt.figure(figsize=(17,13))
-    
-    
-    for ipt in range(len(FF_Dict["p-Pb_FF"])):
-
-        zt_box = np.ones(NzT) * 0.03
-        #pPb_bar = plt.bar(zT_centers, pPb_sys[ipt]+pPb_sys[ipt], bottom=(pPb_FF[ipt])-pPb_sys[ipt], width=zt_box, align='center',edgecolor="blue",color='white',)
-        #pp_bar = plt.bar(zT_centers, pp_sys[ipt]+pp_sys[ipt], bottom=pp_FF[ipt]-pp_sys[ipt], width=zt_box, align='center',edgecolor="red",color='white',)
-
-        zT_max = 0
-        for izt in range(0, NzT-ZT_OFF_PLOT):
-            if (zTbins[izt]*pTbins[ipt] > 15.0):
-                zT_max = zTbins[izt]
-                break
-        
-        if (N_pT_Bins < 5):
-            ax = fig.add_subplot(2,2,ipt+1)
-        elif (N_pT_Bins >=5):
-            ax = fig.add_subplot(3,2,ipt+1)
-            
-        
-        #fig = plt.figure(figsize=(10,7))
-        
-        pPb_plot = plt.errorbar(zT_centers, FF_Dict["p-Pb_FF"][ipt],xerr=zT_widths,yerr=FF_Dict["p-Pb_FF_Errors"][ipt],linewidth=1, fmt='bo',capsize=1,label='p-Pb')
-        pp_plot = plt.errorbar(zT_centers, FF_Dict["pp_FF"][ipt],xerr=zT_widths,yerr=FF_Dict["pp_FF_Errors"][ipt],linewidth=1,fmt='ro',capsize=1,label='pp')
-
-        if(Use_MC):
-            plt.errorbar(zT_centers, FF_Dict["MC_FF"][ipt],xerr=zT_widths,yerr=FF_Dict["MC_FF_Errors"][ipt],linewidth=1, fmt='go',capsize=1,label='MC')
-            MC_plot = plt.fill_between(zT_centers, FF_Dict["MC_FF"][ipt]-FF_Dict["MC_FF_Errors"][ipt], FF_Dict["MC_FF"][ipt]+FF_Dict["MC_FF_Errors"][ipt],color='green',alpha=0.6)
-
-        empt, = plt.plot([], [],' ')
-
-        plt.yscale('log')                                                                                                                                                                                                                                                                                                                                          
-        plt.ylabel(r"$\frac{1}{N_{\mathrm{\gamma}}}\frac{\mathrm{d}N}{\mathrm{d}z_{\mathrm{T}} \mathrm{d}\Delta\eta}$",fontsize=20)
-        plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^\mathrm{h}/p_\mathrm{T}^\mathrm{\gamma}$",fontsize=20)
-        #plt.xlim(xmin = 0.1,xmax=0.7)
-        plt.ylim(ymin = 0.001,ymax=10)
-
-        if(Use_MC):
-            leg = plt.legend([pp_plot,pPb_plot,MC_plot,pp_bar,pPb_bar,empt],["pp $\sqrt{s} = 5$ TeV","p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV","Pythia GJ $\sqrt{s} = 5$ TeV",
-                "pp Systematic","p-Pb Systematic","Normalization $\pm 25\%$"],frameon=False,numpoints=1,title=' ',loc="upper right",prop={'size':14})
-        else:
-            #leg = plt.legend([pp_plot,pPb_plot,pp_bar,pPb_bar,empt],["pp $\sqrt{s} = 5$ TeV","p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV",
-            #    "pp Systematic","p-Pb Systematic","Normalization $\pm 25\%$"],frameon=False,numpoints=1,title=' ',loc="upper right",prop={'size':14})
-            leg = plt.legend([pp_plot,pPb_plot,empt],["pp $\sqrt{s} = 5$ TeV","p-Pb $\sqrt{s_{\mathrm{_{NN}}}}=5$ TeV",
-                r'%1.0f < $p_\mathrm{T}^{\mathrm{trig}}$ < %1.0f GeV/$c$'%(pTbins[ipt],pTbins[ipt+1])],frameon=False,numpoints=1,title=' ',loc="upper right",prop={'size':14})
-
-        leg.set_title("ALICE Work in Progress")
-        plt.setp(leg.get_title(),fontsize=20)
-
-        Title = plt.title(r'Integrated $\mathrm{\gamma}$-Hadron Correlation: $2\pi/3 < \Delta\varphi < \pi, |\Delta\eta| < %1.1f$ '%(eta_max),fontsize=15)
-        plt.gcf()
-        plt.savefig("pics/%s_Systems_FFunction_%i.pdf"%(description_string,ipt), bbox_inches='tight')
-        #plt.show()
-
-    plt.gcf()
-    plt.savefig("pics/Systems_FFunction_All.pdf", bbox_inches='tight')
-    plt.show()
-
-    
-def ProcessData(input_x, input_y, input_yerr,UE_binmin=2, UE_binmax=9,label='data',color='black'):
-
-    Printing = True
-    
-    if (N_dPhi_Bins == 8):
-        UE_binmin = 1
-        UE_binmax = 3
-    
-    x = input_x 
-    dphi = x[1]-x[0]
-    xerr = np.multiply(np.ones(len(x)),dphi/2.0)
-    
-    #y = np.divide(input_y, 2*dphi)
-    #yerr = np.divide(input_yerr,2*dphi)
-    
-    y = np.divide(input_y, 1.0)
-    yerr = np.divide(input_yerr,1.0)
-    
-    yerr_squared = np.power(yerr,2.0)
-    
-    plt.errorbar(x,y,yerr=yerr,xerr=xerr,label=label+" before subtraction",alpha=0.4,color=color, linestyle = 'None')
-    
-    UE_rate = np.sum(y[UE_binmin:UE_binmax])/len(y[UE_binmin:UE_binmax])
-
-    UE_error = np.sqrt(np.sum(yerr_squared[UE_binmin:UE_binmax]))/len(y[UE_binmin:UE_binmax])
-    
-    if (Printing):
-        print 'UE_rate=  {:2.3f} per unit dphi'.format(UE_rate)
-        print 'UE_error= {:2.3f} per unit dphi'.format(UE_error)
-    
-    
-    ue_band_x = [x[UE_binmin]-dphi/2,x[UE_binmax]+dphi/2]
-    plt.fill_between(ue_band_x, UE_rate - UE_error, UE_rate+UE_error, alpha=.5,color='grey')
-    y_sub = np.subtract(y,UE_rate)
-    plt.errorbar(x,y_sub,yerr=yerr,xerr=xerr,label=label+" after subtraction",alpha=0.9,color=color,marker='o', linestyle = 'None')
-    
-   
-    plt.fill_between(ue_band_x, 0.0- UE_error, 0.0+UE_error, alpha=.5,color='grey')
-      
-    plt.ylabel('Rate per dphixdeta',fontsize=16)
-    plt.xlabel('dphi (\text{rad})',fontsize=16)
-
-    #subtract UE
-    y = np.subtract(y, UE_rate)
-    
-    binmax = 4
-    
-    if (N_dPhi_Bins == 8):
-        binmax = 1
-    
-    
-    #for i in range(1,binmax+1):
-        #print 'Rate bin #', i
-        #print '{:2.3f}  +/- {:2.3f} (stat) +/- {:2.3f} (UE syst) tracks per unit dphi'.format(y[-i],yerr[-i],UE_error) 
-
-    for i in range(1,binmax+1):
-        if not i==binmax: continue
-        if (Printing):
-            print 'Combination of ', i, ' bins'
-
-        combination = np.sum(y[-i:])/len(y[-i:])
-        combination_error = np.sqrt(np.sum(yerr_squared[-i:]))/len(y[-i:])
-        total_error = np.sqrt(combination_error*combination_error + UE_error*UE_error)
-        if (Printing):
-            print '{:2.3f}  +/- {:2.3f} (stat) +/- {:2.3f} (UE syst) [+/- {:2.3f} (Total error) ={:2.1%} relative] tracks per unit dphi'.format(combination,combination_error,UE_error,total_error,total_error/combination)
-            print '{:2.1%} relative stat error'.format(combination_error/combination)
-            print ' ' 
-
-    plt.fill_between(ue_band_x, 0.0- UE_error, 0.0+UE_error, alpha=.6,color='grey')
-    
-    integ_band_x = [x[-binmax]-dphi/2,x[-1]+dphi/2]
-    plt.fill_between(integ_band_x, combination - total_error, combination+total_error, alpha=.6,color=color)
-    #plt.fill_between(x[-binmax:], combination - combination_error, combination+combination_error, alpha=.5)
-    
-
-    return combination, total_error
-
-def GetRatio(pp_y,pp_yerr,pPb_y,pPb_yerr,bincenters):
-    fig = plt.figure(figsize=(9,9))
-    pp_avg, pp_error = ProcessData(bincenters, pp_y,pp_yerr,label='pp',color='red')
-    pPb_avg, pPb_error = ProcessData(bincenters, pPb_y,pPb_yerr,label='pPb',color='blue')
-    ratio = pPb_avg/pp_avg
-    ratio_err = ratio*np.sqrt(np.power(pPb_error/pPb_avg,2.0) + np.power(pp_error/pp_avg,2.0))
-    plt.xticks(fontsize=16)
-    plt.yticks(fontsize=16)
-    plt.ylabel(r'$1/N_{\gamma} \: \: \mathrm{d^2}N/\mathrm{d}\Delta \eta \mathrm{d}\Delta \phi$',fontsize=28)
-    plt.xlabel(r'|$\Delta \varphi$|',fontsize=28)
-    plt.legend(fontsize=16,frameon=False)
-    plt.tight_layout() 
-    #plt.savefig('test.pdf')
-    plt.xlim([0.4,np.pi])
-    
-    Printing = True 
-    if (Printing):
-        print 'pp average = {:2.3f} +/- {:2.3f} (total UE and stat uncertainty)'.format(pp_avg,pp_error)
-        print '##############################'
-
-        print 'pPb average = {:2.3f} +/- {:2.3f} (total UE and stat uncertainty)'.format(pPb_avg, pPb_error)
-        print '##############################'
-
-        print 'Ratio = {:2.2f} +/- {:2.2f} (total UE and stat uncertainty)'.format(ratio, ratio_err)
-
-    return ratio, ratio_err

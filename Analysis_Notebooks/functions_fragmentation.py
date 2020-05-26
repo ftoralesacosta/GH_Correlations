@@ -100,7 +100,8 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
     Colors = ["red","blue"]
     Markers = ["s","o"]
     fig = plt.figure(figsize=(8,8))
-    
+    pp_sys_Error = 0
+    p_Pb_sys_Error = 0
     fig.add_axes((0.1,0.3,0.88,0.6))
     for SYS,sys_col,marker in zip(reversed(Systems),reversed(Colors),reversed(Markers)):
 
@@ -115,6 +116,10 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
         FF_Central = Comb_Dict["%s_Combined_FF"%(SYS)] #Eta Correction is applied when creating Dictionary!
         Sys_Uncertainty = np.sqrt(Efficiency_Uncertainty**2 + Comb_Dict["%s_purity_Uncertainty"%(SYS)]**2 + Eta_Cor_Uncertainty**2)
         
+        if (SYS=="pp"):
+            pp_sys_Error = Sys_Uncertainty
+        elif (SYS=="p-Pb"):
+            p_Pb_sys_Error=Sys_Uncertainty
         #Plots
         if (SYS=="pp"):
             leg_string = SYS
@@ -151,8 +156,8 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
     plt.tick_params(which='both',direction='in',right=True,top=True,bottom=False,length=10)
     plt.tick_params(which='minor',length=5)
 
-    pp_sys_Error = (Comb_Dict["pp_Combined_FF"][:NzT-ZT_OFF_PLOT])*math.sqrt(Rel_pUncert["pp"]**2+0.056**2)
-    p_Pb_sys_Error = (Comb_Dict["p-Pb_Combined_FF"][:NzT-ZT_OFF_PLOT])*math.sqrt(Rel_pUncert["p-Pb"]**2+0.056**2+Eta_Cor**2)
+    #pp_sys_Error = (Comb_Dict["pp_Combined_FF"][:NzT-ZT_OFF_PLOT])*math.sqrt(Rel_pUncert["pp"]**2+0.056**2)
+    #p_Pb_sys_Error = (Comb_Dict["p-Pb_Combined_FF"][:NzT-ZT_OFF_PLOT])*math.sqrt(Rel_pUncert["p-Pb"]**2+0.056**2+Eta_Cor**2)
     
     Chi2,NDF,Pval = Get_pp_pPb_List_Chi2(Comb_Dict["pp_Combined_FF"][:NzT-ZT_OFF_PLOT],
                                          Comb_Dict["pp_Combined_FF_Errors"][:NzT-ZT_OFF_PLOT],
@@ -172,16 +177,17 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
 
 
 #HEP FF
-    Fig5 = Table("Figure 5 Top Pannel")
-    Fig5.description = "$\gamma^\mathrm{iso}$-tagged fragmentation function for pp (red) and p$-$Pb~data (blue) at $\sqrt{s_\mathrm{NN}}$ = 5.02 TeV as measured by the ALICE detector. The boxes represent the systematic uncertainties while the vertical bars indicate the statistical uncertainties. The dashed green line corresponds to \textsc{PYTHIA 8.2}. The $\chi^2$ test for the comparison of pp and p$-$Pb~data incorporates correlations among different $z_\mathrm{T}$~intervals. A constant that was fit to the ratio is shown as grey band, with the width indicating the uncertainty on the fit."
-    Fig5.location = "Data from Figure 5 Top Pannel, Page 15"
+    Fig5 = Table("Figure 5 Top Panel")
+    Fig5.description = "$\gamma^\mathrm{iso}$-tagged fragmentation function for pp (red) and p$-$Pb data (blue) at $\sqrt{s_\mathrm{NN}}$ = 5.02 TeV as measured by the ALICE detector. The boxes represent the systematic uncertainties while the vertical bars indicate the statistical uncertainties. The dashed green line corresponds to PYTHIA 8.2 Monash Tune. The $\chi^2$ test for the comparison of pp and p$-$Pb data incorporates correlations among different $z_\mathrm{T}$ intervals. A constant that was fit to the ratio is shown as grey band, with the width indicating the uncertainty on the fit."
+    Fig5.location = "Data from Figure 5 Top Panel, Page 15"
     Fig5.keywords["observables"] = ["$\frac{1}{N_{\mathrm{\gamma}}}\frac{\mathrm{d}^3N}{\mathrm{d}z_{\mathrm{T}}\mathrm{d}\Delta\varphi\mathrm{d}\Delta\eta}$"]
     Fig5.add_image("./pics/LO/zT_Rebin_8_006zT06zT13fnew/Final_FFunction_and_Ratio.pdf")
     
     # x-axis: zT
-    zt = Variable("$z_\mathrm{T}$", is_independent=True, is_binned=True, units="")
+    zt = Variable(r"$z_\mathrm{T}$", is_independent=True, is_binned=True, units="")
     zt.values = zT_edges
-    
+    Fig5.add_variable(zt)
+
     # y-axis: p-Pb Yields
     pPb_data = Variable("p$-$Pb conditional yield of associated hadrons", is_independent=False, is_binned=False, units="")
     pPb_data.values = Comb_Dict["p-Pb_Combined_FF"]
@@ -285,19 +291,21 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
     plt.show()
 
 #RATIO HEP
-    FigRatio = Table("Figure 5 Bottom Pannel")
-    FigRatio.description = "$\gamma^\mathrm{iso}$-tagged fragmentation function for pp (red) and p$-$Pb~data (blue) at $\sqrt{s_\mathrm{NN}}$ = 5.02 TeV as measured by the ALICE detector. The boxes represent the systematic uncertainties while the vertical bars indicate the statistical uncertainties. The dashed green line corresponds to \textsc{PYTHIA 8.2}. The $\chi^2$ test for the comparison of pp and p$-$Pb~data incorporates correlations among different $z_\mathrm{T}$~intervals. A constant that was fit to the ratio is shown as grey band, with the width indicating the uncertainty on the fit."
-    FigRatio.location = "Data from Figure 5, Bottom Pannel, Page 15"
-    FigRatio.keywords["observables"] = ["$\frac{1}{N_{\mathrm{\gamma}}}\frac{\mathrm{d}^3N}{\mathrm{d}z_{\mathrm{T}}\mathrm{d}\Delta\varphi\mathrm{d}\Delta\eta}$"]
+    FigRatio = Table("Figure 5 Bottom Panel")
+    FigRatio.description = r"$\gamma^\mathrm{iso}$-tagged fragmentation function for pp (red) and p$-$Pb data (blue) at $\sqrt{s_\mathrm{NN}}$ = 5.02 TeV as measured by the ALICE detector. The boxes represent the systematic uncertainties while the vertical bars indicate the statistical uncertainties. The dashed green line corresponds to PYTHIA 8.2 Monash Tune. The $\chi^2$ test for the comparison of pp and p$-$Pb data incorporates correlations among different $z_\mathrm{T}$ intervals. A constant that was fit to the ratio is shown as grey band, with the width indicating the uncertainty on the fit."
+    FigRatio.location = "Data from Figure 5, Bottom Panel, Page 15"
+    FigRatio.keywords["observables"] = [r"$\frac{1}{N_{\mathrm{\gamma}}}\frac{\mathrm{d}^3N}{\mathrm{d}z_{\mathrm{T}}\mathrm{d}\Delta\varphi\mathrm{d}\Delta\eta}$"]
     FigRatio.add_image("./pics/LO/zT_Rebin_8_006zT06zT13fnew/Final_FFunction_and_Ratio.pdf")
 
-    # x-axis: zT     zt = Variable("$z_\mathrm{T}$", is_independent=True, is_binned=True, units="")
-    zt.values = zT_edges
+    # x-axis: zT     
+    zt_ratio = Variable(r"$z_\mathrm{T}$", is_independent=True, is_binned=True, units="")
+    zt_ratio.values = zT_edges
+    FigRatio.add_variable(zt_ratio)
 
     # y-axis: p-Pb Yields
     Ratio_HEP = Variable("Ratio conditional yield of associated hadrons in pp and p$-$Pb", is_independent=False, is_binned=False, units="")
     Ratio_HEP.values = Ratio
-    Ratio_sys = Uncertainty("p-Pb Systematic", is_symmetric=True)
+    Ratio_sys = Uncertainty("Ratio Systematic", is_symmetric=True)
     Ratio_sys.values = Ratio_Systematic
     Ratio_stat = Uncertainty("Ratio Statistical", is_symmetric=True)
     Ratio_stat.values = Ratio_Error

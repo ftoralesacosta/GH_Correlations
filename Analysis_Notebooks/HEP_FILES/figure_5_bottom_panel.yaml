@@ -5,49 +5,49 @@ dependent_variables:
   - errors:
     - label: Ratio Statistical
       symerror: 0.47664
-    - label: p-Pb Systematic
+    - label: Ratio Systematic
       symerror: 0.30854
     value: 1.354
   - errors:
     - label: Ratio Statistical
       symerror: 0.2481
-    - label: p-Pb Systematic
+    - label: Ratio Systematic
       symerror: 0.22532
     value: 0.98876
   - errors:
     - label: Ratio Statistical
       symerror: 0.29892
-    - label: p-Pb Systematic
+    - label: Ratio Systematic
       symerror: 0.20511
     value: 0.89971
   - errors:
     - label: Ratio Statistical
       symerror: 0.82528
-    - label: p-Pb Systematic
+    - label: Ratio Systematic
       symerror: 0.43307
     value: 1.899
   - errors:
     - label: Ratio Statistical
       symerror: 0.25209
-    - label: p-Pb Systematic
+    - label: Ratio Systematic
       symerror: 0.18591
     value: 0.81284
   - errors:
     - label: Ratio Statistical
       symerror: 0.56261
-    - label: p-Pb Systematic
+    - label: Ratio Systematic
       symerror: 0.26016
     value: 1.1179
   - errors:
     - label: Ratio Statistical
       symerror: 0.22151
-    - label: p-Pb Systematic
+    - label: Ratio Systematic
       symerror: 0.12937
     value: 0.50234
   - errors:
     - label: Ratio Statistical
       symerror: 0.45576
-    - label: p-Pb Systematic
+    - label: Ratio Systematic
       symerror: 0.2561
     value: 0.69048
 independent_variables:

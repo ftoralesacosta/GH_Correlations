@@ -6,7 +6,7 @@ dependent_variables:
     - label: p-Pb Statistical
       symerror: 0.028497
     - label: p-Pb Systematic
-      symerror: 0.030257
+      symerror: -0.011889
     - label: p-Pb Underlying Event Uncertainty
       symerror: 0.015978
     value: -0.090829
@@ -14,7 +14,7 @@ dependent_variables:
     - label: p-Pb Statistical
       symerror: 0.028334
     - label: p-Pb Systematic
-      symerror: 0.020273
+      symerror: -0.006631
     - label: p-Pb Underlying Event Uncertainty
       symerror: 0.015978
     value: -0.050658
@@ -22,7 +22,7 @@ dependent_variables:
     - label: p-Pb Statistical
       symerror: 0.027383
     - label: p-Pb Systematic
-      symerror: 0.005379
+      symerror: 0.00066527
     - label: p-Pb Underlying Event Uncertainty
       symerror: 0.015978
     value: 0.0050824
@@ -30,7 +30,7 @@ dependent_variables:
     - label: p-Pb Statistical
       symerror: 0.027293
     - label: p-Pb Systematic
-      symerror: 0.010938
+      symerror: 0.0059657
     - label: p-Pb Underlying Event Uncertainty
       symerror: 0.015978
     value: 0.045575
@@ -38,7 +38,7 @@ dependent_variables:
     - label: p-Pb Statistical
       symerror: 0.027892
     - label: p-Pb Systematic
-      symerror: 0.011619
+      symerror: 0.003579
     - label: p-Pb Underlying Event Uncertainty
       symerror: 0.015978
     value: 0.027342
@@ -46,7 +46,7 @@ dependent_variables:
     - label: p-Pb Statistical
       symerror: 0.029113
     - label: p-Pb Systematic
-      symerror: 0.019719
+      symerror: 0.0090931
     - label: p-Pb Underlying Event Uncertainty
       symerror: 0.015978
     value: 0.069467
@@ -54,7 +54,7 @@ dependent_variables:
     - label: p-Pb Statistical
       symerror: 0.031269
     - label: p-Pb Systematic
-      symerror: 0.037989
+      symerror: 0.020621
     - label: p-Pb Underlying Event Uncertainty
       symerror: 0.015978
     value: 0.15753
@@ -62,7 +62,7 @@ dependent_variables:
     - label: p-Pb Statistical
       symerror: 0.032671
     - label: p-Pb Systematic
-      symerror: 0.04656
+      symerror: 0.025306
     - label: p-Pb Underlying Event Uncertainty
       symerror: 0.015978
     value: 0.19332
@@ -73,7 +73,7 @@ dependent_variables:
     - label: pp Statistical
       symerror: 0.035927
     - label: pp Systematic
-      symerror: 0.047685
+      symerror: -0.01788
     - label: pp Underlying Event Uncertainty
       symerror: 0.019218
     value: -0.094119
@@ -81,7 +81,7 @@ dependent_variables:
     - label: pp Statistical
       symerror: 0.035387
     - label: pp Systematic
-      symerror: 0.020013
+      symerror: -0.0023817
     - label: pp Underlying Event Uncertainty
       symerror: 0.019218
     value: -0.012537
@@ -89,7 +89,7 @@ dependent_variables:
     - label: pp Statistical
       symerror: 0.03244
     - label: pp Systematic
-      symerror: 0.0074355
+      symerror: -4.023e-05
     - label: pp Underlying Event Uncertainty
       symerror: 0.019218
     value: -0.00021177
@@ -97,7 +97,7 @@ dependent_variables:
     - label: pp Statistical
       symerror: 0.031925
     - label: pp Systematic
-      symerror: 0.0058225
+      symerror: 0.0024219
     - label: pp Underlying Event Uncertainty
       symerror: 0.019218
     value: 0.012749
@@ -105,7 +105,7 @@ dependent_variables:
     - label: pp Statistical
       symerror: 0.032998
     - label: pp Systematic
-      symerror: 0.0098144
+      symerror: 0.0019874
     - label: pp Underlying Event Uncertainty
       symerror: 0.019218
     value: 0.010462
@@ -113,7 +113,7 @@ dependent_variables:
     - label: pp Statistical
       symerror: 0.034214
     - label: pp Systematic
-      symerror: 0.014634
+      symerror: 0.0050713
     - label: pp Underlying Event Uncertainty
       symerror: 0.019218
     value: 0.026695
@@ -121,7 +121,7 @@ dependent_variables:
     - label: pp Statistical
       symerror: 0.03615
     - label: pp Systematic
-      symerror: 0.024944
+      symerror: 0.019636
     - label: pp Underlying Event Uncertainty
       symerror: 0.019218
     value: 0.10337
@@ -129,7 +129,7 @@ dependent_variables:
     - label: pp Statistical
       symerror: 0.040255
     - label: pp Systematic
-      symerror: 0.03763
+      symerror: 0.02848
     - label: pp Underlying Event Uncertainty
       symerror: 0.019218
     value: 0.14992
@@ -139,35 +139,35 @@ dependent_variables:
   - errors:
     - label: pythia Statistical
       symerror: 0.006273
-    value: -0.0058205
+    value: -0.094119
   - errors:
     - label: pythia Statistical
       symerror: 0.0062807
-    value: -0.0036915
+    value: -0.012537
   - errors:
     - label: pythia Statistical
       symerror: 0.0063843
-    value: -0.00086697
+    value: -0.00021177
   - errors:
     - label: pythia Statistical
       symerror: 0.0062824
-    value: -0.0013282
+    value: 0.012749
   - errors:
     - label: pythia Statistical
       symerror: 0.0064255
-    value: 0.0085769
+    value: 0.010462
   - errors:
     - label: pythia Statistical
       symerror: 0.0066743
-    value: 0.02547
+    value: 0.026695
   - errors:
     - label: pythia Statistical
       symerror: 0.0072399
-    value: 0.064399
+    value: 0.10337
   - errors:
     - label: pythia Statistical
       symerror: 0.0076339
-    value: 0.10966
+    value: 0.14992
 independent_variables:
 - header:
     name: $|\Delta \varphi|$
