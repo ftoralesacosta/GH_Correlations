@@ -40,8 +40,8 @@ Pt_bins:		       [12, 40] #CHANGE ABOVE ASWELL -----
 #Pt_bins:		       [12.00, 17.93, 26.78, 40.00] #3 pT Bins
 
 
-#Cluster_isolation_determinant: cluster_iso_its_04_sub
-Cluster_isolation_determinant: cluster_iso_tpc_04_sub
+Cluster_isolation_determinant: cluster_iso_its_04_sub
+#Cluster_isolation_determinant: cluster_iso_tpc_04_sub
 #Cluster_isolation_determinant: cluster_iso_its_04
 
 Shower_Shape:		       Lambda
