@@ -171,7 +171,7 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
 
     plt.annotate(r"ALICE, $\sqrt{s_{\mathrm{_{NN}}}}=5.02$ TeV",xy=(0.115,0.008),xycoords='axes fraction', ha='left',va='bottom',fontsize=label_size)
     plt.annotate(r"%1.0f < $p_\mathrm{T}^{\gamma}$ < %1.0f GeV/$c$"%(pTbins[0],pTbins[N_pT_Bins]),xy=(0.97, 0.81), xycoords='axes fraction', ha='right', va='top', fontsize=label_size)
-    plt.annotate(r"%1.1f < $p_\mathrm{T}^{h}$ < %1.1f GeV/$c$"%(Min_Hadron_pT,Max_Hadron_pT),xy=(0.97, 0.89), xycoords='axes fraction', ha='right', va='top', fontsize=label_size)
+    plt.annotate(r"%1.1f < $p_\mathrm{T}^\mathrm{h}$ < %1.1f GeV/$c$"%(Min_Hadron_pT,Max_Hadron_pT),xy=(0.97, 0.89), xycoords='axes fraction', ha='right', va='top', fontsize=label_size)
     plt.annotate("$\chi^2/\mathrm{ndf}$ = %1.1f/%i, $p$ = %1.2f"%(Chi2*NDF,NDF,Pval), xy=(0.97, 0.97), xycoords='axes fraction', ha='right', va='top', fontsize=label_size)
 
 
@@ -269,6 +269,7 @@ def Plot_pp_pPb_Avg_FF_and_Ratio(Comb_Dict):
     Show_Fits = True
     if (Show_Fits):
         sys_const = 0.19 #23% relative from purity + tracking
+        #sys_const = 0.504245 #IRC
         plt.annotate("$c = {0:.2f} \pm {1:.2f} \pm {2:.2f}$".format(p0,p0e,sys_const), xy=(0.98, 0.9), xycoords='axes fraction', ha='right', va='top', color="black",fontsize=label_size,alpha=.9)
         plt.annotate(r"$p = %1.2f$"%(pval), xy=(0.98, 0.75), xycoords='axes fraction', ha='right', va='top', color="black",fontsize=label_size,alpha=.9)
 
@@ -336,7 +337,11 @@ def Model_Comparisons(Comb_Dict):
 
         FF_Central = Comb_Dict["%s_Combined_FF"%(SYS)] #Eta Correction is applied when creating Dictionary! 
         Sys_Uncertainty = np.sqrt(Efficiency_Uncertainty**2 + Comb_Dict["%s_purity_Uncertainty"%(SYS)]**2 + Eta_Cor_Uncertainty**2)
-
+        
+        if (SYS=="pp"):
+            pp_sys_Error = Sys_Uncertainty
+        elif (SYS=="p-Pb"):
+            p_Pb_sys_Error=Sys_Uncertainty
         #Plots
         if (SYS=="pp"):
             leg_string = SYS
@@ -373,8 +378,9 @@ def Model_Comparisons(Comb_Dict):
     plt.tick_params(which='both',direction='in',right=True,top=True,bottom=False,length=10)
     plt.tick_params(which='minor',length=5)
 
-    pp_sys_Error = (Comb_Dict["pp_Combined_FF"][:NzT-ZT_OFF_PLOT])*math.sqrt(Rel_pUncert["pp"]**2+0.056**2)
-    p_Pb_sys_Error = (Comb_Dict["p-Pb_Combined_FF"][:NzT-ZT_OFF_PLOT])*math.sqrt(Rel_pUncert["p-Pb"]**2+0.056**2+Eta_Cor**2)
+    #pp_sys_Error = (Comb_Dict["pp_Combined_FF"][:NzT-ZT_OFF_PLOT])*math.sqrt(Rel_pUncert["pp"]**2+0.056**2)
+    #p_Pb_sys_Error = (Comb_Dict["p-Pb_Combined_FF"][:NzT-ZT_OFF_PLOT])*math.sqrt(Rel_pUncert["p-Pb"]**2+0.056**2+Eta_Cor**2)
+
 
     Chi2,NDF,Pval = Get_pp_pPb_List_Chi2(Comb_Dict["pp_Combined_FF"][:NzT-ZT_OFF_PLOT],
                                          Comb_Dict["pp_Combined_FF_Errors"][:NzT-ZT_OFF_PLOT],
@@ -388,7 +394,7 @@ def Model_Comparisons(Comb_Dict):
 
     plt.annotate(r"ALICE, $\sqrt{s_{\mathrm{_{NN}}}}=5.02$ TeV",xy=(0.115,0.008),xycoords='axes fraction', ha='left',va='bottom',fontsize=label_size)
     plt.annotate(r"%1.0f < $p_\mathrm{T}^{\gamma}$ < %1.0f GeV/$c$"%(pTbins[0],pTbins[N_pT_Bins]),xy=(0.97, 0.81), xycoords='axes fraction', ha='right', va='top', fontsize=label_size)
-    plt.annotate(r"%1.1f < $p_\mathrm{T}^{h}$ < %1.1f GeV/$c$"%(Min_Hadron_pT,Max_Hadron_pT),xy=(0.97, 0.89), xycoords='axes fraction', ha='right', va='top', fontsize=label_size)
+    plt.annotate(r"%1.1f < $p_\mathrm{T}^\mathrm{h}$ < %1.1f GeV/$c$"%(Min_Hadron_pT,Max_Hadron_pT),xy=(0.97, 0.89), xycoords='axes fraction', ha='right', va='top', fontsize=label_size)
     plt.annotate("$\chi^2/\mathrm{ndf}$ = %1.1f/%i, $p$ = %1.2f"%(Chi2*NDF,NDF,Pval), xy=(0.97, 0.97), xycoords='axes fraction', ha='right', va='top', fontsize=label_size)
 
     #RATIO SECOND Y_AXIS
@@ -440,7 +446,8 @@ def Model_Comparisons(Comb_Dict):
     ###LABELS/AXES###                                          
     plt.axhline(y=1, color='k', linestyle='--')
 
-    plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^{\mathrm{h}}/p_\mathrm{T}^\gamma$",fontsize=axis_size-8,x=0.9)
+    #plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^{\mathrm{h}}/p_\mathrm{T}^\gamma$",fontsize=axis_size-8,x=0.9)
+    plt.xlabel(r"varphi = $\varphi$, phi = $\phi$",fontsize = 30)
     plt.ylabel(r"$\frac{\mathrm{p-Pb}}{\mathrm{pp}}$",fontsize=axis_size,y=0.5)
     plt.ylim((-0.0, 2.8))
     plt.xticks(fontsize=20)
@@ -449,13 +456,95 @@ def Model_Comparisons(Comb_Dict):
     plt.tick_params(which='both',direction='in',right=True,bottom=True,top=True,length=10)
     plt.tick_params(which='both',direction='in',top=True,length=5)
 
-    plt.fill_between(QGP_zt,QGP_IpPb_LowAll,QGP_IpPb_HighAll,label="QGP Droplet with Parton Energy Loss",color='orange')
+    plt.fill_between(QGP_zt,QGP_IpPb_LowAll,QGP_IpPb_HighAll,label="QGP Droplet",color='orange')
     plt.plot(CNM_zt,CNM_IpPb,color='red',label="CNM Model")
 
     plt.legend(loc='upper left')
 
     plt.savefig("pics/%s/%s/Model_Comparisons.pdf"%(Shower,description_string), bbox_inches = "tight")
     plt.show()
+
+def Model_Ratio_Comparisons(Comb_Dict):
+
+    label_size=24
+    axis_size=34
+    plot_power = False
+    Colors = ["red","blue"]
+    Markers = ["s","o"]
+    fig = plt.figure(figsize=(8,8))
+    fig.add_axes((0.1,0.3,0.88,0.6))
+#    fig.add_axes((0.1,0.1,0.88,0.2))
+
+    pPb_Combined = Comb_Dict["p-Pb_Combined_FF"]
+    pPb_Combined_Errors = Comb_Dict["p-Pb_Combined_FF_Errors"]
+    pPb_purity_Uncertainty = Comb_Dict["p-Pb_purity_Uncertainty"]
+
+    pp_Combined = Comb_Dict["pp_Combined_FF"]
+    pp_Combined_Errors = Comb_Dict["pp_Combined_FF_Errors"]
+    pp_purity_Uncertainty = Comb_Dict["pp_purity_Uncertainty"]
+
+    Ratio = pPb_Combined/pp_Combined
+    Ratio_Error = np.sqrt((pPb_Combined_Errors/pPb_Combined)**2 + (pp_Combined_Errors/pp_Combined)**2)*Ratio
+    Ratio_Plot = plt.errorbar(zT_centers[:NzT-ZT_OFF_PLOT], Ratio[:NzT-ZT_OFF_PLOT], yerr=Ratio_Error[:NzT-ZT_OFF_PLOT],xerr=zT_widths[:NzT-ZT_OFF_PLOT]*0, fmt='ko',capsize=0, ms=6,lw=1)
+    Ratio_for_Legend = plt.plot(zT_centers[:NzT-ZT_OFF_PLOT], Ratio[:NzT-ZT_OFF_PLOT],'ko',label='Data')
+
+    Purity_Uncertainty = np.sqrt((pp_purity_Uncertainty/pp_Combined)**2 + (pPb_purity_Uncertainty/pPb_Combined)**2)*Ratio
+    Efficiency_Uncertainty = np.ones(len(pPb_Combined))*0.056*math.sqrt(2)*Ratio
+    Eta_Cor_Uncertainty = Eta_Correction_Uncertainty/Comb_Dict["p-Pb_Combined_FF"]*Ratio
+    if (CorrectedP):
+        Ratio_Systematic = np.sqrt(Purity_Uncertainty**2 + Efficiency_Uncertainty**2 + Eta_Cor_Uncertainty**2)
+
+    Sys_Plot = plt.bar(zT_centers[:NzT-ZT_OFF_PLOT], Ratio_Systematic[:NzT-ZT_OFF_PLOT]+Ratio_Systematic[:NzT-ZT_OFF_PLOT],
+            bottom=Ratio[:NzT-ZT_OFF_PLOT]-Ratio_Systematic[:NzT-ZT_OFF_PLOT], width=zT_widths[:NzT-ZT_OFF_PLOT]*2, align='center',color='black',alpha=0.25)
+
+    ### ROOT LINEAR and CONSTANT FITS ###                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+    Ratio_TGraph = TGraphErrors()
+    for izt in range (len(Ratio)-ZT_OFF_PLOT):
+        Ratio_TGraph.SetPoint(izt,zT_centers[izt],Ratio[izt])
+        Ratio_TGraph.SetPointError(izt,0,Ratio_Error[izt])
+
+    Ratio_TGraph.Fit("pol0","S")
+    f = Ratio_TGraph.GetFunction("pol0")
+    chi2_red  = f.GetChisquare()/f.GetNDF()
+    pval = f.GetProb()
+    p0 = f.GetParameter(0)
+    p0e = f.GetParError(0)
+    p0col = "grey"
+    Show_Fits = True
+    if (Show_Fits):
+        sys_const = 0.19 #23% relative from purity + tracking                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+        plt.annotate("$c = {0:.2f} \pm {1:.2f} \pm {2:.2f}$".format(p0,p0e,sys_const), xy=(0.02, 0.15), xycoords='axes fraction', ha='left', va='top', color="black",fontsize=label_size,alpha=.9)
+        plt.annotate(r"$p = %1.2f$"%(pval), xy=(0.02, 0.09), xycoords='axes fraction', ha='left', va='top', color="black",fontsize=label_size,alpha=.9)
+
+        c_error = math.sqrt(p0e**2 + sys_const**2)
+        plt.fill_between(np.arange(0,1.1,0.1), p0+c_error, p0-c_error,color=p0col,alpha=.3)
+
+    ###LABELS/AXES###                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+    plt.axhline(y=1, color='k', linestyle='--')
+
+    plt.xlabel("${z_\mathrm{T}} = p_\mathrm{T}^{\mathrm{h}}/p_\mathrm{T}^\gamma$",fontsize=axis_size-8,x=0.9)
+    #plt.xlabel(r"varphi = $\varphi$, phi = $\phi$",fontsize = 30)
+    plt.ylabel(r"$\frac{\mathrm{p-Pb}}{\mathrm{pp}}$",fontsize=axis_size,y=0.88)
+    plt.ylim((-0.0, 2.8))
+    plt.xticks(fontsize=20)
+    plt.yticks([0.5,1.0,1.5,2.0,2.5],fontsize=20)
+    plt.yticks(np.arange(0,3,0.25),["","","0.5","","1.0","","1.5","","2.0","","2.5"])
+
+
+    #Ratio_Plot.yaxis.set_minor_locator(AutoMinorLocator(1))
+    plt.xlim(0,0.65)
+    plt.tick_params(which='both',direction='in',right=True,bottom=True,top=True,length=10)
+    plt.tick_params(which='both',direction='in',top=True,length=5)
+
+    plt.fill_between(QGP_zt,QGP_IpPb_LowAll,QGP_IpPb_HighAll,label="QGP Droplet",color='orange')
+    plt.plot(CNM_zt,CNM_IpPb,color='red',label="CNM Model",linewidth=2)
+
+    leg = plt.legend(loc='upper right',fontsize=20,frameon=False)
+    leg.set_title("ALICE, $\sqrt{s_{\mathrm{_{NN}}}} = $ 5.02 TeV")
+    plt.setp(leg.get_title(),fontsize=24)
+    plt.savefig("pics/%s/%s/Model_Comparisons_Ratio.pdf"%(Shower,description_string), bbox_inches = "tight")
+    plt.show()
+
 
 def FF_Integral(Comb_Dict):
     for SYS in (Systems):
@@ -742,15 +831,15 @@ def Compare_FF_Integration(ranges,strings):
         #Combined_Frags = Average_FF(Frags)
 
         
-def Compare_Results(data_names,label_names,ratio_errors=True):
+def Compare_Results(data_names,label_names,SYS="p-Pb",ratio_errors=True):
     
-    ITS_Centrals = np.load("npy_files/LO_p-Pb_Averaged_Fragmentation_Functions_%s.npy"%(data_names[0]))
-    ITS_Errors = np.load("npy_files/LO_p-Pb_Averaged_Fragmentation_Functions_Errors_%s.npy"%(data_names[0]))
-    ITS_Sys = np.load("npy_files/LO_p-Pb_Averaged_Fragmentation_Functions_Systematics_%s.npy"%(data_names[0]))
+    ITS_Centrals = np.load("npy_files/LO_%s_Averaged_Fragmentation_Functions_%s.npy"%(SYS,data_names[0]))
+    ITS_Errors = np.load("npy_files/LO_%s_Averaged_Fragmentation_Functions_Errors_%s.npy"%(SYS,data_names[0]))
+    ITS_Sys = np.load("npy_files/LO_%s_Averaged_Fragmentation_Functions_Systematics_%s.npy"%(SYS,data_names[0]))
 
-    TPC_Centrals = np.load("npy_files/LO_p-Pb_Averaged_Fragmentation_Functions_%s.npy"%(data_names[1]))
-    TPC_Errors = np.load("npy_files/LO_p-Pb_Averaged_Fragmentation_Functions_Errors_%s.npy"%(data_names[1]))
-    TPC_Sys = np.load("npy_files/LO_p-Pb_Averaged_Fragmentation_Functions_Systematics_%s.npy"%(data_names[1]))
+    TPC_Centrals = np.load("npy_files/LO_%s_Averaged_Fragmentation_Functions_%s.npy"%(SYS,data_names[1]))
+    TPC_Errors = np.load("npy_files/LO_%s_Averaged_Fragmentation_Functions_Errors_%s.npy"%(SYS,data_names[1]))
+    TPC_Sys = np.load("npy_files/LO_%s_Averaged_Fragmentation_Functions_Systematics_%s.npy"%(SYS,data_names[1]))
 
     ITS_Rel_Erorr = ITS_Errors/ITS_Centrals
     TPC_Rel_Erorr = TPC_Errors/TPC_Centrals
@@ -761,13 +850,13 @@ def Compare_Results(data_names,label_names,ratio_errors=True):
 
     fig.add_axes((0.1,0.3,0.88,0.6))
 
-    plt.errorbar(zT_centers, ITS_Centrals,xerr=zT_widths,yerr=ITS_Errors,linewidth=1, fmt='o',color="blue",capsize=1,label=r"$%s$"%(label_names[0]))
+    plt.errorbar(zT_centers, ITS_Centrals,xerr=zT_widths,yerr=ITS_Errors,linewidth=1, fmt='o',color="blue",capsize=1,label=r"$%s~(%s)$"%(label_names[0],SYS))
     ITS_Eff = 0.056*ITS_Centrals
     ITS_Full_Sys = np.sqrt(ITS_Eff**2 + ITS_Sys**2)
     Sys_Plot_ITS = plt.bar(zT_centers, ITS_Full_Sys+ITS_Full_Sys,
     bottom=ITS_Centrals-ITS_Full_Sys,width=zT_widths, align='center',color="blue",alpha=0.3)
 
-    plt.errorbar(zT_centers, TPC_Centrals,xerr=zT_widths,yerr=TPC_Errors,linewidth=1, fmt='o',color="red",capsize=1,label=r"$%s$"%(label_names[1]))
+    plt.errorbar(zT_centers, TPC_Centrals,xerr=zT_widths,yerr=TPC_Errors,linewidth=1, fmt='o',color="red",capsize=1,label=r"$%s~(%s)$"%(label_names[1],SYS))
     TPC_Eff = 0.056*TPC_Centrals
     TPC_Full_Sys = np.sqrt(TPC_Eff**2 + TPC_Sys**2)
     Sys_Plot_TPC = plt.bar(zT_centers, TPC_Full_Sys+TPC_Full_Sys,
