@@ -1,0 +1,291 @@
+dependent_variables:
+- header:
+    name: p$-$Pb conditional yield of associated hadrons
+  values:
+  - errors:
+    - label: p-Pb Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - &id001 !!python/object/apply:numpy.dtype
+        args:
+        - f8
+        - false
+        - true
+        state: !!python/tuple
+        - 3
+        - <
+        - null
+        - null
+        - null
+        - -1
+        - -1
+        - 0
+      - !!binary |
+        E/JBz2bV9D8=
+    - label: p-Pb Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        eAskKH6M/j8=
+    value: 10.15
+  - errors:
+    - label: p-Pb Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        0T/BxYoa7z8=
+    - label: p-Pb Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        XwfOGVHa8z8=
+    value: 7.5766
+  - errors:
+    - label: p-Pb Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        4zYawFsg3T8=
+    - label: p-Pb Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        UvLqHAOy6T8=
+    value: 3.5475
+  - errors:
+    - label: p-Pb Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        ZFjFG5lH1j8=
+    - label: p-Pb Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        iQeUTbnC3T8=
+    value: 2.7136
+  - errors:
+    - label: p-Pb Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        djdPdcjNxD8=
+    - label: p-Pb Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        oBov3SQG0T8=
+    value: 1.2669
+  - errors:
+    - label: p-Pb Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        RKhSswdasT8=
+    - label: p-Pb Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        JvxSP28qwj8=
+    value: 0.52835
+  - errors:
+    - label: p-Pb Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        cTs0LEZdmz8=
+    - label: p-Pb Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        kunQ6Xk3sj8=
+    value: 0.20831
+  - errors:
+    - label: p-Pb Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        omDGFKxxhj8=
+    - label: p-Pb Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        iGaeXFMgoz8=
+    value: 0.085425
+- header:
+    name: pp conditional yield of associated hadrons
+  values:
+  - errors:
+    - label: pp Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        YhBYObTI9j8=
+    - label: pp Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        ufyH9NvXAUA=
+    value: 7.496
+  - errors:
+    - label: pp Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        X5hMFYxK9z8=
+    - label: pp Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        ylTBqKRO9z8=
+    value: 7.6627
+  - errors:
+    - label: pp Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        8piByvj35z8=
+    - label: pp Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        yF7v/niv7j8=
+    value: 3.9429
+  - errors:
+    - label: pp Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        5fIf0m9f0T8=
+    - label: pp Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        3lSkwthC4j8=
+    value: 1.4289
+  - errors:
+    - label: pp Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        iQyreCPz0j8=
+    - label: pp Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        v2VOl8XE1j8=
+    value: 1.5586
+  - errors:
+    - label: pp Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        1Jy8yAT8tj8=
+    - label: pp Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        OpLLf0i/yT8=
+    value: 0.47262
+  - errors:
+    - label: pp Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        7Q2+MJkqtD8=
+    - label: pp Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        DHbDtkWZvT8=
+    value: 0.41467
+  - errors:
+    - label: pp Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        MXpuoSsRmD8=
+    - label: pp Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        qB3+mqxRrz8=
+    value: 0.12372
+- header:
+    name: PYTHIA conditional yield of associated hadrons
+  values:
+  - errors:
+    - label: PYTHIA Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        dv2C3bBt6D8=
+    value: 5.4832
+  - errors:
+    - label: PYTHIA Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        Bd1e0hit4D8=
+    value: 4.3974
+  - errors:
+    - label: PYTHIA Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        Qj7o2az61j8=
+    value: 3.1047
+  - errors:
+    - label: PYTHIA Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        FXR7SWO0zj8=
+    value: 1.7956
+  - errors:
+    - label: PYTHIA Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        tTLhl/p5wz8=
+    value: 1.0742
+  - errors:
+    - label: PYTHIA Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        ToBh+fNtuT8=
+    value: 0.64415
+  - errors:
+    - label: PYTHIA Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        eouH9xxYrj8=
+    value: 0.28648
+  - errors:
+    - label: PYTHIA Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        SZ9W0R+aoT8=
+    value: 0.14212
+independent_variables:
+- header:
+    name: $z_\mathrm{T}$
+  values:
+  - high: 0.08
+    low: 0.06
+  - high: 0.107
+    low: 0.08
+  - high: 0.142
+    low: 0.107
+  - high: 0.19
+    low: 0.142
+  - high: 0.253
+    low: 0.19
+  - high: 0.337
+    low: 0.253
+  - high: 0.45
+    low: 0.337
+  - high: 0.6
+    low: 0.45

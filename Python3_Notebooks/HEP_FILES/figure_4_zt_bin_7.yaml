@@ -1,0 +1,329 @@
+dependent_variables:
+- header:
+    name: p$-$Pb Isolated photon hadron correlations
+  values:
+  - errors:
+    - label: p-Pb Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - &id001 !!python/object/apply:numpy.dtype
+        args:
+        - f8
+        - false
+        - true
+        state: !!python/tuple
+        - 3
+        - <
+        - null
+        - null
+        - null
+        - -1
+        - -1
+        - 0
+      - !!binary |
+        zlvQ1hx7YT8=
+    - label: p-Pb Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        I7ZVt9xTwD4=
+    - label: p-Pb Underlying Event Uncertainty
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        OJDkqJK3Uj8=
+    value: 1.487e-05
+  - errors:
+    - label: p-Pb Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        8u+O545ZYT8=
+    - label: p-Pb Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        ybVX1YFiOj8=
+    - label: p-Pb Underlying Event Uncertainty
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        OJDkqJK3Uj8=
+    value: 0.0030757
+  - errors:
+    - label: p-Pb Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        qO0VzE71Wj8=
+    - label: p-Pb Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        v0sEBTmDOr8=
+    - label: p-Pb Underlying Event Uncertainty
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        OJDkqJK3Uj8=
+    value: -0.0030905
+  - errors:
+    - label: p-Pb Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        1wl5TsRsYz8=
+    - label: p-Pb Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        0lOi9J4tRD8=
+    - label: p-Pb Underlying Event Uncertainty
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        OJDkqJK3Uj8=
+    value: 0.0047043
+  - errors:
+    - label: p-Pb Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        /co5Z/rbZD8=
+    - label: p-Pb Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        LEtTiHBhN78=
+    - label: p-Pb Underlying Event Uncertainty
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        OJDkqJK3Uj8=
+    value: -0.0027255
+  - errors:
+    - label: p-Pb Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        rIoV2t4TcD8=
+    - label: p-Pb Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        aV8vA4TFVz8=
+    - label: p-Pb Underlying Event Uncertainty
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        OJDkqJK3Uj8=
+    value: 0.011084
+  - errors:
+    - label: p-Pb Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        qe9GMB9adT8=
+    - label: p-Pb Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        hWaNMPsrWj8=
+    - label: p-Pb Underlying Event Uncertainty
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        OJDkqJK3Uj8=
+    value: 0.012204
+- header:
+    name: pp Isolated photon hadron correlations
+  values:
+  - errors:
+    - label: pp Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        ssUkEjsJaz8=
+    - label: pp Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        8sHf7Ul5QD8=
+    - label: pp Underlying Event Uncertainty
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        Nq0UArnEYT8=
+    value: 0.0026465
+  - errors:
+    - label: pp Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        gvgKHBpgcD8=
+    - label: pp Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        u9ZabwZFRD8=
+    - label: pp Underlying Event Uncertainty
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        Nq0UArnEYT8=
+    value: 0.0032562
+  - errors:
+    - label: pp Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        eqpDboYbcD8=
+    - label: pp Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        JmoOtRJfUr8=
+    - label: pp Underlying Event Uncertainty
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        Nq0UArnEYT8=
+    value: -0.0059027
+  - errors:
+    - label: pp Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        ACCCBYsecz8=
+    - label: pp Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        xyy9LqriKT8=
+    - label: pp Underlying Event Uncertainty
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        Nq0UArnEYT8=
+    value: 0.0010396
+  - errors:
+    - label: pp Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        SJ3Ks9zjdj8=
+    - label: pp Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        2OLoZIjnRT8=
+    - label: pp Underlying Event Uncertainty
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        Nq0UArnEYT8=
+    value: 0.0035188
+  - errors:
+    - label: pp Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        Ot4uRQPCeD8=
+    - label: pp Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        8XnNxNdLIT8=
+    - label: pp Underlying Event Uncertainty
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        Nq0UArnEYT8=
+    value: 0.00069462
+  - errors:
+    - label: pp Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        djFyuzxCgj8=
+    - label: pp Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        5feRtkzhbD8=
+    - label: pp Underlying Event Uncertainty
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        Nq0UArnEYT8=
+    value: 0.018558
+- header:
+    name: PYTHIA Isolated photon hadron correlations
+  values:
+  - errors:
+    - label: pythia Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        PRsD/GTWXD8=
+    value: 0.0013551
+  - errors:
+    - label: pythia Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        AIKDBxc8Vj8=
+    value: -0.0011096
+  - errors:
+    - label: pythia Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        JezbSUT4Vz8=
+    value: -0.00095751
+  - errors:
+    - label: pythia Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        bRkV3R+UXD8=
+    value: 0.0014076
+  - errors:
+    - label: pythia Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        ORMuP8tOWj8=
+    value: 0.00088256
+  - errors:
+    - label: pythia Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        kdz1Lc5zXz8=
+    value: 0.006426
+  - errors:
+    - label: pythia Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        LNih9UsfZT8=
+    value: 0.021318
+independent_variables:
+- header:
+    name: $|\Delta \varphi|$
+    units: Radians
+  values:
+  - high: 0.7854
+    low: 0.3927
+  - high: 1.1781
+    low: 0.7854
+  - high: 1.5708
+    low: 1.1781
+  - high: 1.9635
+    low: 1.5708
+  - high: 2.3562
+    low: 1.9635
+  - high: 2.7489
+    low: 2.3562
+  - high: 3.1416
+    low: 2.7489

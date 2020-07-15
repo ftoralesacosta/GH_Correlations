@@ -1,0 +1,133 @@
+dependent_variables:
+- header:
+    name: Ratio conditional yield of associated hadrons in pp and p$-$Pb
+  values:
+  - errors:
+    - label: Ratio Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - &id001 !!python/object/apply:numpy.dtype
+        args:
+        - f8
+        - false
+        - true
+        state: !!python/tuple
+        - 3
+        - <
+        - null
+        - null
+        - null
+        - -1
+        - -1
+        - 0
+      - !!binary |
+        xcn9DkWB3j8=
+    - label: Ratio Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        c4Bgjh6/0z8=
+    value: 1.354
+  - errors:
+    - label: Ratio Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        4JwRpb3Bzz8=
+    - label: Ratio Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        gT6RJ0nXzD8=
+    value: 0.98876
+  - errors:
+    - label: Ratio Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        U7MHWoEh0z8=
+    - label: Ratio Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        U5EKYwtByj8=
+    value: 0.89971
+  - errors:
+    - label: Ratio Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        Rl9BmrFo6j8=
+    - label: Ratio Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        8zy4O2u32z8=
+    value: 1.899
+  - errors:
+    - label: Ratio Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        UYNpGD4i0D8=
+    - label: Ratio Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        B+v/HObLxz8=
+    value: 0.81284
+  - errors:
+    - label: Ratio Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        xuHMr+YA4j8=
+    - label: Ratio Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        EY3uIHam0D8=
+    value: 1.1179
+  - errors:
+    - label: Ratio Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        tVTejnBazD8=
+    - label: Ratio Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        ybCKNzKPwD8=
+    value: 0.50234
+  - errors:
+    - label: Ratio Statistical
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        Jcy0/Ssr3T8=
+    - label: Ratio Systematic
+      symerror: !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        wFsgQfFj0D8=
+    value: 0.69048
+independent_variables:
+- header:
+    name: $z_\mathrm{T}$
+  values:
+  - high: 0.08
+    low: 0.06
+  - high: 0.107
+    low: 0.08
+  - high: 0.142
+    low: 0.107
+  - high: 0.19
+    low: 0.142
+  - high: 0.253
+    low: 0.19
+  - high: 0.337
+    low: 0.253
+  - high: 0.45
+    low: 0.337
+  - high: 0.6
+    low: 0.45
